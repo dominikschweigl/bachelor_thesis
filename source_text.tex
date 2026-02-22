@@ -1,7 +1,7 @@
 \documentclass[12pt,oneside,bibtotoc,liststotoc]{scrbook}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
-\usepackage[english]{babel}
+\usepackage[ngerman,german]{babel}
 \usepackage{a4wide}
 \usepackage{parskip}
 \usepackage[bookmarks]{hyperref}
@@ -321,79 +321,122 @@ autonomous perception are compared.
 
 % TODO: Images for each modality, showing example detections and challenges
 
-\paragraph{Visible-band Imaging}
+\paragraph{RGB Imaging}
 
-Optical remote sensing is the oldest remote sensing method, 
-originating with the invention of photography. 
-RGB cameras are passive sensors that function analogously 
-to the human eye, capturing reflected ambient light to form 
-a 2D image of the scene. They measure reflected solar 
-electromagnetic energy in the spectral range of approximately 
-0.4~$\mu$m to 1~mm.
-The incoming energy reflected from the earth's surface is directed 
-through an aperture, which controls the amount of light entering 
-the sensor. The light then passes through a lens that focuses it onto the image 
-sensor, where a color filter array separates incoming light into red, green, and blue 
-spectral components, each recorded by the corresponding photodetectors. 
-% TODO: Add image showing the optical path and sensor array
-% TODO: Add image of electromagnetic spectrum, showing the visible range and 
-%       other modalities, image of passive verus active sensing, image of 
-%       the sensor array with RGB filters and photodetectors (Page 34 in
-%       Computer Vision: Algorithms and Applications by Richard Szeliski
-%       https://library.huree.edu.mn/data/202295/2024-06-03/Computer%20Vision%20-%20Algorithms%20and%20Applications%202nd%20Edition,%20Richard%20Szeliski.pdf)
-% TODO: Find source textbook for the part with aperture lens and photodetectors
-%       for the sentence above
-% TODO: Replace spectral range to 400nm-700nm as this includes NIR and UV
-Each spectral component is recorded 
-independently by the sensor array, producing a two-dimensional array of 
-rows and columns of pixels, where each pixel contains a digital 
-number representing the spectral reflectance of the corresponding 
-surface area within a particular spectral band.
-Because they rely entirely on reflected ambient light, they are 
-passive sensors and can only collect data during daytime.
-The detection range is primarily governed by the optical properties 
-of the camera: the focal length, which determines angular resolution, 
-the aperture size, which controls the amount of light entering the sensor, 
-and the sensitivity of the image sensor. 
-\cite{wu2025comparativeAnalysisLiDARRadarCamera}.
+Optical remote sensing is the oldest method of remote sensing.
+It was started with the invention of photography. 
 \cite{agrawal2019comparativeRemoteSensing}
 
-RGB cameras provide very high spatial resolution, typically 
-exceeding millions of pixels per frame, and capture rich semantic 
-information including color, texture, shape, and fine-grained 
-patterns.
-\cite{wu2025comparativeAnalysisLiDARRadarCamera}
-This makes them uniquely capable of tasks such as 
-reading road signs, identifying lane markings, and recognizing 
-traffic states -- capabilities that are fundamentally inaccessible 
-to geometric sensors. 
-Their low cost, small form factor, and low energy consumption
-have made them a widely adopted sensing modality in autonomous
-traffic applications, and the 
-rapid development of deep learning 
-and convolutional neural networks has further unlocked their 
-potential for scene understanding and object classification. 
+RGB cameras provide high spatial resolution and rich texture
+information, making them well suited for modern deep learning-
+based object detection methods. They enable detailed scene
+understanding and fine-grained classification. However, RGB
+imaging strongly depends on ambient illumination and may
+degrade significantly in low-light or night-time conditions.
+
+The camera is a passive sensor that functions analogously
+to the human eye, capturing reflected ambient light to form
+a 2D image of the world. Its ubiquity, low cost, and high
+resolution have made it an indispensable component of
+transportation systems. While other sensors provide
+geometric or motion data, the camera's unique strength lies
+in its ability to deliver rich semantic and textural
+information. It can distinguish colors, read text, and
+recognize intricate patterns, allowing it to perform tasks that
+are impossible for LiDAR or Radar, such as identifying
+traffic light states, reading road signs, and detecting lane
+markings [27]. The rapid advancement of deep learning and
+convolutional neural networks has further unlocked the
+camera's potential, enabling sophisticated scene
+understanding and object classification from image data
+alone.
 \cite{soltanirad2025autonomousTransportationPerception}
+
+In optical imaging, electromagnetic energy of the sun which is
+reflected by the earth is received and measured. Its
+electromagnetic spectrum range is from 0.4~$\mu$m to 1~mm. It is a
+passive remote sensing technique. Hence it collects data only in
+daytime. The incoming energy from earth is separated into
+several spectral components that are sensed independently. The
+light wave is directed from the grating through a prism that split
+the energy into different wavelengths like UV, visible and near
+infra-red. Multispectral image is a two dimensional (2D) array
+of columns and rows of pixels. Each pixel contains digital
+number that gives spectral reflection from the object of
+particular band. Depending upon the number of bands it can be
+multispectral or hyperspectral.
+\cite{agrawal2019comparativeRemoteSensing}
+
+
+
+On the other hand, data fusion techniques aim to synthesize the
+information from different types of data (RGB, IR, LiDAR, radar) for
+the same scene to increase their suitability for further image processing.
+For instance, IR images can better reflect areas with high-temperature
+contrast without being affected by dazzling light. In contrast, visible 
+images can provide better details of the scene. Thus, fusing the two types
+of images can combine the information and strengthen the performance
+of the detection. Depending on the level of abstraction, the methods can
+be applied to raw pixel data (low-level data fusion), extracted feature
+data (medium-level data fusion), and/or combined classification data
+from multiple sensors (decision-level data fusion).
 \cite{bustos2023reviewObjectDetectionIR}
 
-However, RGB cameras do not directly measure depth or metric distance. 
-Such information must be inferred through stereo vision or 
-learning-based estimation, making metric accuracy sensitive to 
-scene conditions. 
-Performance degrades significantly under low illumination, glare, 
-backlighting, and adverse weather conditions such as rain or snow. 
-While high dynamic range (HDR) sensors partially mitigate illumination 
-challenges, they remain vulnerable to rapid lighting changes and 
-lens contamination from dirt or moisture.
-Under favorable daylight conditions, detection range can extend 
-to several hundred metres, but this drops substantially in poor 
-visibility. Typical 
-frame rates of 30--60~Hz or above provide a smooth visual stream 
-suitable for real-time processing.
+Detecting objects in RGB and IR images pose different types of challenges. 
+Fig. 2 shows an example of key differences in object detection
+on RGB and thermal images. For RGB images, lighting variations, color
+confusion, and occlusions can make it difficult to accurately detect
+objects. In contrast, IR images lack visual details, have a lower spatial
+resolution, and are susceptible to environmental interference. Thus,
+approaches that effectively combine and utilize the information from
+different image modalities (i.e., fused RGB and thermal image) have the
+potential to improve object detection. Understanding these challenges
+and the methods that have been presented is crucial for developing
+more effective object detection systems that leverage the strengths
+of multiple imaging modalities while also considering their inherent
+limitations.
+\cite{bustos2023reviewObjectDetectionIR}
+
+Cameras are cheap and small, but do not provide depth perception
+capability and suffer from insufficient illumination or occlusions.
+The camera's spatial resolution is naturally very high, in most cases higher
+than millions of pixels per frame. Therefore, they can capture many semantic elements like color,
+texture, and shape in a rich scene. However, the metric accuracy from cameras is inferred rather than
+directly measured by stereovision or deep-learning-based depth estimation methods. Therefore, it is
+affected easily by illumination changes or poses (e., occlusions) or other environments (e., rain or
+snow) [10].
+Typically, a camera operates at more than 30 Hz - 60Hz or above for a smooth
+visual stream similar to what humans see. Still, the actual performance greatly depends on the speed
+of image processing.
 \cite{wu2025comparativeAnalysisLiDARRadarCamera}
-\cite{bustos2023reviewObjectDetectionIR}
 
+One of the major distinguishing characteristics among these sensors is the mental robustness. The
+effective range of Lidar sensors can be drastically reduced due to poor weather conditions such as
+rain, fog, and smoke [3], with lower reflectivity surfaces decreasing the laser pulses to only about
+33\% [3], which originate from the scattering and absorption of the laser pulses by the suspended
+particles. Radar has almost no such issue because the atmospheric particles hardly hinder its longer
+wavelength and are still able to function effectively even in heavy rain or dense fog conditions [4];
+therefore, it can not only significantly improve the safety for cars during nighttime driving but also
+replace LiDAR in all-weather perception systems. Compared with cameras, in low light, glare or
+back-light conditions, the perceived information of a camera could become very bad. Even though
+high dynamic range HDR sensors could solve this problem to some extent, they would be
+significantly affected when there was a fast change in lighting. The reason was that the lens of these
+high dynamic range sensors was sensitive to certain types of pollution, such as dirt and raindrops.
+\cite{wu2025comparativeAnalysisLiDARRadarCamera}
 
+Detection Range
+The camera range is
+controlled mainly by its optical properties: the focal length (angular resolution), the aperture of the
+lens (allowing more/less light through) and the sensor's sensitivity. Under ideal daylight conditions,
+a camera may detect objects over several hundred metres and resolve information such as road lines
+or traffic signs. However, this depends heavily on lighting and visibility. When exposed to adverse
+weather or poor lighting, these cameras are no longer helpful in a safety context.
+\cite{wu2025comparativeAnalysisLiDARRadarCamera}
+
+Refresh rate and latency
+Typically, a camera operates at more than 30 Hz - 60Hz or above for a smooth
+visual stream similar to what humans see.
+\cite{wu2025comparativeAnalysisLiDARRadarCamera}
 
 \paragraph{Thermal Imaging (LWIR)}
 
@@ -468,31 +511,52 @@ Table~\ref{tab:modality_comparison} summarizes the main
 advantages and disadvantages of the evaluated sensing
 modalities for UAV-based vehicle detection.
 
-\begin{table}[h]
-    \centering
-    \caption{Key properties of sensing modalities for UAV-based vehicle detection.}
-    \label{tab:modality_comparison}
-    \begin{tabular}{lc}
-        \toprule
-        \textbf{Property} & \textbf{Visible-band Imaging} \\
-        \midrule
-        Sensing principle          & Passive; reflected ambient light \\
-        Electromagnetic range      & 0.4~$\mu$m -- 0.7~$\mu$m \\
-        Spatial resolution         & Very high (megapixels) \\
-        Semantic richness          & Very high  \\
-        Depth / metric output      & Indirect (inferred) \\
-        Low-light                  & Poor \\
-        Weather robustness         & Low \\
-        Detection range            & Up to several hundred metres \\
-        Typical frame rate         & 30--60~Hz \\
-        Weight                     & Low \\
-        Power consumption          & Low \\
-        Form factor                & Compact \\
-        Cost                       & Low \\
-        Maturity                   & Very high \\
-        \bottomrule
-    \end{tabular}
-\end{table}
+
+\begin{table*}[t]
+\centering
+\caption{Comparison of sensing modalities for UAV-based vehicle detection}
+\label{tab:modality_comparison}
+
+\begin{tabularx}{\textwidth}{l X X}
+\hline
+\textbf{Modality} & \textbf{Advantages} & \textbf{Disadvantages} \\
+\hline
+RGB & High spatial resolution; rich texture and color information; mature detection algorithms &
+Strong dependence on illumination; reduced night-time performance \\
+
+LWIR & Illumination-independent; strong thermal contrast of vehicles; suitable for night-time operation &
+Lower spatial resolution; reduced contrast in thermally homogeneous scenes \\
+
+LiDAR & Accurate 3D geometry; lighting invariant; precise distance measurement &
+High system complexity; increased payload and cost; sparse data at higher altitudes \\
+
+Radar & Weather robust; direct velocity measurement; long detection range &
+Low spatial resolution; limited classification capability \\
+\hline
+\end{tabularx}
+\end{table*}
+
+\begin{table*}[t]
+\centering
+\caption{Qualitative comparison of sensing modalities for UAV-based vehicle detection}
+\label{tab:modality_comparison}
+
+\begin{tabular}{l c c c c c}
+\toprule
+\textbf{Modality} 
+& \textbf{High Resolution} 
+& \textbf{Illumination Independent} 
+& \textbf{3D Geometry} 
+& \textbf{Weather Robust} 
+& \textbf{Velocity} \\
+\midrule
+RGB    & \cmark &  &  &  &  \\
+LWIR   &        & \cmark &  &  &  \\
+LiDAR  &        & \cmark & \cmark &  &  \\
+Radar  &        & \cmark &  & \cmark & \cmark \\
+\bottomrule
+\end{tabular}
+\end{table*}
 
 
 \subsection{Modality Selection}
