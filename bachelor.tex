@@ -13,6 +13,7 @@
 \usepackage{tabularx}
 \usepackage{booktabs}
 \usepackage{pifont}
+\usepackage{siunitx}
 
 \newcommand{\cmark}{\ding{51}}
 
@@ -309,7 +310,135 @@ hardware \textit{Workswell WIRIS Enterprise} is described,
 including its specifications and the rationale for its selection.
 
 
-\subsection{Modality Comparison}
+\subsection{Remote Sensing}
+
+
+Remote sensing in the context of UAV-based vehicle detection is 
+the acquisition of information about the Earth's surface and objects on it
+without making physical contact. The remotely collected data can
+be of many different types, yet the primary sensing approach in
+autonomous systems and object detection applications is 
+based on the detection of electromagnetic radiation.
+\cite[p.~1]{lillesand2015remoteSensing}
+
+Figure~\ref{fig:electromagnetic_remote_sensing} illustrates 
+the elements involved in electromagnetic remote sensing of earth 
+resources in airborne systems.  The elements of the data 
+acquisition process are energy sources (a), propagation of energy 
+through the atmosphere (b), energy interactions with earth surface 
+features (c), retransmission of energy through the atmosphere (d), 
+and sensors (e), which results in the generation 
+of sensor data in pictorial form. 
+\cite[p.~2]{lillesand2015remoteSensing} 
+Note that passive systems rely on external sources of energy, such 
+as reflected sunlight as in photography, or heat emitted by objects 
+themselves as in thermal imaging, while active systems such as 
+radar and LiDAR transmit their own energy and record the return signal 
+\cite[p.~9,45]{lillesand2015remoteSensing}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/electromagnetic_remote_sensing_modified.png}
+    \caption{
+        Schematic representation of the generalized processes and elements involved in
+        electromagnetic remote sensing. Modified after 
+        \cite[p.~16]{lillesand2015remoteSensing}
+    }
+    \label{fig:electromagnetic_remote_sensing}
+\end{figure}
+
+Electromagnetic energy encompasses a broad range of radiation, all 
+propagating as sinusoidal waves at the constant speed of light 
+$c = 3 \times 10^8$~m/s. Each form of radiation is characterized by 
+its wavelength $\lambda$, the distance between successive wave peaks,
+ and frequency $f$, the number of wave cycles per second, 
+which are inversely related through
+\begin{equation}
+    c = \lambda f.
+\end{equation}
+In remote sensing, radiation is typically categorized by wavelength, 
+with the micrometer \si{\micro\meter} being the most common unit. 
+The resulting electromagnetic spectrum and its named divisions, as 
+shown in Figure~\ref{fig:electromagnetic_spectrum}, are organized 
+largely by convenience rather than any inherent differences in energy 
+characteristics --- the divisions have grown from the different methods 
+developed for sensing each type of radiation rather than from 
+clear-cut physical boundaries \cite[pp.~4]{lillesand2015remoteSensing}.
+
+
+The spectral sensitivity of the human eye spans only the narrow visible 
+portion of the spectrum, from approximately \SI{0.4}{\micro\meter} to 
+\SI{0.7}{\micro\meter}, divided into blue (0.4--0.5), green (0.5--0.6), 
+and red (0.6--0.7). Ultraviolet 
+(UV) energy adjoins the blue end of the visible range. Beyond the red 
+end lies the infrared (IR) region, subdivided into near-IR 
+(0.7--\SI{1.3}{\micro\meter}), mid-IR or shortwave IR 
+(1.3--\SI{3}{\micro\meter}), and thermal or longwave IR 
+(3--\SI{14}{\micro\meter}), where only the longwave portion is directly 
+related to heat sensation, giving it's name. 
+At much longer wavelengths, from \SI{1}{\milli\meter} to \SI{1}{\meter}, 
+lies the microwave region. Most remote sensing systems operate in one 
+or several of these regions: optical cameras in the visible, LiDAR 
+typically at \SI{1.064}{\micro\meter} in the near-IR 
+to avoid interference with 
+the atmosphere and other sensors, thermal sensors in the thermal IR, 
+and radar in the microwave region.
+\cite[pp.~6, 386, 481]{lillesand2015remoteSensing}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/electromagnetic_spectrum.png}
+    \caption{
+        The electromagnetic spectrum. The visible spectrum is 
+        highlighted, and the ranges of other relevant 
+        modalities (thermal, LiDAR, radar) are indicated.
+        \cite[p.~5]{lillesand2015remoteSensing}
+    }
+    \label{fig:electromagnetic_spectrum}
+\end{figure}
+
+Different regions of the spectrum interact with matter in fundamentally 
+different ways, which determines their utility for remote sensing.
+Also, higher energy levels (shorter wavelengths) are easier to detect and provide more detailed information about the environment,
+(needs verification somewhere)
+The atmosphere does not 
+transmit all wavelengths equally --- certain ranges, known as 
+atmospheric windows, exhibit high transmittance and are therefore 
+the practical basis for most remote sensing systems 
+\cite[p.~7]{lillesand2015remoteSensing}. Different sensing modalities 
+exploit these windows: optical cameras capture reflected sunlight in 
+the visible range, thermal sensors detect emitted heat radiation in 
+the infrared, LiDAR operates in the near-infrared, and radar 
+penetrates clouds and operates independently of solar illumination 
+in the microwave region, each with distinct properties 
+relevant to vehicle detection.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/electromagnetic_absorption.png}
+    \caption{
+        Spectral characteristics of (a) energy sources, 
+        (b) atmospheric transmittance,
+        \cite[p.~5]{lillesand2015remoteSensing}
+    }
+    \label{fig:electromagnetic_absorption}
+\end{figure}
+
+
+An ideal sensor would be highly sensitive to all wavelengths, yielding 
+spatially detailed radiance data across the entire electromagnetic
+spectrum and wide areas on the ground. This ideal sensor would be
+simple and reliable, require virtually no power or space, and be accurate 
+and economical to
+operate. Unsurprisingly, no such ideal sensor exists. No 
+single sensor is sensitive to all wavelengths or
+energy levels. All real sensors have fixed limits of spatial, spectral, 
+radiometric and temporal resolution.
+\cite[p.~46]{lillesand2015remoteSensing}
+Therefore, the
+available electromagnetic remote sensing modalities are evaluated against 
+the specific requirements of UAV-based vehicle detection to identify the 
+most suitable option.
 
 Understanding the strengths and weaknesses of different sensing 
 modalities is crucial for selecting the appropriate sensors for 
@@ -327,7 +456,8 @@ Optical remote sensing is the oldest remote sensing method,
 originating with the invention of photography. 
 RGB cameras are passive sensors that function analogously 
 to the human eye, capturing reflected ambient light to form 
-a 2D image of the scene. They measure reflected solar 
+a 2D image of the scene and belong to the electro-optical (EO) category. 
+They measure reflected solar 
 electromagnetic energy in the spectral range of approximately 
 0.4~$\mu$m to 1~mm.
 The incoming energy reflected from the earth's surface is directed 
@@ -344,6 +474,8 @@ spectral components, each recorded by the corresponding photodetectors.
 % TODO: Find source textbook for the part with aperture lens and photodetectors
 %       for the sentence above
 % TODO: Replace spectral range to 400nm-700nm as this includes NIR and UV
+% TODO: Add Image showcasing RGB images in different lighting conditions, 
+%       weather conditions, and times of day
 Each spectral component is recorded 
 independently by the sensor array, producing a two-dimensional array of 
 rows and columns of pixels, where each pixel contains a digital 
@@ -398,6 +530,18 @@ suitable for real-time processing.
 \paragraph{Thermal Imaging (LWIR)}
 
 Thermal imaging in the long-wave infrared (LWIR) spectrum
+is very similar to RGB imaging in terms of the underlying sensing principle,
+as it is also a passive modality that relies on the detection 
+of electromagnetic radiation. However, while RGB cameras 
+capture reflected light in the visible spectrum, LWIR imaging
+captures emitted radiation in the wavelength range of approximately
+8~$\mu$m to 14~$\mu$m, which corresponds to the thermal radiation 
+emitted by objects at typical Earth surface temperatures.
+
+% TODO: show thermal images in different lighting conditions, 
+%       weather conditions, and times of day
+
+Thermal imaging in the long-wave infrared (LWIR) spectrum
 captures emitted radiation rather than reflected light. This
 enables reliable detection of vehicles independent of visible
 illumination and makes the modality particularly suitable for
@@ -407,14 +551,109 @@ segmentation tasks. Limitations include lower spatial resolution
 compared to RGB sensors and reduced performance in scenarios
 with minimal temperature differences.
 
+The thermal sensor has the advantage
+of having less an effect on illumination changes, as it captures 
+emitted radiation rather than reflected light.
  One of
 the main challenges when handling a thermal sensor is the
 temporal change of the thermal contrast ratio according to the
 amount of heating energy. 
+\cite{choi2018kaist}
 
-KAIST Multi-Spectral Day/Night Data Set for Autonomous 
-and Assisted Driving
+In contrast to RGB cameras, IR images lack visual details, have a lower spatial
+resolution, and are susceptible to environmental interference,
+\cite{bustos2023reviewObjectDetectionIR}
 
+In this work, the term “uncontrolled environment” is
+employed to refer to outdoor scenes where illumination
+and temperature changes occur frequently, and where
+various atmospheric conditions can be observed. Specific
+environmental condition will not bear an equivalent
+impact on thermal and visible imaging because the
+properties of radiation propagation in the atmosphere vary
+greatly with wavelength range.
+\cite{stlaurent2007combinationColorThermal}
+
+ It is worth to mention that the LWIR spectral range
+(8-12 µm) is more suitable than the MWIR range (3-5
+µm) for video monitoring of human activity. The main
+reason is that emitted radiation from objects at ambient
+temperature (300 K) peaks in this long-wavelength range
+[10]. More precisely, a human body, at 37°C, have a
+dominant wavelength of 9.3 µm.
+\cite{stlaurent2007combinationColorThermal}
+
+Obviously, visible cameras are more sensitive than LWIR
+ones to illumination changes. However, since the sunlight
+warms up exposed surfaces, long-term illumination
+changes also affect thermal images. And sunlight does
+not equally warm up all objects of the scene. Those with
+high thermal inertia, like water, trees and people, will
+present little changes comparatively to cars or building,
+which have low thermal inertia. Moreover, dark surfaces
+with low reflective properties, as asphalt, will be more
+strongly affected by sun’s rays than brighter objects. It is
+why a scene observed at 4PM and 4AM appears so
+differently. In the first case, asphalt and other inanimate
+objects have been heated all day long and appear warmer
+than people.
+\cite{stlaurent2007combinationColorThermal}
+
+A first factor that has significant impact on contrast of
+thermal images is the wind, which accelerates warm
+objects cool down. Hence, the background will tend to
+have a more uniform temperature and less contrast during
+strong wind days. This is demonstrated by comparing
+images of top and middle rows of figure 1.
+Fig. 1: Visible and LWIR images during slight overcast
+(top), strong wind and rain (middle) and snow (bottom).
+ Fog, rain and snow are others climate factors that
+affect thermal wavelength transmission, thus decreasing
+thermal image contrast. However, along some studies
+[11][12], and based on our own experience, absorption
+and scattering in LWIR range seem slightly inferior than
+in visible range. This can be noticed on last row images
+of figure 1, where a building can be distinguished in the
+background of the thermal image, but not in the colour
+one. Figure 2 also illustrates this fact. Airplanes, vehicles
+and ground installations can be seen in the LWIR image
+(right), but it is almost impossible to recognize any object
+in the visible image (left).
+Fig. 2: Visible (left) and LWIR (right) images in thick fog
+(courtesy of Ottawa airport and Searidge Technologies,
+Ottawa, Canada).
+\cite{stlaurent2007combinationColorThermal}
+
+
+% Needs adjustment from pedestrian detection to vehicle detection, 
+% but the general points with appropriate sources for vehicle data
+To address these challenges for automobile applications,
+generally two types of infrared sensors are used: near infrared (0.75-1.3µm) cameras or long-wavelength infrared
+(7.5-13µm, also known as the thermal band) cameras.
+Physically, pedestrians are more visible in thermal cameras than in near infrared cameras. This is because longwavelength infrared cameras are more robust to the interferences produced by headlights and traffic signals. Even more
+importantly, a human body radiates in the long-wavelength
+Figure 1. Examples of our multispectral pedestrian dataset. It has
+aligned pair of color (left column) and thermal (right column) images captured from day/night traffic scenes. The dense annotations
+provided with the dataset such as green, yellow, and red boxes
+indicate no-occlusion, partial occlusion, and heavy occlusion respectively. Images are cropped for better visualization.
+infrared light wavelength of 9.3µm [25], which supports the
+suitability of thermal cameras for capturing humans.
+\cite{hwang2015multispectralPedestrianDetection}
+
+Appearance change. Figure 7 shows several examples of
+pedestrians in the day and night time. The color image in
+daytime shows a distinct human shape due to the strong
+sunlight. On the other hand, the shape in the color image
+at nighttime is not distinguishable due to the dark environment. 
+However, the thermal image shows a distinct shape
+at nighttime, because the temperature difference is greater
+when the air temperature is cooler, so the pedestrians having a 
+fixed temperature, can be clearly captured in the nighttime. In 
+the daytime, the strong sun radiation causes background clutters. 
+For these reasons, we can expect to obtain
+better performance by using the strong points of the color
+and the thermal images throughout the day.
+\cite{hwang2015multispectralPedestrianDetection}
 
 
 For object detection using primarily IR images, various approaches
@@ -427,6 +666,29 @@ images are closer to the visible human spectrum whereas images with
 longer wavelengths capture information on the temperature differences
 between the object and the background, and thus are less affected
 by reflected light and weather conditions.
+\cite{bustos2023reviewObjectDetectionIR}
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/thermal_showcase_modified.png}
+    \caption{
+        Example of Thermal and Thermal MSX (multispectral with embedded 
+        visual spectrum edges) images. All the images are from the 
+        same scene taken on a sunny morning (first row), sunny afternoon 
+        (second row), and rainy morning (third row).
+        \cite{bustos2023reviewObjectDetectionIR}
+    }
+\end{figure}
+
+An example demonstrating the differences between RGB and thermal images is shown in Fig. 1. The figure contains a series of images
+taken via a FLIR MSX (Multispectral Dynamic Imaging) camera. In
+addition to RGB and thermal images, the camera also provides a
+fused image by embedding edges and outlining details from the visible
+spectrum onto the thermal images. These images of the same scene have
+been taken during different times of the day and in different weather
+conditions. As evident from the figures, images taken in rainy weather
+capture less temperature contrast, as can be expected.
 \cite{bustos2023reviewObjectDetectionIR}
 
 \paragraph{LiDAR}
@@ -453,6 +715,22 @@ DOI: 10.54254/2755-2721/2026.TJ28614
 weather, and economic considerations [3]; millimeter-wave radar data suffers from sparsity, high
 noise levels, and semantic interpretation difficulties [4]; and camera-based systems are challenged
 by depth estimation, illumination variations, and occlusions [5].
+
+
+LIDAR, an acronym for “laser imaging, detection, and ranging”, is a remote sensing
+technology that has become increasingly popular in recent years, due to its ability to
+generate precise and highly accurate 3D images of the Earth’s surface. LIDAR systems
+mounted on UAVs are capable of collecting data for a wide range of applications, including
+surveying [51,52], environmental monitoring [53], and infrastructure inspection [54–56].
+\cite{zhang2023reviewUAVRemoteSensing}
+
+One of the key advantages of using LIDAR in UAV remote sensing is its ability to
+provide highly accurate and detailed elevation data. By measuring the time it takes for
+laser pulses to bounce off the ground and return to the sensor, LIDAR can create a highresolution digital elevation model (DEM) of the terrain. This data can be used to create
+detailed 3D maps of the landscape, which are useful for a variety of applications, such as
+flood modeling, land use planning, and urban design.
+\cite{zhang2023reviewUAVRemoteSensing}
+
 
 
 \paragraph{Radar}
@@ -529,6 +807,10 @@ limitations.
 
 \subsection{Selected Hardware Platform}
 
+% Find out if optical and thermal sensors are already aligned in the WIRIS Enterprise,
+% like in \cite{hwang2015multispectralPedestrianDetection}, where beam splitter
+% is used or if there is small amount of parallax
+
 Reason for selection: Ease of integration/lightweight
 and out-of-the box alignment (explain the alignment problem
 and how it would have been needed to be solved with illustrations)
@@ -597,8 +879,8 @@ during flight.
 
 sources: 
 A systematic literature review on object detection using near infrared and
-thermal images (Drive) - late part of the paper, where they compare early, mid and late fusion approaches
-
+thermal images (Drive) 
+late part of the paper, where they compare early, mid and late fusion approaches
 % Use end of introduction to motivate sensor fusion \cite{bustos2023reviewObjectDetectionIR}
 % Use section 6 for fusion approaches \cite{bustos2023reviewObjectDetectionIR}
 % Use section 7 for challenges \cite{bustos2023reviewObjectDetectionIR}
