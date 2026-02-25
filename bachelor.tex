@@ -383,74 +383,101 @@ typically at \SI{1.064}{\micro\meter} in the near-IR
 to avoid interference with 
 the atmosphere and other sensors, thermal sensors in the thermal IR, 
 and radar in the microwave region.
-\cite[pp.~6, 386, 481]{lillesand2015remoteSensing}.
+\cite[p.~6]{lillesand2015remoteSensing}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/electromagnetic_spectrum.png}
     \caption{
         The electromagnetic spectrum. The visible spectrum is 
-        highlighted, and the ranges of other relevant 
-        modalities (thermal, LiDAR, radar) are indicated.
+        highlighted, and other important regions are indicated.
         \cite[p.~5]{lillesand2015remoteSensing}
     }
     \label{fig:electromagnetic_spectrum}
 \end{figure}
 
-Different regions of the spectrum interact with matter in fundamentally 
-different ways, which determines their utility for remote sensing.
-Also, higher energy levels (shorter wavelengths) are easier to detect and provide more detailed information about the environment,
-(needs verification somewhere)
-The atmosphere does not 
-transmit all wavelengths equally --- certain ranges, known as 
-atmospheric windows, exhibit high transmittance and are therefore 
-the practical basis for most remote sensing systems 
-\cite[p.~7]{lillesand2015remoteSensing}. Different sensing modalities 
-exploit these windows: optical cameras capture reflected sunlight in 
-the visible range, thermal sensors detect emitted heat radiation in 
-the infrared, LiDAR operates in the near-infrared, and radar 
-penetrates clouds and operates independently of solar illumination 
-in the microwave region, each with distinct properties 
-relevant to vehicle detection.
+Figure~\ref{fig:electromagnetic_atmospheric_windows} illustrates the 
+interrelationship between energy sources and atmospheric absorption 
+characteristics. Figure~\ref{fig:electromagnetic_atmospheric_windows}a 
+shows the spectral distribution of energy emitted by the sun and by earth 
+features, the two most common natural energy sources in remote sensing. The 
+energy of a wave is inversely proportional to its wavelength, meaning 
+longer wavelengths carry lower energy content. This has important 
+implications for remote sensing. Naturally emitted long-wavelength 
+radiation, such as thermal infrared energy (\SIrange{8}{14}{\micro\meter}), 
+is more difficult to sense than shorter-wavelength radiation, such as 
+visible light (\SIrange{0.4}{0.7}{\micro\meter}). Consequently, systems 
+operating at long wavelengths must view larger areas of the earth at any 
+given time to obtain a detectable signal. Conversely, shorter wavelengths 
+are easier to detect and provide more detailed information about the 
+environment, such as material texture, but are also more susceptible to 
+atmospheric absorption and scattering in suboptimal atmospheric conditions.
+\cite[pp.~6, 9, 11]{lillesand2015remoteSensing}
+
+The atmosphere does not transmit all wavelengths equally --- certain 
+ranges, known as atmospheric windows, exhibit high transmittance and 
+form the basis for remote sensing systems. In 
+Figure~\ref{fig:electromagnetic_atmospheric_windows}b, spectral 
+regions where the atmosphere blocks energy are shaded, and remote sensing 
+data acquisition is restricted to the unshaded windows. Each sensing 
+modality exploits a different window. Optical cameras operate in the 
+visible range (\SIrange{0.4}{0.7}{\micro\meter}), which coincides with 
+both an atmospheric window and the peak of solar energy output 
+(Figure~\ref{fig:electromagnetic_atmospheric_windows}c), resulting in 
+high-detail imagery under good atmospheric conditions. Thermal sensors 
+detect emitted heat energy from the earth, shown by the small curve 
+in (a), through windows at \SIrange{3}{5}{\micro\meter} and 
+\SIrange{8}{14}{\micro\meter}. Its much lower intensity than solar 
+radiation limits spatial detail, but the independence from solar 
+illumination is a key advantage for detection in low-light conditions. 
+LiDAR operates at 
+\SI{1.064}{\micro\meter} in the near-infrared to minimise atmospheric 
+interference, overlap with other sensors, and optimise detector material 
+efficiency, though its proximity to the visible spectrum makes it more 
+susceptible to scattering by fog and aerosols than radar.
+% TODO: needs source (https://www.yellowscan.com/knowledge/why-does-lidar-have-a-specific-wavelength/)
+Radar and passive microwave systems operate through a window spanning 
+\SI{1}{\milli\meter} to \SI{1}{\meter}, where they can penetrate clouds 
+and function entirely independently of solar illumination.
+\cite[pp.~6, 10, 386, 481]{lillesand2015remoteSensing}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{images/electromagnetic_absorption.png}
+    \includegraphics[width=0.9\textwidth]{images/electromagnetic_atmospheric_windows.png}
     \caption{
         Spectral characteristics of (a) energy sources, 
-        (b) atmospheric transmittance,
-        \cite[p.~5]{lillesand2015remoteSensing}
+        (b) atmospheric transmittance, and
+        (c) common remote sensing systems on 
+        logarithmic wavelength scale.
+        Modified after 
+        \cite[p.~11]{lillesand2015remoteSensing}
     }
-    \label{fig:electromagnetic_absorption}
+    \label{fig:electromagnetic_atmospheric_windows}
 \end{figure}
 
 
-An ideal sensor would be highly sensitive to all wavelengths, yielding 
+An ideal sensor would be highly sensitive to all wavelengths, yielding
 spatially detailed radiance data across the entire electromagnetic
-spectrum and wide areas on the ground. This ideal sensor would be
-simple and reliable, require virtually no power or space, and be accurate 
-and economical to
-operate. Unsurprisingly, no such ideal sensor exists. No 
-single sensor is sensitive to all wavelengths or
-energy levels. All real sensors have fixed limits of spatial, spectral, 
-radiometric and temporal resolution.
+spectrum and wide areas on the ground. It would be simple and reliable,
+require virtually no power or space, and be accurate and economical to
+operate. Unsurprisingly, no such sensor exists: no single sensor is
+sensitive to all wavelengths or energy levels, and all real sensors have
+fixed limits of spatial, spectral, radiometric, and temporal resolution.
 \cite[p.~46]{lillesand2015remoteSensing}
-Therefore, the
-available electromagnetic remote sensing modalities are evaluated against 
-the specific requirements of UAV-based vehicle detection to identify the 
-most suitable option.
-
-Understanding the strengths and weaknesses of different sensing 
-modalities is crucial for selecting the appropriate sensors for 
-UAV-based vehicle detection. Each modality captures different 
-aspects of the environment, and their performance can vary 
-significantly under different environmental conditions. Here,
-the most widely used modalities in object detection and 
-autonomous perception are compared.
+Therefore, in the following the available electromagnetic remote sensing modalities are
+evaluated against the specific requirements of UAV-based vehicle
+detection to identify the most suitable option, comparing how each
+captures different aspects of the environment and how their performance
+varies under different environmental conditions.
 
 % TODO: Images for each modality, showing example detections and challenges
 
 \paragraph{Visible-band Imaging}
+
+Note in Figure~\ref{fig:electromagnetic_atmospheric_windows}c that the spectral sensitivity range of the eye (the
+<visible= range) coincides with both an atmospheric window and the peak level of
+energy from the sun. Emitted <heat= energy from the earth, shown by the small
+curve in (a)
 
 Optical remote sensing is the oldest remote sensing method, 
 originating with the invention of photography. 
