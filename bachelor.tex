@@ -119,6 +119,14 @@ Fakultät für Mathematik, Informatik und Physik}\\[3ex]
 \vspace{1.5cm}
 
 
+% TODOs:
+% - fusion strategies (early, mid, late)
+% - common problems of multimodality fusion
+% - quantization
+% - Hardware Setup (Selection of the camera and modalities - LiDAR/Radar/RGB/LWIR with Table of pros and cons) Kamerasetup und Kalibrierung Einstellung
+
+
+
 \textbf{\LARGE{Bachelorarbeit}}
 \medskip\par
 \textbf{\normalsize{zur Erreichung des akademischen Grades}} \\[3ex]
@@ -368,8 +376,9 @@ clear-cut physical boundaries \cite[pp.~4]{lillesand2015remoteSensing}.
 
 The spectral sensitivity of the human eye spans only the narrow visible 
 portion of the spectrum, from approximately \SI{0.4}{\micro\meter} to 
-\SI{0.7}{\micro\meter}, divided into blue (0.4--0.5), green (0.5--0.6), 
-and red (0.6--0.7). Ultraviolet 
+\SI{0.7}{\micro\meter}, divided into blue (0.4--\SI{0.5}{\micro\meter}), 
+green (0.5--\SI{0.6}{\micro\meter}), 
+and red (0.6--\SI{0.7}{\micro\meter}). Ultraviolet 
 (UV) energy adjoins the blue end of the visible range. Beyond the red 
 end lies the infrared (IR) region, subdivided into near-IR 
 (0.7--\SI{1.3}{\micro\meter}), mid-IR or shortwave IR 
@@ -404,9 +413,9 @@ features, the two most common natural energy sources in remote sensing. The
 energy of a wave is inversely proportional to its wavelength, meaning 
 longer wavelengths carry lower energy content. This has important 
 implications for remote sensing. Naturally emitted long-wavelength 
-radiation, such as thermal infrared energy (\SIrange{8}{14}{\micro\meter}), 
+radiation, such as thermal infrared energy, 
 is more difficult to sense than shorter-wavelength radiation, such as 
-visible light (\SIrange{0.4}{0.7}{\micro\meter}). Consequently, systems 
+visible light. Consequently, systems 
 operating at long wavelengths must view larger areas of the earth at any 
 given time to obtain a detectable signal. Conversely, shorter wavelengths 
 are easier to detect and provide more detailed information about the 
@@ -474,33 +483,103 @@ varies under different environmental conditions.
 
 \paragraph{Visible-band Imaging}
 
-Note in Figure~\ref{fig:electromagnetic_atmospheric_windows}c that the spectral sensitivity range of the eye (the
-<visible= range) coincides with both an atmospheric window and the peak level of
-energy from the sun. Emitted <heat= energy from the earth, shown by the small
-curve in (a)
+Optical remote sensing is the oldest electromagnetic remote sensing method, 
+originating with the invention of photography. We will refer to optical
+remote sensors as cameras. Cameras are passive sensors that capture light
+emitted by one or more sources, possibly reflected from object surfaces
+multiple times, and directed towards the camera through the lens onto the
+image sensor to form an image of the scene
+as illustrated in Figure~\ref{fig:photometric_image_formation}b.
+\cite[p.~66]{szeliski2022computerVision}
+\cite{agrawal2019comparativeRemoteSensing}
 
-Optical remote sensing is the oldest remote sensing method, 
-originating with the invention of photography. 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/photometric_image_formation_szeliski_2021_lillesand_2015.png}
+    \caption{
+        (a) Spectral characteristics of  Simple lens camera, 
+        \cite[p.~89]{lillesand2015remoteSensing}
+        (b) A simplified model of photometric image formation.
+        \cite[p.~66]{szeliski2022computerVision}
+    }
+    \label{fig:photometric_image_formation}
+\end{figure}
+
+The simple lens camera, shown in Figure~\ref{fig:photometric_image_formation}a, 
+was developed to increase the amount of light reaching the image sensor within 
+a given time, referred to as exposure. It achieves this by using a lens to 
+gather light originating from a scene object over a larger area and converge it 
+onto a single point on the sensor, provided the camera is properly focused on 
+the object. The design and function of modern adjustable 
+cameras is conceptually identical to the simple lens camera.
+\cite[pp.~89]{lillesand2015remoteSensing}
+
+To obtain sharp, properly exposed images, the camera must be focused and the 
+correct exposure settings must be applied. In modern cameras, focus is achieved 
+automatically by adjusting the position of the lens element. Beyond the lens 
+itself, modern cameras introduce two additional controls: an adjustable diaphragm 
+and an adjustable shutter. The diaphragm controls the diameter of the lens 
+opening during exposure, while the shutter controls the duration of exposure.
+\cite[pp.~89]{lillesand2015remoteSensing}
+
+For a given camera and scene, exposure can be varied by changing the shutter 
+speed $t$ and/or the lens opening diameter $d$, with various combinations of 
+the two yielding equivalent exposures. Short exposure times allow one to freeze 
+motion and prevent blurring when photographing moving objects, or when the camera 
+itself is moving, as in the case of a UAV-mounted system. However, a shorter 
+exposure time requires more light to reach the sensor per unit time, necessitating 
+more illumination or a larger lens opening diameter. The largest available lens opening diameter is 
+referred to as the lens speed, and determines the minimum exposure time achievable 
+under a given lighting condition. A large lens opening diameter allows more light 
+to reach the image sensor, making it beneficial under low-light conditions. A small 
+lens opening diameter, on the other hand, limits overexposure and yields a larger range of distances over 
+which objects appear sharp in the image, known as the depth of field. This is 
+because the narrower diaphragm limits the angle of incoming light rays, forcing 
+them to converge more directly onto the sensor.
+\cite[pp.~89]{lillesand2015remoteSensing}
+\cite[p.~81]{szeliski2022computerVision}
+
+After light passes through the camera's lens, it reaches the imaging sensor, a 
+two-dimensional array of photosensitive semiconductors. When light energy strikes each 
+individual detector in this array, it produces a small electrical charge proportional 
+to the brightness of the scene at that point. This charge is then converted into a 
+voltage, and ultimately into a digital brightness value. However, these sensors are 
+inherently monochromatic, so to capture color, each detector is covered by a colored 
+filter most commonly arranged in a Bayer pattern (Figure~\ref{fig:bayer_filter}a). 
+In this color filter array, half of the filters 
+are green, with the remaining half split equally between red and blue. The overrepresentation 
+of green takes advantage of both the green peak of solar radiation 
+(Figure~\ref{fig:electromagnetic_atmospheric_windows}) and the human visual 
+system's greater sensitivity to detail in brightness, which is largely determined by green, 
+than in color. Since each detector only records 
+one color, the two missing color values at every pixel must be interpolated from neighboring 
+detectors of the same color — a process called demosaicing — to produce the final RGB 
+image we see (Figure~\ref{fig:bayer_filter}b).
+\cite[pp.~93]{szeliski2022computerVision}
+\cite[pp.~115]{lillesand2015remoteSensing}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{images/bayer_filter_szeliski_2021_computer_vision.png}
+    \caption{
+        Bayer RGB pattern: (a) color filter array layout; (b) Pixel values,
+        with interpolated values shown as lower case
+        \cite[p.~94]{szeliski2022computerVision}
+    }
+    \label{fig:bayer_filter}
+\end{figure}
+
 RGB cameras are passive sensors that function analogously 
 to the human eye, capturing reflected ambient light to form 
 a 2D image of the scene and belong to the electro-optical (EO) category. 
 They measure reflected solar 
 electromagnetic energy in the spectral range of approximately 
-0.4~$\mu$m to 1~mm.
+0.4~$\mu$m to 0.7~$\mu$m.
 The incoming energy reflected from the earth's surface is directed 
 through an aperture, which controls the amount of light entering 
 the sensor. The light then passes through a lens that focuses it onto the image 
 sensor, where a color filter array separates incoming light into red, green, and blue 
 spectral components, each recorded by the corresponding photodetectors. 
-% TODO: Add image showing the optical path and sensor array
-% TODO: Add image of electromagnetic spectrum, showing the visible range and 
-%       other modalities, image of passive verus active sensing, image of 
-%       the sensor array with RGB filters and photodetectors (Page 34 in
-%       Computer Vision: Algorithms and Applications by Richard Szeliski
-%       https://library.huree.edu.mn/data/202295/2024-06-03/Computer%20Vision%20-%20Algorithms%20and%20Applications%202nd%20Edition,%20Richard%20Szeliski.pdf)
-% TODO: Find source textbook for the part with aperture lens and photodetectors
-%       for the sentence above
-% TODO: Replace spectral range to 400nm-700nm as this includes NIR and UV
 % TODO: Add Image showcasing RGB images in different lighting conditions, 
 %       weather conditions, and times of day
 Each spectral component is recorded 
@@ -517,6 +596,8 @@ and the sensitivity of the image sensor.
 \cite{wu2025comparativeAnalysisLiDARRadarCamera}.
 \cite{agrawal2019comparativeRemoteSensing}
 
+Cameras are the most widely used remote sensing modality in autonomous traffic
+applications, and for good reason.
 RGB cameras provide very high spatial resolution, typically 
 exceeding millions of pixels per frame, and capture rich semantic 
 information including color, texture, shape, and fine-grained 
@@ -534,6 +615,21 @@ and convolutional neural networks has further unlocked their
 potential for scene understanding and object classification. 
 \cite{soltanirad2025autonomousTransportationPerception}
 \cite{bustos2023reviewObjectDetectionIR}
+
+% Alternative:
+% Adverse weather conditions such as fog, rain, and snow can significantly degrade the performance of visible-band imaging. Fog and haze scatter visible light, reducing contrast and obscuring details. Rain can cause water droplets to adhere to the camera lens, further distorting the image. Snow can create a bright, uniform background that makes it difficult to distinguish objects. Additionally, low-light conditions at night or during heavy cloud cover can severely limit the effectiveness of visible-band cameras, as they rely on ambient light for illumination. High dynamic range (HDR) sensors can mitigate some of these issues by capturing a wider range of light intensities, but they still struggle with rapid lighting changes and lens contamination from dirt or moisture.
+
+Suboptimal scenarios:
+- Low-light conditions (night, heavy cloud cover) (Cars usually have headlights, but they can be occluded by other vehicles or objects from side view, and they may not always be on)
+- Haze and atmospheric scattering in Adverse weather (fog, rain, snow, sandstorms)
+- High dynamic range scenes (e.g., direct sunlight, shadows)
+- Glare and backlighting
+- Mirror reflections
+- Lens contamination (misty lens, water droplets)
+
+Look for image samples in Teledyne FLIR ADAS Thermal Dataset v2 on Kaggle
+candidate for backlighting is video-FkqCGijjAKpABetZZ-frame-000013-jcbKcEFnttPLKjtsi.jpg (469.9 kB)
+
 
 However, RGB cameras do not directly measure depth or metric distance. 
 Such information must be inferred through stereo vision or 
@@ -556,6 +652,16 @@ suitable for real-time processing.
 
 \paragraph{Thermal Imaging (LWIR)}
 
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/IR_radiation_classification.png}
+    \caption{
+        A visualization of the electromagnetic spectrum showcasing 
+        differentsections attributed to IR wavelengths.
+        \cite{rizk2025humandDetectionThermalIR}
+    }
+\end{figure}
+
 Thermal imaging in the long-wave infrared (LWIR) spectrum
 is very similar to RGB imaging in terms of the underlying sensing principle,
 as it is also a passive modality that relies on the detection 
@@ -567,6 +673,9 @@ emitted by objects at typical Earth surface temperatures.
 
 % TODO: show thermal images in different lighting conditions, 
 %       weather conditions, and times of day
+
+% - Blindspots that are filled by thermal
+%   Exploring thermal images for object detection in underexposure regions for autonomous driving
 
 Thermal imaging in the long-wave infrared (LWIR) spectrum
 captures emitted radiation rather than reflected light. This
@@ -945,7 +1054,29 @@ Lorem ipsum
 \newpage
 \chapter{Dataset}
 \label{chap:dataset}
-Lorem ipsum
+
+Dataset collection I found that is usable:
+- VisDrone Dronevehicle
+- KAIST?
+- DAWN Dataset
+- RASMD Dataset (SWIR but maybe usable as pretraining data for our LWIR)
+- ACDC
+- FLIR
+- FLIR OEM
+- M3FD
+Look in table 1 of RASMD dataset for others that can be used for pretraining
+
+Though I need to consider that most of the datasets are for pedestrian detection, 
+and I need to focus on vehicle detection, so I need to find datasets that have a 
+good amount of vehicle data in them.
+
+Also the viewing angle from the drone is from the side view primarily while mounted
+on a car is mostly from front facing other cars.
+
+Describe Process of converting label schemas and annotation formats, and the challenges of doing so
+
+Describe the process of creating fiftyone dataset and uploading to s3 plusserver
+and then running the model training on clearmls with the data stored on s3 through fiftyone
 
 \newpage
 \chapter{Detection Implementation}
