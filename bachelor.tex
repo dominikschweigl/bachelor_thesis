@@ -317,6 +317,13 @@ requirements. After modality evaluation, the selected
 hardware \textit{Workswell WIRIS Enterprise} is described, 
 including its specifications and the rationale for its selection.
 
+% TODO: Maybe write here that I was tasked with selecting the 
+%       sensor system, and that I evaluated the different modalities 
+%       based on the requirements of UAV-based vehicle detection, 
+%       comparing their strengths and weaknesses in terms of spatial 
+%       resolution, robustness to illumination changes, weather tolerance, 
+%       geometric information content, and computational requirements. 
+
 
 \subsection{Remote Sensing}
 
@@ -569,84 +576,70 @@ image we see (Figure~\ref{fig:bayer_filter}b).
     \label{fig:bayer_filter}
 \end{figure}
 
-RGB cameras are passive sensors that function analogously 
-to the human eye, capturing reflected ambient light to form 
-a 2D image of the scene and belong to the electro-optical (EO) category. 
-They measure reflected solar 
-electromagnetic energy in the spectral range of approximately 
-0.4~$\mu$m to 0.7~$\mu$m.
-The incoming energy reflected from the earth's surface is directed 
-through an aperture, which controls the amount of light entering 
-the sensor. The light then passes through a lens that focuses it onto the image 
-sensor, where a color filter array separates incoming light into red, green, and blue 
-spectral components, each recorded by the corresponding photodetectors. 
-% TODO: Add Image showcasing RGB images in different lighting conditions, 
-%       weather conditions, and times of day
-Each spectral component is recorded 
-independently by the sensor array, producing a two-dimensional array of 
-rows and columns of pixels, where each pixel contains a digital 
-number representing the spectral reflectance of the corresponding 
-surface area within a particular spectral band.
-Because they rely entirely on reflected ambient light, they are 
-passive sensors and can only collect data during daytime.
-The detection range is primarily governed by the optical properties 
-of the camera: the focal length, which determines angular resolution, 
-the aperture size, which controls the amount of light entering the sensor, 
-and the sensitivity of the image sensor. 
-\cite{wu2025comparativeAnalysisLiDARRadarCamera}.
-\cite{agrawal2019comparativeRemoteSensing}
-
-Cameras are the most widely used remote sensing modality in autonomous traffic
-applications, and for good reason.
-RGB cameras provide very high spatial resolution, typically 
-exceeding millions of pixels per frame, and capture rich semantic 
-information including color, texture, shape, and fine-grained 
-patterns.
-\cite{wu2025comparativeAnalysisLiDARRadarCamera}
-This makes them uniquely capable of tasks such as 
-reading road signs, identifying lane markings, and recognizing 
-traffic states -- capabilities that are fundamentally inaccessible 
-to geometric sensors. 
+Cameras are the most widely used remote sensing modality in autonomous 
+traffic applications—and for good reason. RGB cameras offer exceptionally 
+high spatial resolution and capture rich semantic information, including 
+color, texture, shape, and fine-grained patterns over distances of several 
+hundred meters \cite{wu2025comparativeAnalysisLiDARRadarCamera}. This 
+detailed visual content enables tasks such as reading road signs, identifying 
+lane markings, and recognizing traffic states, many of which are fundamentally 
+inaccessible to purely geometric sensors or sensors operating outside the 
+visible spectrum.
 Their low cost, small form factor, and low energy consumption
 have made them a widely adopted sensing modality in autonomous
-traffic applications, and the 
-rapid development of deep learning 
-and convolutional neural networks has further unlocked their 
-potential for scene understanding and object classification. 
+traffic applications.
+Their ubiquity has been further amplified by rapid advances in deep learning 
+and convolutional neural networks, which have significantly improved scene 
+object detection performance.
 \cite{soltanirad2025autonomousTransportationPerception}
 \cite{bustos2023reviewObjectDetectionIR}
 
-% Alternative:
-% Adverse weather conditions such as fog, rain, and snow can significantly degrade the performance of visible-band imaging. Fog and haze scatter visible light, reducing contrast and obscuring details. Rain can cause water droplets to adhere to the camera lens, further distorting the image. Snow can create a bright, uniform background that makes it difficult to distinguish objects. Additionally, low-light conditions at night or during heavy cloud cover can severely limit the effectiveness of visible-band cameras, as they rely on ambient light for illumination. High dynamic range (HDR) sensors can mitigate some of these issues by capturing a wider range of light intensities, but they still struggle with rapid lighting changes and lens contamination from dirt or moisture.
+Despite these strengths, reliance on visual-spectrum imaging alone is 
+insufficient for robust perception. Cameras, although equipped with 
+exposure and gain controls to adapt to varying illumination, remain 
+passive sensors and are therefore fundamentally dependent on ambient 
+light. In low-light conditions, such as nighttime, their ability to 
+capture clear and detailed imagery degrades substantially, leading to 
+reduced contrast and diminished detection performance. While vehicle 
+headlights partially compensate by illuminating the roadway ahead, they 
+provide limited illumination of the vehicle itself, restricting their 
+usefulness for vision-based vehicle detection. Moreover, headlights are 
+not a reliable discriminative feature. Many objects emit or reflect light, 
+headlights may be occluded from certain viewpoints, particularly in 
+side-view observations, or may not be active at all.
 
-Suboptimal scenarios:
-- Low-light conditions (night, heavy cloud cover) (Cars usually have headlights, but they can be occluded by other vehicles or objects from side view, and they may not always be on)
-- Haze and atmospheric scattering in Adverse weather (fog, rain, snow, sandstorms)
-- High dynamic range scenes (e.g., direct sunlight, shadows)
-- Glare and backlighting
-- Mirror reflections
-- Lens contamination (misty lens, water droplets)
+In addition, adverse weather conditions, including fog, rain, and snow, 
+further degrade image quality by scattering and absorbing light during 
+atmospheric transmission. High dynamic range scenes, such as environments 
+with direct sunlight or deep shadows, also present challenges, 
+as cameras often struggle to simultaneously preserve details in both 
+brightly illuminated and dark regions. Glare and strong backlighting may 
+lead to overexposure and localized loss of detail. Moreover, mirror 
+reflections and lens contamination caused by dirt or moisture 
+hinder reliable vehicle detection. Examples of these conditions are 
+illustrated in Figure~\ref{fig:camera_lighting_defects}.
+To address these limitations, alternative remote sensing modalities 
+aimed at enabling more robust vehicle detection beyond the constraints 
+of the visible spectrum are explored in the following.
+\cite{kenk2020dawn}
+\cite{yahiaoui2020sunGlareDetection}
+\cite{youngwan2026rasmd}
+\cite{jia2021llvip}
 
-Look for image samples in Teledyne FLIR ADAS Thermal Dataset v2 on Kaggle
-candidate for backlighting is video-FkqCGijjAKpABetZZ-frame-000013-jcbKcEFnttPLKjtsi.jpg (469.9 kB)
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/camera_lighting_defects_collection.png}
+    \caption{
+        Collection of lighting conditions and environmental factors that 
+        negatively impact vehicle detection in camera images, including 
+        reflections, sand, rain, snow, and fog \cite{kenk2020dawn}, 
+        sun glare \cite{yahiaoui2020sunGlareDetection}, backlighting 
+        \cite{youngwan2026rasmd}, and low-light night conditions 
+        \cite{jia2021llvip}.
+    }
+    \label{fig:camera_lighting_defects}
+\end{figure}
 
-
-However, RGB cameras do not directly measure depth or metric distance. 
-Such information must be inferred through stereo vision or 
-learning-based estimation, making metric accuracy sensitive to 
-scene conditions. 
-Performance degrades significantly under low illumination, glare, 
-backlighting, and adverse weather conditions such as rain or snow. 
-While high dynamic range (HDR) sensors partially mitigate illumination 
-challenges, they remain vulnerable to rapid lighting changes and 
-lens contamination from dirt or moisture.
-Under favorable daylight conditions, detection range can extend 
-to several hundred metres, but this drops substantially in poor 
-visibility. Typical 
-frame rates of 30--60~Hz or above provide a smooth visual stream 
-suitable for real-time processing.
-\cite{wu2025comparativeAnalysisLiDARRadarCamera}
-\cite{bustos2023reviewObjectDetectionIR}
 
 
 
