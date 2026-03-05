@@ -196,6 +196,9 @@ Unterschrift: & & \rule{7cm}{0.4pt}
 
 
 \chapter{Introduction}
+
+% TODO: Research questions?
+
 Goes here...
 \cite{karle2017semantify}
 
@@ -486,8 +489,6 @@ detection to identify the most suitable option, comparing how each
 captures different aspects of the environment and how their performance
 varies under different environmental conditions.
 
-% TODO: Images for each modality, showing example detections and challenges
-
 \paragraph{Visible-band Imaging}
 
 Optical remote sensing is the oldest electromagnetic remote sensing method, 
@@ -600,7 +601,7 @@ exposure and gain controls to adapt to varying illumination, remain
 passive sensors and are therefore fundamentally dependent on ambient 
 light. In low-light conditions, such as nighttime, their ability to 
 capture clear and detailed imagery degrades substantially, leading to 
-reduced contrast and diminished detection performance. While vehicle 
+reduced contrast and diminished detection performance. While vehicle    
 headlights partially compensate by illuminating the roadway ahead, they 
 provide limited illumination of the vehicle itself, restricting their 
 usefulness for vision-based vehicle detection. Moreover, headlights are 
@@ -636,6 +637,9 @@ of the visible spectrum are explored in the following.
         sun glare \cite{yahiaoui2020sunGlareDetection}, backlighting 
         \cite{youngwan2026rasmd}, and low-light night conditions 
         \cite{jia2021llvip}.
+        % Potentially get better examples from DAWN Dataset as in this
+        % paper showcased in the end: Assessment of Efficient and Cost-Effective Vehicle
+        % Detection in Foggy Weather
     }
     \label{fig:camera_lighting_defects}
 \end{figure}
@@ -643,32 +647,93 @@ of the visible spectrum are explored in the following.
 
 
 
-\paragraph{Thermal Imaging (LWIR)}
+\paragraph{Infrared Imaging}
 
-\begin{figure}
+Infrared imaging is a passive remote sensing modality that captures electromagnetic 
+radiation in the infrared spectrum, which lies just beyond the visible range. Unlike 
+visible-band imaging, which relies on reflected sunlight or artificial illumination, 
+infrared sensors detect radiation emitted or reflected by objects themselves. This 
+independence from external light sources enables detection both during daylight and 
+at night, without reliance on solar illumination. While the optical design principles
+of infrared sensors closely resembles that of optical cameras, the detector array is 
+engineered to respond to the longer wavelengths characteristic of infrared radiation. 
+The infrared spectrum spans several distinct subregions, each with different physical 
+properties and sensing applications, as illustrated in Figure~\ref{fig:IR_spectrum}.
+\cite[pp.~7,~218]{lillesand2015remoteSensing}
+
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{images/IR_radiation_classification.png}
+    \includegraphics[width=0.65\textwidth]{images/IR_radiation_classification_modified.png}
     \caption{
         A visualization of the electromagnetic spectrum showcasing 
-        differentsections attributed to IR wavelengths.
+        different sections attributed to IR wavelengths. Modified after
         \cite{rizk2025humandDetectionThermalIR}
     }
+    \label{fig:IR_spectrum}
 \end{figure}
 
-Thermal imaging in the long-wave infrared (LWIR) spectrum
-is very similar to RGB imaging in terms of the underlying sensing principle,
-as it is also a passive modality that relies on the detection 
-of electromagnetic radiation. However, while RGB cameras 
-capture reflected light in the visible spectrum, LWIR imaging
-captures emitted radiation in the wavelength range of approximately
-8~$\mu$m to 14~$\mu$m, which corresponds to the thermal radiation 
-emitted by objects at typical Earth surface temperatures.
+Of particular relevance to infrared imaging is the concept of blackbody radiation.
+All objects emit thermal radiation as a function of their temperature, and the 
+blackbody model describes this behavior for an ideal radiator that fully absorbs 
+and reemits all incident energy.
+As Figure~\ref{fig:black_body_radiation} shows, both the total emitted energy and its
+spectral distribution vary with temperature: higher temperatures produce greater
+total radiation and shift the peak toward shorter wavelengths, a relationship known
+as Wien's displacement law. The sun approximates a 6000~K blackbody, with a spectral
+peak near 0.5~$\mu$m, while Earth's surface at ${\sim}300$~K or 27~$^\circ$C peaks at 
+${\sim}9.7~\mu$m. Consequently, the long-wave infrared
+(LWIR) band (8--14~$\mu$m) is of particular interest for object detection, as it
+captures thermal radiation emitted by objects at typical Earth surface temperatures,
+enabling the detection of targets that exhibit a thermal contrast with, or elevated
+temperature relative to, their surroundings such as vehicles and personnel.
+\cite[pp.~7,~218]{lillesand2015remoteSensing}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{images/spectral_distribution_temperatures_lillesand_2015_remote_sensing.png}
+    \caption{
+        Spectral distribution of energy radiated from blackbodies 
+        of various temperatures.
+        \cite[p.~8]{lillesand2015remoteSensing}
+    }
+    \label{fig:black_body_radiation}
+\end{figure}
+
+To demonstrate the applicability of long-wave infrared sensing to vehicles under realistic 
+conditions, outdoor thermal measurements were conducted on two structurally identical models, 
+the Volkswagen e-Golf and the Volkswagen Golf 1.5 TSI. Thermographic images were acquired 
+after 30 minutes of city driving at low ambient temperatures of 5~$^\circ$C and $-1~^\circ$C. 
+The resulting thermograms, shown in Figure~\ref{fig:vehicle_thermal_radiation}, include views 
+of the front hood and mask area as well as the side regions, and capture spatial 
+temperature variations across the vehicle body and its surroundings. In particular, the hood 
+area of the combustion engine vehicle exhibits a more pronounced temperature increase, 
+whereas the electric vehicle's front surface remains closer to ambient temperature. In both 
+cases, additional heat signatures such as warmed tires, wheel arches, fenders, headlights, 
+tail lights, and windows are visible. The windows appear warmer because the vehicle interior 
+is heated, allowing more thermal radiation to be transmitted through the glass. Together,
+these characteristic regions provide stable and detectable thermal patterns in operating 
+vehicles for infrared-based detection.
+\cite{svorc2020detectionElectricVehicleThermal}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/vehicle_thermal_radiation_tichy_2021_thermal_vehicle_feature_detection.png}
+    \caption{
+        Example of outdoor thermal measurements of the \textit{Volkswagen e-Golf} and 
+        the \textit{Volkswagen Golf 1.5 TSI}. Thermograms 
+        show front and side views of (a) the electric vehicle and (b) the combustion 
+        engine vehicle after 30 minutes of city driving. Modified after      
+        \cite{svorc2020detectionElectricVehicleThermal}
+    }
+    \label{fig:vehicle_thermal_radiation}
+\end{figure}
 
 % TODO: show thermal images in different lighting conditions, 
 %       weather conditions, and times of day
 
 % - Blindspots that are filled by thermal
-%   Exploring thermal images for object detection in underexposure regions for autonomous driving
+%   Exploring thermal images for object detection in underexposure regions for 
+%   autonomous driving
 
 Thermal imaging in the long-wave infrared (LWIR) spectrum
 captures emitted radiation rather than reflected light. This
@@ -700,7 +765,7 @@ various atmospheric conditions can be observed. Specific
 environmental condition will not bear an equivalent
 impact on thermal and visible imaging because the
 properties of radiation propagation in the atmosphere vary
-greatly with wavelength range.
+greatly with wavelength range as seen in \ref{fig:electromagnetic_atmospheric_windows}.
 \cite{stlaurent2007combinationColorThermal}
 
  It is worth to mention that the LWIR spectral range
@@ -783,6 +848,19 @@ For these reasons, we can expect to obtain
 better performance by using the strong points of the color
 and the thermal images throughout the day.
 \cite{hwang2015multispectralPedestrianDetection}
+
+It is very challenging for various visual tasks on visible
+image with limited quality, for example, in low light conditions due to the loss of effective target areas. Infrared
+images, which are not limited by light conditions, can play
+a role of supplementary information. Visible images contain a great deal of texture information and details, but it
+is difficult to distinguish objects under low-light condition.
+Infrared images are imaged through the temperature field
+of the object surface, so they can highlight targets such as
+pedestrians, but the texture information is missing. Visible
+and infrared image fusion can generate a single complementary image that has both rich detail information and effective
+target areas. Then the fused image can be applied to human
+visual perception, object detection and video surveillance.
+Source: LLVIP: A Large-Scale Visible-Infrared Paired Dataset for Low-Light Video Surveillance
 
 
 For object detection using primarily IR images, various approaches
@@ -1014,6 +1092,15 @@ late part of the paper, where they compare early, mid and late fusion approaches
 % Use section 6 for fusion approaches \cite{bustos2023reviewObjectDetectionIR}
 % Use section 7 for challenges \cite{bustos2023reviewObjectDetectionIR}
 
+Appearance change. Figure 7 shows several examples of
+pedestrians in the day and night time. The color image in
+daytime shows a distinct human shape due to the strong
+sunlight. On the other hand, the shape in the color image
+at nighttime is not distinguishable due to the dark environment. However, the thermal image shows a distinct shape
+at nighttime, because the temperature difference is greater
+when the air temperature is cooler, so the pedestrians having a fixed temperature, can be clearly captured in the nighttime. In the daytime, the strong sun radiation causes background clutters. For these reasons, we can expect to obtain
+Source: Multispectral Pedestrian Detection: Benchmark Dataset and Baseline
+
 \section{Motivation for Sensor Fusion}
 
 Maybe put in the hardware chapter when we talk about selection
@@ -1071,9 +1158,19 @@ Describe Process of converting label schemas and annotation formats, and the cha
 Describe the process of creating fiftyone dataset and uploading to s3 plusserver
 and then running the model training on clearmls with the data stored on s3 through fiftyone
 
+Evaluation of the dataset, including statistics on the number of images, distribution of classes, and examples of challenging scenarios (e.g., low-light, occlusions, weather conditions).
+Inspire the evaluation from other dataset papers that I used to create
+the training dataset
+
 \newpage
 \chapter{Detection Implementation}
 \label{chap:implementation}
+
+% TODO:
+
+% Explain ClearML and how it is used for experiment tracking and management.
+% Explain the training pipeline, including data loading, preprocessing, model 
+% architecture, loss functions, and optimization.
 
 Lorem ipsum
 
@@ -1089,6 +1186,24 @@ Lorem ipsum
 \label{chap:evaluation}
 Lorem ipsum
 
+% TODO:
+
+% Explain the evaluation metrics used to assess model performance.
+
+% Analyse results using the loss function convergence.
+
+% Analyse latency etc on recorded Videos and Test Setup using Raspberry + Hailo.
+
+% Maybe do some feature alignment Analysis for the rgb and thermal branches.
+
+% Do a lot of Analysis on the data and object detection results.
+
+% Dimensionality reduction and visualization of the feature space for the RGB and thermal branches to understand how the model is learning to fuse the two modalities.
+
+% Metrics like mAP, precision, recall, F1-score, and inference time should 
+% be reported for both single-modality and fused models. Additionally, an ablation 
+% study could be conducted to assess the contribution of each modality to the overall 
+% performance.
 
 \newpage
 \chapter{Limitations}
