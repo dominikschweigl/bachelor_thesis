@@ -202,6 +202,11 @@ Unterschrift: & & \rule{7cm}{0.4pt}
 Goes here...
 \cite{karle2017semantify}
 
+In this work, the term “uncontrolled environment” is
+employed to refer to outdoor scenes where illumination
+and temperature changes occur frequently, and where
+various atmospheric conditions can be observed.
+
 The remainder of this thesis is structured as follows. 
 Chapter~\ref{chap:literature_review} provides a review of related 
 literature on UAV-based traffic monitoring, sensor fusion, and aerial 
@@ -637,7 +642,7 @@ of the visible spectrum are explored in the following.
         sun glare \cite{yahiaoui2020sunGlareDetection}, backlighting 
         \cite{youngwan2026rasmd}, and low-light night conditions 
         \cite{jia2021llvip}.
-        % Potentially get better examples from DAWN Dataset as in this
+        % TODO: Potentially get better examples from DAWN Dataset as in this
         % paper showcased in the end: Assessment of Efficient and Cost-Effective Vehicle
         % Detection in Foggy Weather
     }
@@ -659,7 +664,7 @@ of infrared sensors closely resembles that of optical cameras, the detector arra
 engineered to respond to the longer wavelengths characteristic of infrared radiation. 
 The infrared spectrum spans several distinct subregions, each with different physical 
 properties and sensing applications, as illustrated in Figure~\ref{fig:IR_spectrum}.
-\cite[pp.~7,~218]{lillesand2015remoteSensing}
+\cite[pp.~243]{lillesand2015remoteSensing}
 
 \begin{figure}[H]
     \centering
@@ -699,6 +704,16 @@ temperature relative to, their surroundings such as vehicles and personnel.
     \label{fig:black_body_radiation}
 \end{figure}
 
+% TODO: maybe explain graybody radiation and emissivity here, and how it affects the thermal contrast of objects in the scene
+%       lillesand2015remoteSensing page 246 onwards
+% TODO: maybe also explain that the lenses in thermal sensors are made of different materials 
+%       than those in optical cameras, such as germanium or chalcogenide glass, which are 
+%       transparent to infrared radiation but opaque to visible light
+%       because thermal radiation cannot penetrate glass
+% TODO: maybe also explain that thermal sensors typically have lower spatial resolution than 
+%       optical cameras due to the longer wavelengths and the need for larger detector 
+%       elements (microbolometers), which can limit the level of detail in the captured images
+
 To demonstrate the applicability of long-wave infrared sensing to vehicles under realistic 
 conditions, outdoor thermal measurements were conducted on two structurally identical models, 
 the Volkswagen e-Golf and the Volkswagen Golf 1.5 TSI. Thermographic images were acquired 
@@ -728,175 +743,105 @@ vehicles for infrared-based detection.
     \label{fig:vehicle_thermal_radiation}
 \end{figure}
 
-% TODO: show thermal images in different lighting conditions, 
-%       weather conditions, and times of day
 
-% - Blindspots that are filled by thermal
-%   Exploring thermal images for object detection in underexposure regions for 
-%   autonomous driving
-
-Thermal imaging in the long-wave infrared (LWIR) spectrum
-captures emitted radiation rather than reflected light. This
-enables reliable detection of vehicles independent of visible
-illumination and makes the modality particularly suitable for
-night-time or low-contrast scenarios. In addition, thermal
-contrast between vehicles and the background often simplifies
-segmentation tasks. Limitations include lower spatial resolution
-compared to RGB sensors and reduced performance in scenarios
-with minimal temperature differences.
-
-The thermal sensor has the advantage
-of having less an effect on illumination changes, as it captures 
-emitted radiation rather than reflected light.
- One of
-the main challenges when handling a thermal sensor is the
-temporal change of the thermal contrast ratio according to the
-amount of heating energy. 
-\cite{choi2018kaist}
-
-In contrast to RGB cameras, IR images lack visual details, have a lower spatial
-resolution, and are susceptible to environmental interference,
-\cite{bustos2023reviewObjectDetectionIR}
-
-In this work, the term “uncontrolled environment” is
-employed to refer to outdoor scenes where illumination
-and temperature changes occur frequently, and where
-various atmospheric conditions can be observed. Specific
-environmental condition will not bear an equivalent
-impact on thermal and visible imaging because the
-properties of radiation propagation in the atmosphere vary
-greatly with wavelength range as seen in \ref{fig:electromagnetic_atmospheric_windows}.
-\cite{stlaurent2007combinationColorThermal}
-
- It is worth to mention that the LWIR spectral range
-(8-12 µm) is more suitable than the MWIR range (3-5
-µm) for video monitoring of human activity. The main
-reason is that emitted radiation from objects at ambient
-temperature (300 K) peaks in this long-wavelength range
-[10]. More precisely, a human body, at 37°C, have a
-dominant wavelength of 9.3 µm.
-\cite{stlaurent2007combinationColorThermal}
-
-Obviously, visible cameras are more sensitive than LWIR
-ones to illumination changes. However, since the sunlight
-warms up exposed surfaces, long-term illumination
-changes also affect thermal images. And sunlight does
-not equally warm up all objects of the scene. Those with
-high thermal inertia, like water, trees and people, will
-present little changes comparatively to cars or building,
-which have low thermal inertia. Moreover, dark surfaces
-with low reflective properties, as asphalt, will be more
-strongly affected by sun’s rays than brighter objects. It is
-why a scene observed at 4PM and 4AM appears so
-differently. In the first case, asphalt and other inanimate
-objects have been heated all day long and appear warmer
-than people.
-\cite{stlaurent2007combinationColorThermal}
-
-A first factor that has significant impact on contrast of
-thermal images is the wind, which accelerates warm
-objects cool down. Hence, the background will tend to
-have a more uniform temperature and less contrast during
-strong wind days. This is demonstrated by comparing
-images of top and middle rows of figure 1.
-Fig. 1: Visible and LWIR images during slight overcast
-(top), strong wind and rain (middle) and snow (bottom).
- Fog, rain and snow are others climate factors that
-affect thermal wavelength transmission, thus decreasing
-thermal image contrast. However, along some studies
-[11][12], and based on our own experience, absorption
-and scattering in LWIR range seem slightly inferior than
-in visible range. This can be noticed on last row images
-of figure 1, where a building can be distinguished in the
-background of the thermal image, but not in the colour
-one. Figure 2 also illustrates this fact. Airplanes, vehicles
-and ground installations can be seen in the LWIR image
-(right), but it is almost impossible to recognize any object
-in the visible image (left).
-Fig. 2: Visible (left) and LWIR (right) images in thick fog
-(courtesy of Ottawa airport and Searidge Technologies,
-Ottawa, Canada).
-\cite{stlaurent2007combinationColorThermal}
+Thermal imaging in the long-wave infrared spectrum overcomes
+many of the limitations of visible-band imaging previously illustrated
+in Figure~\ref{fig:camera_lighting_defects}. Unlike RGB sensors, LWIR
+cameras are unaffected by changes in visible illumination, enabling
+reliable detection of vehicles and pedestrians in low-light and
+nighttime conditions. In full darkness, LWIR is the only passive
+sensor capable of pedestrian detection. In foggy conditions, LWIR
+similarly maintains reliable detection where visible-band cameras
+fail, as illustrated in Figure~\ref{fig:comparison_recognition_vis_lwir}.
+Since LWIR cameras are inherently insensitive to visible light, they
+are equally immune to glare from direct sunlight, vehicle headlights,
+reflections, and high-contrast backlighting, all of which can cause
+overexposure and loss of detail in visible-band
+imagery.
+\cite{pinchon2018allWeatherVision}
 
 
-% Needs adjustment from pedestrian detection to vehicle detection, 
-% but the general points with appropriate sources for vehicle data
-To address these challenges for automobile applications,
-generally two types of infrared sensors are used: near infrared (0.75-1.3µm) cameras or long-wavelength infrared
-(7.5-13µm, also known as the thermal band) cameras.
-Physically, pedestrians are more visible in thermal cameras than in near infrared cameras. This is because longwavelength infrared cameras are more robust to the interferences produced by headlights and traffic signals. Even more
-importantly, a human body radiates in the long-wavelength
-Figure 1. Examples of our multispectral pedestrian dataset. It has
-aligned pair of color (left column) and thermal (right column) images captured from day/night traffic scenes. The dense annotations
-provided with the dataset such as green, yellow, and red boxes
-indicate no-occlusion, partial occlusion, and heavy occlusion respectively. Images are cropped for better visualization.
-infrared light wavelength of 9.3µm [25], which supports the
-suitability of thermal cameras for capturing humans.
-\cite{hwang2015multispectralPedestrianDetection}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/comparison_recognition_vis_lwir_rivera2022_iwasaki2013.png}
+    \caption{
+        Comparison of visible and thermal imagery under challenging
+        conditions. Left: foggy conditions, where a vehicle is clearly
+        visible in the thermal image but almost entirely obscured in
+        the visible image~\cite{iwasaki2013robustVehicleDetection}.
+        Right: nighttime conditions, where a pedestrian and a distant
+        vehicle are visible in the thermal image but hidden in the
+        visible image~\cite{rivera2022analysisThermalExtremeFog}.
+    }
+    \label{fig:comparison_recognition_vis_lwir}
+\end{figure}
 
-Appearance change. Figure 7 shows several examples of
-pedestrians in the day and night time. The color image in
-daytime shows a distinct human shape due to the strong
-sunlight. On the other hand, the shape in the color image
-at nighttime is not distinguishable due to the dark environment. 
-However, the thermal image shows a distinct shape
-at nighttime, because the temperature difference is greater
-when the air temperature is cooler, so the pedestrians having a 
-fixed temperature, can be clearly captured in the nighttime. In 
-the daytime, the strong sun radiation causes background clutters. 
-For these reasons, we can expect to obtain
-better performance by using the strong points of the color
-and the thermal images throughout the day.
-\cite{hwang2015multispectralPedestrianDetection}
+Compared to NIR and SWIR, LWIR also performs better in adverse
+weather. In fog combined with oncoming headlights, VIS, NIR, and SWIR
+sensors are susceptible to glare severe enough to render vehicle
+recognition impossible. LWIR delivers more consistent recognition
+results regardless of whether a vehicle's headlights are on or off.
+Due to its longer wavelength, LWIR is less affected by atmospheric
+scattering from fog, snow, and sand than NIR, SWIR, and visible-band
+cameras~\cite{pinchon2018allWeatherVision}. However, LWIR is not
+entirely immune to atmospheric degradation. Water vapor in fog and
+rain absorbs and scatters infrared radiation, reducing thermal
+contrast and detection range in very dense
+fog~\cite{rivera2022analysisThermalExtremeFog}. LWIR should therefore
+be regarded as more robust than visible, NIR, and SWIR imaging under
+adverse conditions, rather than completely unaffected by them. These
+properties are illustrated in
+Figure~\ref{fig:comparison_recognition_vis_nir_swir_lwir}.
 
-It is very challenging for various visual tasks on visible
-image with limited quality, for example, in low light conditions due to the loss of effective target areas. Infrared
-images, which are not limited by light conditions, can play
-a role of supplementary information. Visible images contain a great deal of texture information and details, but it
-is difficult to distinguish objects under low-light condition.
-Infrared images are imaged through the temperature field
-of the object surface, so they can highlight targets such as
-pedestrians, but the texture information is missing. Visible
-and infrared image fusion can generate a single complementary image that has both rich detail information and effective
-target areas. Then the fused image can be applied to human
-visual perception, object detection and video surveillance.
-Source: LLVIP: A Large-Scale Visible-Infrared Paired Dataset for Low-Light Video Surveillance
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/comparison_recognition_vis_nir_swir_lwir_pinchon2018allWeatherVision.png}
+    \caption{
+        Comparison of VIS, NIR, SWIR, and LWIR imagery under adverse
+        conditions. Top: glare effects from oncoming headlights across
+        all four spectral bands. Bottom: images recorded in a fog
+        tunnel with the four different cameras. Modified
+        after~\cite{pinchon2018allWeatherVision}.
+    }
+    \label{fig:comparison_recognition_vis_nir_swir_lwir}
+\end{figure}
 
+Thermal imaging, however, comes with its own set of limitations. Compared to RGB sensors,
+thermal cameras generally offer lower spatial resolution, since the low energy content and
+low emitted radiation of long-wavelength radiation, as seen in Fig.~\ref{fig:black_body_radiation},
+requires sensing larger areas to obtain a detectable signal. This also results in generally
+lower image contrast than in the visible spectrum \cite[p.~6-8]{lillesand2015remoteSensing}.
+Thermal images also lack the visual detail, texture, and color information that visible
+cameras provide, all of which are important cues for object recognition and classification
+\cite{bustos2023reviewObjectDetectionIR}.
 
-For object detection using primarily IR images, various approaches
-have been presented that use different types of IR images and multispectral data (RGB, IR, LiDAR, radar). The types of IR images depend on
-the wavelength: near-infrared (NIR), short-wavelength infrared (SWIR),
-mid-wavelength infrared (MWIR), long-wavelength infrared (LWIR),
-and far infrared (FIR). These IR image types differ in the equipment
-used for data acquisition and in the information being captured. NIR
-images are closer to the visible human spectrum whereas images with
-longer wavelengths capture information on the temperature differences
-between the object and the background, and thus are less affected
-by reflected light and weather conditions.
-\cite{bustos2023reviewObjectDetectionIR}
+Environmental conditions further constrain thermal performance by reducing the temperature
+difference between objects and their surroundings.Wind accelerates the cooling of warm objects and rain causes water to absorb much of the 
+objects thermal energy, both producing a more uniform background and diminishing contrast
+\cite{stlaurent2007combinationColorThermal, bustos2023reviewObjectDetectionIR}. 
+Solar heating further affects thermal contrast, as it warms objects differently depending 
+on their thermal inertia. Asphalt and vehicles
+heat up considerably during the day, while water, trees, and people change comparatively
+little \cite{stlaurent2007combinationColorThermal, choi2018kaist}. In summer, this can
+reduce the temperature contrast between vehicles and background as the entire scene heats up, 
+lowering thermal
+performance precisely when optical cameras perform very well under clear-sky conditions.
+An illustrative example is shown in Fig.~\ref{fig:thermal_contrast_sunny_rainy}, where the reduction
+in thermal contrast during rain and sunny days is clearly visible \cite{bustos2023reviewObjectDetectionIR}.
 
-
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{images/thermal_showcase_modified.png}
     \caption{
         Example of Thermal and Thermal MSX (multispectral with embedded 
         visual spectrum edges) images. All the images are from the 
-        same scene taken on a sunny morning (first row), sunny afternoon 
-        (second row), and rainy morning (third row).
+        same scene taken on a sunny morning, sunny afternoon , and 
+        rainy morning.
         \cite{bustos2023reviewObjectDetectionIR}
     }
+    \label{fig:thermal_contrast_sunny_rainy}
 \end{figure}
 
-An example demonstrating the differences between RGB and thermal images is shown in Fig. 1. The figure contains a series of images
-taken via a FLIR MSX (Multispectral Dynamic Imaging) camera. In
-addition to RGB and thermal images, the camera also provides a
-fused image by embedding edges and outlining details from the visible
-spectrum onto the thermal images. These images of the same scene have
-been taken during different times of the day and in different weather
-conditions. As evident from the figures, images taken in rainy weather
-capture less temperature contrast, as can be expected.
-\cite{bustos2023reviewObjectDetectionIR}
 
 \paragraph{LiDAR}
 
@@ -1010,6 +955,56 @@ more effective object detection systems that leverage the strengths
 of multiple imaging modalities while also considering their inherent
 limitations.
 \cite{bustos2023reviewObjectDetectionIR}
+
+The sensors commonly used for perception in the autonomous driving includes Lidar,
+RGB cameras, and radar. Object detection using these sensor modalities provides the
+perception for the autonomous driving, but in contrast, each of these sensor modalities
+has its drawbacks. Lidar gives a sparse 3D map representation of the environment, but
+small objects like pedestrians and cyclists are hard to detect at a large distance. Similarly,
+the RGB camera performs poorly in unfavorable illumination conditions such as low
+lighting, sun glare, and glare from the headlight of the vehicle. Radar has a low spatial
+resolution to detect pedestrians accurately. There exists a performance gap in object
+detection for adverse lighting conditions [40]. The inclusion of a thermal camera in the
+sensor’s suite provides a way to fill the blind spots in environmental perception. The
+thermal camera is robust against illumination variation and has advantage to be deployed
+during day and night. The object detection and classification are indispensable for visual
+perception, which provides a basis for computing perception in an autonomous driving.
+SOURCE: Exploring Thermal Images for Object Detection in
+Underexposure Regions for Autonomous Driving
+
+Maybe use table at the end of "All-weather vision for automotive safety: which spectral band?"
+as inspiration for a table comparing the advantages and 
+disadvantages of different sensor modalities.
+
+Appearance change. Figure 7 shows several examples of
+pedestrians in the day and night time. The color image in
+daytime shows a distinct human shape due to the strong
+sunlight. On the other hand, the shape in the color image
+at nighttime is not distinguishable due to the dark environment. 
+However, the thermal image shows a distinct shape
+at nighttime, because the temperature difference is greater
+when the air temperature is cooler, so the pedestrians having a 
+fixed temperature, can be clearly captured in the nighttime. In 
+the daytime, the strong sun radiation causes background clutters. 
+For these reasons, we can expect to obtain
+better performance by using the strong points of the color
+and the thermal images throughout the day.
+\cite{hwang2015multispectralPedestrianDetection}
+
+It is very challenging for various visual tasks on visible
+image with limited quality, for example, in low light conditions due to the loss of effective target areas. Infrared
+images, which are not limited by light conditions, can play
+a role of supplementary information. Visible images contain a great deal of texture information and details, but it
+is difficult to distinguish objects under low-light condition.
+Infrared images are imaged through the temperature field
+of the object surface, so they can highlight targets such as
+pedestrians, but the texture information is missing. Visible
+and infrared image fusion can generate a single complementary image that has both rich detail information and effective
+target areas. Then the fused image can be applied to human
+visual perception, object detection and video surveillance.
+Source: LLVIP: A Large-Scale Visible-Infrared Paired Dataset for Low-Light Video Surveillance
+
+
 
 
 \subsection{Selected Hardware Platform}
