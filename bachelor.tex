@@ -845,45 +845,131 @@ in thermal contrast during rain and sunny days is clearly visible \cite{bustos20
 
 \paragraph{LiDAR}
 
-Light Detection and Ranging (LiDAR) systems actively measure
-distance by emitting laser pulses and analyzing their return
-time. They provide accurate 3D geometric information and are
-largely invariant to lighting conditions. However, UAV-mounted
-LiDAR systems typically introduce higher weight, power
-consumption, cost, and computational complexity. Moreover,
-point cloud density at typical UAV altitudes may limit small
-object detection performance.
+LiDAR (Light Detection and Ranging) is an active remote sensing technique 
+for range-finding. It projects an optical signal onto a target and detects the
+reflected or backscattered return. By processing this return signal, the
+system determines the distance to the target and constructs a 3D point cloud
+of the surrounding environment, as illustrated in Fig.~\ref{fig:lidar_point_cloud}.
+LiDAR systems typically employ laser sources in the near-infrared spectral region,
+with wavelengths between 0.80 and 1.55\,\textmu m. This range coincides with
+an atmospheric transmission window, where water absorption is low. These
+wavelengths are also invisible to the human eye, which is an important
+safety consideration \cite{royo2019overviewLiDARAutonomousVehicles}.
 
-Source:
-ComparativeAnalysis of LiDAR, Radar, and Camera Sensors
-forAutonomous Perception: Principles, Challenges, and
-Fusion Strategies
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/lidar_point_cloud_melotti_2020_multimodal_recognition.png}
+    \caption{
+        Example obtained from KITTI 2D Object
+        Detection Dataset. The 3D point cloud is projected onto 
+        the image and coloured proportionally to the measured distance.
+        \cite{melotti2020multimodalCameraLiDARRecognition}
+    }
+    \label{fig:lidar_point_cloud}
+\end{figure}
 
-Although sensor applications have been significantly successful in many sectors, numerous
-problems or limitations remain. LiDAR's efficacy is hampered by specular reflections, inclement
-Proceedings of CONF-SPML 2026 Symposium: The 2nd Neural Computing and Applications Workshop 2025
-DOI: 10.54254/2755-2721/2026.TJ28614
-73
-weather, and economic considerations [3]; millimeter-wave radar data suffers from sparsity, high
-noise levels, and semantic interpretation difficulties [4]; and camera-based systems are challenged
-by depth estimation, illumination variations, and occlusions [5].
+Three main measurement approaches exist: pulsed time-of-flight (TOF),
+amplitude-modulated continuous wave (AMCW), and frequency-modulated
+continuous wave (FMCW). Pulsed TOF is currently the most widely used
+technology in automotive LiDAR systems and is therefore the focus of this
+section.
+\cite{royo2019overviewLiDARAutonomousVehicles}
+In pulsed TOF LiDAR, a short laser pulse is emitted toward a target. The
+system records the elapsed time until the reflected echo returns to the
+detector. Since the speed of light $c$ is a known constant, the range $R$ to
+the target is computed as:
+
+\begin{equation}
+    R = \frac{1}{2} \cdot c \cdot t_{\mathrm{TOF}}
+    \label{eq:lidar_range}
+\end{equation}
+
+where $t_{\mathrm{TOF}}$ is the round-trip travel time of the pulse. The
+factor of two accounts for the pulse travelling the distance to the target
+twice: once on the outward path and once on the return path. This principle
+is illustrated in Figure~\ref{fig:lidar_tof}.
+\cite{wang2024introductionLiDARRemoteSensing}
+The ambiguity distance arises when a second pulse is
+emitted before the echo of the first has returned. In this case, the system
+cannot reliably assign the echo to the correct pulse. To avoid this, each
+new pulse must be transmitted only after the return of the previous one has
+been received \cite{wang2024introductionLiDARRemoteSensing}. The ambiguity
+distance is therefore inversely related to the pulse repetition rate, which
+can be seen in Equation~\ref{eq:lidar_range}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/lidar_tof_wang_2024_introduction_lidar.png}
+    \caption{
+        Pulsed time-of-flight measurement principle. A laser pulse is
+        emitted toward the target and the round-trip travel time
+        $t$ of the reflected echo is measured to determine
+        the range $R$.
+        \cite{royo2019overviewLiDARAutonomousVehicles}
+    }
+    \label{fig:lidar_tof}
+\end{figure}
 
 
-LIDAR, an acronym for “laser imaging, detection, and ranging”, is a remote sensing
-technology that has become increasingly popular in recent years, due to its ability to
-generate precise and highly accurate 3D images of the Earth’s surface. LIDAR systems
-mounted on UAVs are capable of collecting data for a wide range of applications, including
-surveying [51,52], environmental monitoring [53], and infrastructure inspection [54–56].
-\cite{zhang2023reviewUAVRemoteSensing}
+Two factors constrain the maximum measurable object recognition range in LiDAR systems.
+The first is atmospheric scattering, which causes the laser pulse to lose
+energy as it travels, leaving only a small fraction of emitted light to
+return to the detector.
+\cite{royo2019overviewLiDARAutonomousVehicles}
+This effect is worsened by adverse weather conditions such as fog, snow,
+and rain, analogous to the scattering behavior previously described for
+near-infrared cameras, as LiDAR operates in the same electromagnetic range.
+In such conditions, suspended particles redirect a portion of the emitted
+pulse back toward the sensor before it reaches the target, a phenomenon
+known as backscatter.
+At a visibility of \SI{25}{\meter}, backscatter reduces the perceivable
+range to approximately \SI{6}{\meter} and introduces numerous false
+measurements, as illustrated in Figure~\ref{fig:fog_chamber_rgb_lidar_radar}.
+Therefore, LiDAR is a viable solution for night driving, yet unreliable
+under adverse weather conditions.
+\cite{bijelic2020seeingThroughFog}
+\cite{kim2023analysisLiDARPerformanceFogRain}
 
-One of the key advantages of using LIDAR in UAV remote sensing is its ability to
-provide highly accurate and detailed elevation data. By measuring the time it takes for
-laser pulses to bounce off the ground and return to the sensor, LIDAR can create a highresolution digital elevation model (DEM) of the terrain. This data can be used to create
-detailed 3D maps of the landscape, which are useful for a variety of applications, such as
-flood modeling, land use planning, and urban design.
-\cite{zhang2023reviewUAVRemoteSensing}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/fog_chamber_rgb_lidar_radar_bijelic_2020_seeing_through_fog.png}
+    \caption{
+        Multimodal sensor response of RGB camera, scanning lidar, and radar 
+        in a fog chamber with dense fog. Reference recordings under clear 
+        conditions shown in the first row, recordings in fog with 
+        visibility of \SI{23}{\meter} shown in the second row.
+        \cite{bijelic2020seeingThroughFog}
+    }
+    \label{fig:fog_chamber_rgb_lidar_radar}
+\end{figure}
 
+The second factor limiting the maximum object recognition range is the sparsity
+and limited information content of point clouds. Unlike RGB images, point clouds
+lack rich semantic cues such as texture and color information, which limits
+object recognition capabilities compared to camera-based methods. 
+Beyond this, the structure of point cloud data itself
+poses difficulties. Unlike the regular 2D pixel grid of a camera image, 3D
+points are unordered and lack fixed neighborhoods, making local feature
+extraction sensitive to small perturbations, especially at larger distances. 
+This is further compounded by sparsity, which is severely imbalanced 
+across objects and worsens with distance, as illustrated in 
+Figure~\ref{fig:sparse_point_cloud}. At greater distances, 
+fewer points are captured and spatial shapes become increasingly 
+incomplete, causing small or thin objects like pedestrians to be 
+potentially missed entirely.
+\cite{wang2023lidarOnly3DObjectDetection}
+\cite{qi2020imvotenet}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/sparse_point_cloud_wang_2023_3d_only_detection.png}
+    \caption{
+        Sparse point cloud distribution of vehicles at increasing distances.
+        \cite{wang2023lidarOnly3DObjectDetection}
+    }
+    \label{fig:sparse_point_cloud}
+\end{figure}
 
 \paragraph{Radar}
 
@@ -926,6 +1012,20 @@ modalities for UAV-based vehicle detection.
 
 
 \subsection{Modality Selection}
+
+Light Detection and Ranging (LiDAR) systems actively measure
+distance by emitting laser pulses and analyzing their return
+time. They provide accurate 3D geometric information and are
+largely invariant to lighting conditions. However, UAV-mounted
+LiDAR systems typically introduce higher weight, power
+consumption, cost, and computational complexity. Moreover,
+point cloud density at typical UAV altitudes may limit small
+object detection performance.
+
+Source:
+ComparativeAnalysis of LiDAR, Radar, and Camera Sensors
+forAutonomous Perception: Principles, Challenges, and
+Fusion Strategies
 
 Based on this evaluation, a multimodal configuration combining
 RGB and LWIR imaging was selected. The two modalities provide
