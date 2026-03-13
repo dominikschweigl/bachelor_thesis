@@ -315,9 +315,9 @@ operational autonomy and system responsiveness.
 The choice of the sensor system was primarily driven by the
 selection of suitable data modalities for reliable vehicle
 detection in aerial imagery and ease of integration. 
-Several sensing modalities
-were considered: RGB imaging, long-wave infrared (LWIR)
-thermal imaging, LiDAR, and radar. Each modality offers
+The most widely used modalities in autonomous automotive
+applications are being evaluated: RGB imaging, infrared
+imaging, LiDAR, and radar. Each modality offers
 distinct advantages and limitations in terms of spatial
 resolution, robustness to illumination changes, weather
 tolerance, geometric information content, and computational
@@ -888,14 +888,14 @@ where $t_{\mathrm{TOF}}$ is the round-trip travel time of the pulse. The
 factor of two accounts for the pulse travelling the distance to the target
 twice: once on the outward path and once on the return path. This principle
 is illustrated in Figure~\ref{fig:lidar_tof}.
-\cite{wang2024introductionLiDARRemoteSensing}
 The ambiguity distance arises when a second pulse is
 emitted before the echo of the first has returned. In this case, the system
 cannot reliably assign the echo to the correct pulse. To avoid this, each
 new pulse must be transmitted only after the return of the previous one has
-been received \cite{wang2024introductionLiDARRemoteSensing}. The ambiguity
+been received. The ambiguity
 distance is therefore inversely related to the pulse repetition rate, which
 can be seen in Equation~\ref{eq:lidar_range}.
+\cite[pp.~25]{wang2024introductionLiDARRemoteSensing}
 
 \begin{figure}[H]
     \centering
@@ -973,18 +973,191 @@ potentially missed entirely.
 
 \paragraph{Radar}
 
-Radar sensors operate robustly under adverse weather conditions
-such as fog, rain, or dust and provide direct velocity
-information via the Doppler effect. Nevertheless, radar
-generally offers lower spatial resolution compared to optical
-modalities, which complicates precise object localization and
-classification in dense traffic scenes.
+The basic operating principle of imaging radar (Radio Detection and Ranging) is 
+largely similar to that of LiDAR systems. While LiDAR emits laser pulses in the 
+near-infrared spectrum and detects the reflected light using photodetectors, radar 
+systems transmit radio waves in the microwave range and detect the reflected signals 
+using antennas.
+Imaging radar emits short microwave pulses in a narrow beam from its antennas. These 
+waves propagate through space, reflect off objects, and return as echoes, as illustrated 
+in Figure~\ref{fig:radar_principle}. The received signals are then processed by the 
+radar receiver, where the signal processing chain is largely based on the Fourier 
+transform, which converts the raw wave signals measured by antenna arrays 
+into spatial and motion-related information. From this processing, the range of 
+objects is estimated from the time delay of the returned signal, while the signal 
+strength provides information about the reflectivity of targets, which depends on 
+properties such as size, shape, and material. In addition, the relative radial velocity of 
+objects can be estimated using the Doppler shift of the returned signal. 
+To localize objects in the environment, angular 
+information is obtained from the antenna array geometry using phase differences 
+across antennas, which allows estimation of the 
+vertical angle (elevation) along the vertical antenna dimension and the horizontal 
+angle (azimuth) along the horizontal antenna dimension.
+\cite[pp.~389, 400]{lillesand2015remoteSensing}
+\cite{kurniawan2023clusterfusionRadarCamera3DObjectDetection}
+\cite{srivastav2023radarsAutonomousDriving}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/radar_principle_lillesand_2015_remote_sensing.png}
+    \caption{
+        Operating principle of imaging radar: (a) propagation of one radar
+        pulse wavefront location at multiple time intervals; (b) resulting
+        antenna return.
+        Modified after \cite[p.~390]{lillesand2015remoteSensing}.
+    }
+    \label{fig:radar_principle}
+\end{figure}
+
+Radar data can be represented in several formats extracted at different
+stages of the Fourier-transform-based signal processing chain, including
+the range-azimuth-Doppler (RAD) tensor, range-azimuth heatmap, point cloud,
+and micro-Doppler spectrogram (rarely used for object detection because it
+does not provide spatial information), as illustrated in Fig.~\ref{fig:radar_formats}. 
+Modern 4D radars capture observations across range, Doppler, azimuth, and elevation,
+producing a four-dimensional radar tensor. Earlier 3D radar systems commonly
+store observations in a three-dimensional range-azimuth-Doppler tensor,
+where measurements are averaged over the elevation dimension if present.
+This representation allows object position, speed, and coarse 2D shape to
+be inferred directly from the tensor, because the azimuth and elevation
+resolution are typically low.
+Due to their large size, RAD tensors are impractical for deep learning and
+are often compressed. A common example is
+the range-azimuth heatmap, which forms a 2D radar image (top-down view) by
+collapsing the Doppler dimension. Each bin contains the amplitude of the
+observations as seen in Figure~\ref{fig:range_azimuth_heatmap}, 
+occasionally including collapsed Doppler information. This
+representation still enables localization of objects in the top-down view,
+but loses the ability to represent multiple velocities at the same spatial
+location, retaining only an average Doppler estimate per location.
+\cite{srivastav2023radarsAutonomousDriving}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/radar_formats_2023_srivastav_radars_autonomous_vehicles.png}
+    \caption{
+        Commonly used radar data formats: 
+        (a) Range-Azimuth-Doppler tensor, 
+        (b) Range-Azimuth heatmap,
+        (c) Radar point cloud showing strong observations from the radar cube,
+        (d) Micro-Doppler spectrogram capturing temporal variations of object motion.
+        \cite{srivastav2023radarsAutonomousDriving}
+    }
+    \label{fig:radar_formats}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/range_azimuth_map_2021_wang_rodnet.png}
+    \caption{
+        Example Images of range-azimuth heatmaps with corresponding RGB images.
+        Leftmost image shows two pedestrians detected as a single azimuth peak.
+        Right image shows detection of occluded vehicle.
+        Rightmost images shows detection independent of sunlight.
+        \cite{wang2021rodnetRadarObjectDetection}
+    }
+    \label{fig:range_azimuth_heatmap}
+\end{figure}
+
+While the formats mentioned above are commonly used to represent radar data, 
+object detection commonly relies on radar point clouds for input data. The 
+point cloud represents relevant observations within the radar cube as a sparse 
+set of data points in 3D space, since objects typically occupy only small 
+subspaces of the radar tensor. Each point corresponds to a peak in the radar 
+tensor obtained using a constant false alarm rate (CFAR) peak extraction 
+algorithm. CFAR classifies a cell in the radar cube as containing a signal, that 
+is an echo, if its amplitude relative to the average noise floor computed from 
+surrounding cells exceeds a predefined threshold. Each point in the cloud 
+contains both spatial features describing its 3D location consisting of range, 
+azimuth, and elevation if present, and radar specific attributes such as radial 
+velocity.
+\cite{srivastav2023radarsAutonomousDriving}
+
+Radar point clouds are represented either in a bird's eye view (BEV) or in a 
+perspective view, as illustrated in Figure~\ref{fig:radar_point_cloud_formats}. 
+In the BEV representation, points are accumulated in a top down grid that includes 
+observations even when they are occluded. In contrast, the perspective view 
+represents the radar data from the viewpoint of the radar sensor and is similar 
+to camera images from the ego vehicle, but with an additional depth feature and 
+an associated velocity assigned to each pixel. However, radar 
+perspective images have low and irregular spatial resolution due to the limited 
+azimuth and elevation resolution of radar sensors. Moreover, the capability to 
+capture occluded objects is lost in the perspective view.
+\cite{srivastav2023radarsAutonomousDriving}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/radar_point_cloud_formats_2023_srivastav_radars_autonomous_vehicles.png}
+    \caption{
+        Radar point cloud data input formats used for deep learning
+        models. The bird-eye view (BEV) (a) in a top-down grid,
+        while the perspective view (b) projects data as seen from an image.
+        \cite{srivastav2023radarsAutonomousDriving}
+    }
+    \label{fig:radar_point_cloud_formats}
+\end{figure}
+
+Overall, radar sensors provide high resolution information about object distance
+and velocity, as well as low-resolution estimates of shape, size, and
+material properties, which is beneficial for object detection.
+Since radar systems operate using radio waves of roughly \SI{4}{\milli\meter} 
+rather than visible or
+infrared light, they are largely insensitive to lighting conditions
+and remain robust in low-visibility environments such as fog, dust,
+or moderate rain. Their relatively large wavelength results in minimal
+scattering by small particles, allowing radar signals to propagate
+through adverse weather conditions with little attenuation, as
+illustrated in Figure~\ref{fig:signal_attenuation_radar_lidar}.
+This also enables radar to detect objects over long distances and
+to observe objects under partial occlusion.
+\cite{kurniawan2023clusterfusionRadarCamera3DObjectDetection}
+\cite{karangwa2023reviewVehicleDetectionAutonomousDriving}
+\cite{srivastav2023radarsAutonomousDriving}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/signal_attenuation_radar_lidar_2023_srivastav_radars_autonomous_vehicles.png}
+    \caption{
+        A comparison of signal power attenuation in moderate and
+        heavy rain (left) and in moderate and dense fog conditions (right). 
+        Both lidar and radar perform well in heavy rain conditions, but
+        lidar undergoes significant attenuation in fog while radar is unaffected.
+        \cite{srivastav2023radarsAutonomousDriving}
+    }
+    \label{fig:signal_attenuation_radar_lidar}
+\end{figure}
+
+However, radar sensors typically provide low angular resolution due to 
+antenna array size constraints and therefore produce sparse and partial 
+point clouds of detected objects. This sparsity makes reliable object 
+recognition very difficult when radar data is used alone and often 
+requires fusion with complementary sensors such as cameras or LiDAR, 
+which limits the overall weather robustness to that of the fused sensors. 
+In addition, the large radar wavelength can cause nearby surfaces, such as 
+the ground or guardrails, to act as specular reflectors (i.e. mirrors), 
+producing spurious observations in radar data known as clutter, as seen in 
+Figure~\ref{fig:radar_multipath_clutter}, which may result in false positives.
+\cite{kurniawan2023clusterfusionRadarCamera3DObjectDetection}
+\cite{karangwa2023reviewVehicleDetectionAutonomousDriving}
+\cite{srivastav2023radarsAutonomousDriving}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/radar_multipath_2023_srivastav_radars_autonomous_vehicles.png}
+    \caption{
+        Three multipath effects caused by reflections that produce spurious radar 
+        observations with incorrect path length, velocity, or location: 
+        (a) double bounce, (b) underbody reflections, and (c) mirrored ghost detections.
+        \cite{srivastav2023radarsAutonomousDriving}
+    }
+    \label{fig:radar_multipath_clutter}
+\end{figure}
 
 Table~\ref{tab:modality_comparison} summarizes the main
 advantages and disadvantages of the evaluated sensing
 modalities for UAV-based vehicle detection.
 
-\begin{table}[h]
+\begin{table}[H]
     \centering
     \caption{Key properties of sensing modalities for UAV-based vehicle detection.}
     \label{tab:modality_comparison}
@@ -995,7 +1168,8 @@ modalities for UAV-based vehicle detection.
         Sensing principle          & Passive; reflected ambient light \\
         Electromagnetic range      & 0.4~$\mu$m -- 0.7~$\mu$m \\
         Spatial resolution         & Very high (megapixels) \\
-        Semantic richness          & Very high  \\
+        Texture information        & Very high  \\
+        Color information          & Yes \\
         Depth / metric output      & Indirect (inferred) \\
         Low-light                  & Poor \\
         Weather robustness         & Low \\
@@ -1006,6 +1180,10 @@ modalities for UAV-based vehicle detection.
         Form factor                & Compact \\
         Cost                       & Low \\
         Maturity                   & Very high \\
+        Occluded object detection  & Poor \\
+        Spatial resolution         & High \\
+        Velocity information       & No \\
+
         \bottomrule
     \end{tabular}
 \end{table}
