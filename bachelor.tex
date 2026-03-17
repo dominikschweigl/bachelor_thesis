@@ -583,7 +583,7 @@ image we see (Figure~\ref{fig:bayer_filter}b).
 \end{figure}
 
 Cameras are the most widely used remote sensing modality in autonomous 
-traffic applications—and for good reason. RGB cameras offer exceptionally 
+traffic applications for good reason. RGB cameras offer exceptionally 
 high spatial resolution and capture rich semantic information, including 
 color, texture, shape, and fine-grained patterns over distances of several 
 hundred meters \cite{wu2025comparativeAnalysisLiDARRadarCamera}. This 
@@ -1159,181 +1159,112 @@ modalities for UAV-based vehicle detection.
 
 \begin{table}[H]
     \centering
-    \caption{Key properties of sensing modalities for UAV-based vehicle detection.}
+    \caption{Qualitative comparison of sensing modalities for vehicle detection.}
     \label{tab:modality_comparison}
-    \begin{tabular}{lc}
+    \small
+    \setlength{\tabcolsep}{8pt}
+    \begin{tabular}{lcccc}
         \toprule
-        \textbf{Property} & \textbf{Visible-band Imaging} \\
-        \midrule
-        Sensing principle          & Passive; reflected ambient light \\
-        Electromagnetic range      & 0.4~$\mu$m -- 0.7~$\mu$m \\
-        Spatial resolution         & Very high (megapixels) \\
-        Texture information        & Very high  \\
-        Color information          & Yes \\
-        Depth / metric output      & Indirect (inferred) \\
-        Low-light                  & Poor \\
-        Weather robustness         & Low \\
-        Detection range            & Up to several hundred metres \\
-        Typical frame rate         & 30--60~Hz \\
-        Weight                     & Low \\
-        Power consumption          & Low \\
-        Form factor                & Compact \\
-        Cost                       & Low \\
-        Maturity                   & Very high \\
-        Occluded object detection  & Poor \\
-        Spatial resolution         & High \\
-        Velocity information       & No \\
-
+        \textbf{Property} & \textbf{Optical} & \textbf{LWIR} & \textbf{LiDAR} & \textbf{Radar} \\
+        \midrule  
+        Sensing principle          & Passive & Passive & Active & Active \\
+        Spatial resolution         & Very high & Moderate & High & Low \\
+        Texture information        & Very high & Low & None & None \\
+        Color information          & Yes & No & No & No \\
+        Depth                      & No & No & Yes & Yes \\
+        Low-light                  & Poor & Excellent & Excellent & Excellent \\
+        Fog                        & Poor & Good & Poor & Excellent \\
+        Rain                       & Moderate & Good & Moderate & Excellent \\
+        Snow                       & Poor & Moderate & Poor & Excellent \\
+        High-contrast lighting     & Poor & Excellent & Excellent & Excellent \\
+        Occluded object detection  & Poor & Poor & Poor & Moderate \\
+        Velocity information       & No & No & Inferred & Yes \\
         \bottomrule
     \end{tabular}
 \end{table}
 
 
-\subsection{Modality Selection}
+\subsection{Sensor System}
 
-Light Detection and Ranging (LiDAR) systems actively measure
-distance by emitting laser pulses and analyzing their return
-time. They provide accurate 3D geometric information and are
-largely invariant to lighting conditions. However, UAV-mounted
-LiDAR systems typically introduce higher weight, power
-consumption, cost, and computational complexity. Moreover,
-point cloud density at typical UAV altitudes may limit small
-object detection performance.
-
-Source:
-ComparativeAnalysis of LiDAR, Radar, and Camera Sensors
-forAutonomous Perception: Principles, Challenges, and
-Fusion Strategies
+% TODO: refine the wording of this section
 
 Based on this evaluation, a multimodal configuration combining
-RGB and LWIR imaging was selected. The two modalities provide
-complementary information: RGB data enables high-resolution
-visual feature extraction under favorable lighting conditions,
-while LWIR data ensures robustness in low-light or night-time
-scenarios. This combination allows investigation of both
-single-modality and sensor-fusion approaches without the
-increased system complexity associated with LiDAR or radar
-integration.
-
-The selected hardware platform integrates these modalities in a
-compact UAV-compatible form factor, enabling synchronized
-data acquisition and simplified calibration between sensors.
-
-For instance, RGB 
-imaging provides high spatial resolution and rich texture 
-information but is sensitive to lighting conditions. In contrast, 
-thermal imaging captures emitted radiation, making it robust to 
-illumination changes but often with lower spatial resolution. 
-LiDAR offers precise 3D geometric information but can be affected 
-by weather conditions and may have limited range from a UAV platform. 
-Radar is robust to adverse weather and provides velocity information 
-but typically has low spatial resolution.
-Therefore, is crucial for developing
-more effective object detection systems that leverage the strengths
-of multiple imaging modalities while also considering their inherent
-limitations.
-\cite{bustos2023reviewObjectDetectionIR}
-
-The sensors commonly used for perception in the autonomous driving includes Lidar,
-RGB cameras, and radar. Object detection using these sensor modalities provides the
-perception for the autonomous driving, but in contrast, each of these sensor modalities
-has its drawbacks. Lidar gives a sparse 3D map representation of the environment, but
-small objects like pedestrians and cyclists are hard to detect at a large distance. Similarly,
-the RGB camera performs poorly in unfavorable illumination conditions such as low
-lighting, sun glare, and glare from the headlight of the vehicle. Radar has a low spatial
-resolution to detect pedestrians accurately. There exists a performance gap in object
-detection for adverse lighting conditions [40]. The inclusion of a thermal camera in the
-sensor’s suite provides a way to fill the blind spots in environmental perception. The
-thermal camera is robust against illumination variation and has advantage to be deployed
-during day and night. The object detection and classification are indispensable for visual
-perception, which provides a basis for computing perception in an autonomous driving.
-SOURCE: Exploring Thermal Images for Object Detection in
-Underexposure Regions for Autonomous Driving
-
-Maybe use table at the end of "All-weather vision for automotive safety: which spectral band?"
-as inspiration for a table comparing the advantages and 
-disadvantages of different sensor modalities.
-
-Appearance change. Figure 7 shows several examples of
-pedestrians in the day and night time. The color image in
-daytime shows a distinct human shape due to the strong
-sunlight. On the other hand, the shape in the color image
-at nighttime is not distinguishable due to the dark environment. 
-However, the thermal image shows a distinct shape
-at nighttime, because the temperature difference is greater
-when the air temperature is cooler, so the pedestrians having a 
-fixed temperature, can be clearly captured in the nighttime. In 
-the daytime, the strong sun radiation causes background clutters. 
+RGB and LWIR imaging was selected. Optical imaging provide the
+the most informative visual features under favorable lighting conditions
+of all modalities. 
+The inclusion of a thermal camera provides a way to 
+fill the blind spots in optical environmental perception
+in low-light and adverse weather conditions.
+To make up for the limitations of optical cameras, LWIR imaging was selected 
+as a complementary modality because of its independence of external 
+illumination and robustness to atmospheric scattering in adverse weather
+due to it's longer wavelength.
 For these reasons, we can expect to obtain
 better performance by using the strong points of the color
 and the thermal images throughout the day.
-\cite{hwang2015multispectralPedestrianDetection}
+LiDAR was disregarded due to the fact that its performance
+degrades significantly in fog, rain, and snow, which are precisely the
+conditions under which RGB cameras also fail as seen in Table~\ref{tab:modality_comparison}. The
+NIR spectrum 
+used by LiDAR lies very close to the visible spectrum.
+Radar was also disregarded due to its low spatial resolution, 
+which requires fusion with complementary 
+sensors such as cameras or LiDAR to achieve reliable object 
+recognition, which would limit the overall weather robustness 
+to that of the fused sensors.
+The selected RGB and LWIR modalities provide a good balance of 
+complementary strengths and weaknesses for vehicle detection,
+though they are not without limitations as previously discussed.
+It was deemed that the combination of these two modalities would provide a
+sufficiently rich data source for
+object detection under a wide range of conditions.
 
-It is very challenging for various visual tasks on visible
-image with limited quality, for example, in low light conditions due to the loss of effective target areas. Infrared
-images, which are not limited by light conditions, can play
-a role of supplementary information. Visible images contain a great deal of texture information and details, but it
-is difficult to distinguish objects under low-light condition.
-Infrared images are imaged through the temperature field
-of the object surface, so they can highlight targets such as
-pedestrians, but the texture information is missing. Visible
-and infrared image fusion can generate a single complementary image that has both rich detail information and effective
-target areas. Then the fused image can be applied to human
-visual perception, object detection and video surveillance.
-Source: LLVIP: A Large-Scale Visible-Infrared Paired Dataset for Low-Light Video Surveillance
+A big limitation of this configuration is that it does not include 
+active sensors such as LiDAR or radar, which provide depth information.
+This would be very beneficial for the later stage of traffic jam
+classification, as it would allow for more accurate estimation of the
+distance to detected vehicles and their relative speed, which are important 
+cues for traffic jam classification. For this reason, a laser-based 
+distance measurement was desired in the selected hardware platform, 
+which can provide some depth information. An initial idea was to
+integrate this modality with the existing RGB and LWIR sensors to
+give the model depth information which can be used to better predict
+vehicle bounding box sizes. However, it was decided that this modality is not 
+used for object detection in this project 
+due to the fact that it only provides a single distance measurement
+in the center of the field of view which can be vastly different 
+from the actual position of detected vehicles, making it unsuitable 
+for estimating vehicle size in the image, and is not robust to adverse weather conditions, as it 
+operates in the same near-infrared spectrum as LiDAR. Therefore, 
+it was decided that the laser-based distance measurement would be 
+reserved for later use in traffic jam classification.
 
-
-
-
-\subsection{Selected Hardware Platform}
-
-% Find out if optical and thermal sensors are already aligned in the WIRIS Enterprise,
-% like in \cite{hwang2015multispectralPedestrianDetection}, where beam splitter
-% is used or if there is small amount of parallax
-
-Reason for selection: Ease of integration/lightweight
-and out-of-the box alignment (explain the alignment problem
-and how it would have been needed to be solved with illustrations)
-
-Sensor data acquisition is performed using the 
-\textit{Workswell WIRIS Enterprise}, a multi-sensor system 
-specifically designed for use with UAVs. The WIRIS Enterprise 
-integrates three sensing 
-modalities: RGB imaging, thermal imaging, and laser-based 
-distance measurement. Its weight is specified at less than 
+Based on this specification, sensor data acquisition is performed using the 
+\textit{Workswell WIRIS Enterprise} seen in Figure~\ref{fig:WIRIS_Enterprise}. 
+The WIRIS Enterprise integrates the three sensing 
+modalities: RGB imaging at resolution 1920\,×\,1080 pixels, thermal imaging
+ at resolution 640\,×\,512 pixels, and laser-based 
+central distance measurement along the optical axis of up to 1500\,m.
+These values are below the maximum specifications listed for the
+WORKswell WIRIS Enterprise, but they are the maximum that can be achieved
+during simultaneous video recording and are sufficient for the intended application, as the RGB 
+and LWIR resolutions are comparable to those of existing datasets used 
+for training and evaluation of vehicle detection models.
+This multi-sensor system is
+specifically designed for use with UAVs and significantly reduces
+the complexity of mounting the three sensors on the drone by requiring
+only a single gimbal.
+Its weight is specified at less than 
 680\,g, and its dimensions are approximately 76\,×\,107\,×\,102\,mm. 
 The system operates with a supply voltage between 9\,V and 36\,V 
 DC and has a typical power consumption of approximately 
 18\,W (peak consumption around 21\,W). These specifications 
-allow integration into the drone’s power system with 
+allow integration into the drone's power system with 
 appropriate battery capacity planning.
 \cite{worksellWIRISspec2022}
 
-The integrated RGB camera provides high-resolution visual 
-imagery with a resolution of up to 4928\,×\,3264 pixels. This modality enables detailed 
-visual analysis and supports object detection algorithms 
-requiring high spatial resolution.
-\cite{worksellWIRISspec2022}
 
-The thermal imaging unit is based on an uncooled long-wave 
-infrared (LWIR) microbolometer. In super-resolution mode, it 
-delivers thermal frames with a resolution of 1266\,×\,1010 
-pixels. The thermal modality enables vehicle detection 
-independent of visible lighting conditions and is particularly 
-advantageous in low-light or night-time scenarios.
-\cite{worksellWIRISspec2022}
-
-In addition to visual and thermal imaging, the WIRIS Enterprise 
-integrates an eye-safe laser rangefinder with a maximum 
-detection range of up to 1500\,m. The system provides a 
-central distance measurement per frame, corresponding to the 
-measured distance along the optical axis. This distance 
-information is used for spatial localization of detected 
-vehicles and for estimating ground sampling distance (GSD) 
-during flight.
-\cite{worksellWIRISspec2022}
-
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.45\textwidth]{images/wiris_enterprise_shadow.png}
     \vspace{-1em}
@@ -1344,7 +1275,50 @@ during flight.
     \label{fig:WIRIS_Enterprise}
 \end{figure}
 
-\section{System Integration Overview}
+% Find out if optical and thermal sensors are already aligned in the WIRIS Enterprise,
+% like in \cite{hwang2015multispectralPedestrianDetection}, where beam splitter
+% is used or if there is small amount of parallax
+
+A primary reason for the \textit{Workswell WIRIS Enterprise} is the
+out-of-the-box spatial alignment it provides between these two sensor types.
+This is a non-trivial advantage: RGB and infrared sensors generally suffer from
+inherent misalignment because they occupy different physical positions on a
+device, resulting in different coordinate systems, mismatched fields of view,
+and differing sampling frequencies that introduce temporal offsets — and for
+moving objects, these temporal gaps result in spatial misalignment as well.
+Many existing multi-modal fusion methods assume that visible-infrared image
+pairs are perfectly geometrically aligned and fuse features directly, but in
+practice, paired images remain only weakly aligned, with objects differing 
+not only in position but also in scale and angle, as illustrated in
+Figure~\ref{fig:rgb_thermal_misalignment}.
+The practical severity of this problem is well documented: in the DroneVehicle
+dataset, which provides RGB-thermal image pairs captured from a UAV
+perspective, more than 20\% of bounding boxes exhibit misalignment defined as
+a position or size offset of at least 3 pixels or an angular offset of at
+least 3 degrees.
+Such misalignment directly degrades detection performance, producing
+low-quality bounding box predictions and undermining fusion methods that rely
+on aligned feature maps.
+\cite{yuan2022crossModalAlignmentVehicleDetection}
+\cite{he2023misalignedRGBTadaptiveCalibration}
+The hope is that by selecting a platform with factory-calibrated sensors, the
+alignment problem is addressed by the manufacturer as they specify aligned output
+of the modalities, eliminating the need
+for complex post-hoc registration.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.45\textwidth]{images/rgb_thermal_misalignment_yuan_2022_crossmodal_alignment.png}
+    \vspace{-1em}
+    \caption{
+        Illustration of the spatial modality misalignment problem.
+        \cite{yuan2022crossModalAlignmentVehicleDetection}
+    }
+    \label{fig:rgb_thermal_misalignment}
+\end{figure}
+
+
+% \section{System Integration Overview}
 
 % Table for weight
 
@@ -1369,10 +1343,16 @@ Appearance change. Figure 7 shows several examples of
 pedestrians in the day and night time. The color image in
 daytime shows a distinct human shape due to the strong
 sunlight. On the other hand, the shape in the color image
-at nighttime is not distinguishable due to the dark environment. However, the thermal image shows a distinct shape
+at nighttime is not distinguishable due to the dark environment. 
+However, the thermal image shows a distinct shape
 at nighttime, because the temperature difference is greater
-when the air temperature is cooler, so the pedestrians having a fixed temperature, can be clearly captured in the nighttime. In the daytime, the strong sun radiation causes background clutters. For these reasons, we can expect to obtain
-Source: Multispectral Pedestrian Detection: Benchmark Dataset and Baseline
+when the air temperature is cooler, so the pedestrians having a 
+fixed temperature, can be clearly captured in the nighttime. In 
+the daytime, the strong sun radiation causes background clutters. 
+For these reasons, we can expect to obtain
+better performance by using the strong points of the color
+and the thermal images throughout the day.
+\cite{hwang2015multispectralPedestrianDetection}
 
 \section{Motivation for Sensor Fusion}
 
@@ -1384,6 +1364,53 @@ chapter, we can talk about the motivation for sensor fusion.
 
 Fusion Degradation - Rethinking Multi-modal Object Detection from the Perspective of
 Mono-Modality Feature Learning (Drive)
+
+\paragraph{Misalignment}
+
+
+Image alignment is one of the issues that should be considered in cross-modal
+image applications. Existing methods [11,16,40,29,6,38,39] usually assume that
+visible-infrared image pairs are perfectly geometrically aligned, and they directly
+perform the multi-modal fusion methods. 
+Actually, after the image registration
+algorithm, the paired images are just weakly aligned (shown in Fig. 1(a)). However, 
+objects differ not only
+in position, but also in scale and angle. These three deviations (position, size and
+angle) of the paired arbitrary oriented objects are closely coupled, changing one
+will affect another one, which makes the alignment operation more complicated.
+As shown in Fig. 1(b), the dashed boxes represent the position of the corresponding 
+bounding-boxes in the infrared images. We find that the same object
+on image pairs differs in location, scale and angle. Therefore, weakly misalignment 
+in cross-modal aerial images is a common issue that needs to be addressed.
+To demonstrate the generality of the misalignment 
+problem in aerial
+imagery, we also obtain the statistics information of DroneVehicle dataset,
+a dataset that provides RGBT data taken from the UAV drone perspective. we
+separately count the number of bounding-boxes with deviations (position and
+size offset by 3 pixels, angle offset by 3 degrees) in the DroneVehicle dataset.
+More than 20\% of the bounding-boxes have the misalignment 
+problem.
+\cite{yuan2022crossModalAlignmentVehicleDetection}
+
+Spatial misalignment: Since RGB and infrared sensors have different coordinate systems,
+fields of view, and sampling frequencies, pairs of RGB and infrared images usually are spatial
+misaligned [21], resulting in low-quality bounding boxes predicted by RGB and infrared fusion
+object detection, as shown in Figure 1a. Figure 1b indicates that the fusion of original RGB
+and infrared images via the image fusion algorithm [22] will take in a significantly misaligned
+ghost, which will also disturb localization. The downsampling may decrease the degree of
+misalignment [8], yet the situation still exists, as shown in Figure 1c. The performance of
+RGB and infrared fusion detection methods that directly fuse misaligned features is not ideal.
+Therefore, achieving spatial alignment between RGB and infrared modalities is crucial. The
+training process of existing RGB and infrared fusion object-detection networks [7,19] relies on
+manually aligned datasets in advance. However, manual alignment is a labor-intensive task
+[13,23], and there will still be subtle misalignments after manual processing, such as the FLIR
+dataset [24]. A more feasible way is to take misaligned RGB and infrared images as input
+directly, and how to adaptively perform spatial alignment at the feature level is the concern of
+our work. Furthermore, RGB and infrared images usually have different resolutions. Existing
+works [22,25] directly resize different modal images to the same size through downscaling or
+upscaling, either dropping beneficial information or introducing redundancy and increasing
+computational overhead.
+\cite{he2023misalignedRGBTadaptiveCalibration}
 
 \section{Early Fusion}
 
@@ -1414,9 +1441,10 @@ Dataset collection I found that is usable:
 - DAWN Dataset
 - RASMD Dataset (SWIR but maybe usable as pretraining data for our LWIR)
 - ACDC
-- FLIR
+- FLIR ADAS v2 vey good
 - FLIR OEM
-- M3FD
+- M3FD <- not so big and multispectral focused
+- VTUAV <- is rather tracking focussed than detection
 Look in table 1 of RASMD dataset for others that can be used for pretraining
 
 Though I need to consider that most of the datasets are for pedestrian detection, 
