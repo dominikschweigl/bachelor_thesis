@@ -1275,13 +1275,10 @@ appropriate battery capacity planning.
     \label{fig:WIRIS_Enterprise}
 \end{figure}
 
-% Find out if optical and thermal sensors are already aligned in the WIRIS Enterprise,
-% like in \cite{hwang2015multispectralPedestrianDetection}, where beam splitter
-% is used or if there is small amount of parallax
 
 A primary reason for the \textit{Workswell WIRIS Enterprise} is the
 out-of-the-box spatial alignment it provides between these two sensor types.
-This is a non-trivial advantage: RGB and infrared sensors generally suffer from
+This is an advantage as RGB and infrared sensors generally suffer from
 inherent misalignment because they occupy different physical positions on a
 device, resulting in different coordinate systems, mismatched fields of view,
 and differing sampling frequencies that introduce temporal offsets — and for
@@ -1297,16 +1294,12 @@ perspective, more than 20\% of bounding boxes exhibit misalignment defined as
 a position or size offset of at least 3 pixels or an angular offset of at
 least 3 degrees.
 Such misalignment directly degrades detection performance, producing
-low-quality bounding box predictions and undermining fusion methods that rely
+low-quality bounding box predictions and undermine fusion methods that rely
 on aligned feature maps.
 \cite{yuan2022crossModalAlignmentVehicleDetection}
 \cite{he2023misalignedRGBTadaptiveCalibration}
-The hope is that by selecting a platform with factory-calibrated sensors, the
-alignment problem is addressed by the manufacturer as they specify aligned output
-of the modalities, eliminating the need
-for complex post-hoc registration.
 
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.45\textwidth]{images/rgb_thermal_misalignment_yuan_2022_crossmodal_alignment.png}
     \vspace{-1em}
@@ -1316,6 +1309,20 @@ for complex post-hoc registration.
     }
     \label{fig:rgb_thermal_misalignment}
 \end{figure}
+
+However, this approach did not work because the WIRIS camera only 
+provides aligned images over the HDMI interface, which cannot be used 
+when distance measurements are required. Only the visible and thermal 
+streams are available there. All three streams are only accessible 
+simultaneously over Ethernet through separate RTSP streams, but in this 
+configuration, the visible and thermal cameras are not spatially aligned 
+or overlayed by the camera. Therefore, sensor alignment must be manually 
+implemented as described in section~\ref{chap:sensor_alignment}. On the 
+other hand, this separation offers more flexibility in developing the 
+object detection model, as the process is not constrained by the 
+cameras internal overlay method. By working with two complete, independent 
+video streams instead of a single overlayed stream, we gain access to 
+more information for detection.
 
 
 % \section{System Integration Overview}
@@ -1365,8 +1372,304 @@ chapter, we can talk about the motivation for sensor fusion.
 Fusion Degradation - Rethinking Multi-modal Object Detection from the Perspective of
 Mono-Modality Feature Learning (Drive)
 
-\paragraph{Misalignment}
+\section{Sensor Alignment}
+\label{chap:sensor_alignment}
 
+The sensor data exhibited two main issues that needed to be addressed:
+temporal misalignment and spatial misalignment between the RGB and thermal
+video streams.
+
+\paragraph{Temporal Misalignment}
+The temporal misalignment was primarily caused by differences in the sampling 
+rates of the two cameras. The RGB camera captured frames at 20\,fps, whereas 
+the thermal
+camera operated at 21.2\,fps. As a result, a direct frame-by-frame overlay
+was not possible, since the streams gradually drift apart over time. For
+instance, the ratio $20 / 21.2 \approx 0.9434$ leads to a temporal drift of
+approximately $3.4$\,seconds after one minute of recording.
+Additionally, the recordings from both cameras did not start simultaneously,
+introducing a constant temporal offset between the two streams.
+
+To address these issues, a two-step synchronization process was applied.
+First, the thermal video was temporally aligned to the RGB video by matching
+frames based on their timestamps. For each RGB frame, the closest thermal
+frame in time was identified using the presentation timestamps stored in the
+frame metadata. These timestamps were converted from discrete clock ticks to
+seconds by applying the corresponding timebase of each video stream. The
+thermal frame with the smallest temporal difference to the RGB frame was then
+selected, resulting in two videos with equal numbers of synchronized frames.
+
+While this step eliminated the progressive temporal drift, a constant offset
+between the videos remained due to different recording start times. This
+offset was estimated by identifying a distinct and easily recognizable event
+in both videos (e.g., two cars crossing, as shown in
+Figure~\ref{fig:event}). The difference between the corresponding timestamps
+yielded an offset of 2.6\,seconds.
+The final synchronization was achieved by shifting one video by this offset
+and repeating the frame-matching procedure. This resulted in temporally
+aligned video streams with a maximum frame pairing error of 55\,ms over
+15-minute recordings.
+
+The first problem that needed to be addressed for the sensor data
+was temporal misalignment in the collected video samples during data
+collection. This was due to the fact that the optical camera sampled
+frames at a rate of 20 fps, while the thermal camera provides 21.2 fps.
+This means that overlaying frame by frame was not possible as this
+leads to significant temporal mismatch. For example, after 1 minute with
+20/21.2 = 0.9434 which leads to a difference of 60s * 0.9434 = 3.4 seconds
+after 1 minute already.
+In addition, it was found that the videos collected during data collection did not start
+at the same time, which means that the temporal misalignment is also because of this.
+
+The first step to address this problem was to synchronize the videos by first
+converting the thermal video to the same frame rate as the RGB video. This was done by
+iterating through the RGB video frame by frame and for each RGB frame, 
+finding the closest thermal frame in time by using the presentation timestamp
+included in the metadata of the video frames, multiplying this timestamp 
+by the corresponding timebase of the two videos to convert it from ticks, which are
+integer time units used by media stream clocks, to seconds, and then finding the 
+thermal frame with the closest second timestamp to the RGB frame timestamp and matching
+them together, creating two videos with the same number of synchronized frames.
+
+After this process, the videos were no longer drifting apart temporally over time, yet
+there was still a constant temporal offset between the two videos due to the differing
+start times. This offset was estimated by selecting a well suited and easily identifiable
+event in both videos, such as two cars crossing each other as seen in Figure~\ref{fig:event}. 
+From this event, the timestamp 
+of the event in both videos was found and the difference between them was calculated 
+to obtain the temporal offset of 2.6 seconds. After this step, the videos were synchronized by shifting 
+one of the videos by this temporal offset and applying the same frame matching algorithm
+as before with the new offset. This resulted in two videos that were temporally aligned 
+with a maximum temporal frame pairing offset of 55 ms across 15 minute videos.
+
+\paragraph{Spatial Misalignment}
+After temporal alignment, spatial alignment between the two modalities was
+addressed. The spatial misalignment originates from three independent 
+factors, which are the physical separation of the sensors causing parallax, 
+the differing fields of view (FOV) of the cameras, and a misalignment in 
+the optical axes of the two cameras called boresight error.
+The camera parameters used to compute the required corrections are 
+listed in Table~\ref{tab:camera_params}.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcc}
+  \toprule
+  Parameter              & Visible                   & Thermal                  \\
+  \midrule
+  Resolution (W$\times$H) & $1280\times720$\,px       & $640\times512$\,px       \\
+  Horizontal FOV         & $63.7^\circ$                   & $45.0^\circ$                  \\
+  Vertical FOV           & $38.6^\circ$                   & $37.0^\circ$                  \\
+  Focal length           & $4.3$\,mm                 & $13.0$\,mm               \\
+  \bottomrule
+\end{tabular}
+\caption{
+    Workswell WIRIS Camera intrinsic parameters as provided by the calibration 
+    certificate and the specifications. \cite{worksellWIRISspec2022}
+}
+\label{tab:camera_params}
+\end{table}
+
+\paragraph{FOV error}
+
+The thermal camera covers a smaller angular region of the scene
+due to its narrower FOV (Table~\ref{tab:camera_params}).
+To quantify this, separate horizontal and vertical scale factors
+$s_H$ and $s_V$ are defined as the ratio of the real-world
+extents $H$ captured by each camera at equal depth $Z$.
+The pinhole model is used to derive this ratio. It approximates
+the camera projection by treating the lens as a single point,
+thereby neglecting distortion at the edges of the image, as
+illustrated in Figure~\ref{fig:pinhole_fov_scale}. Under this
+model, the half-extent at depth $Z$ is $Z\tan(\mathrm{FOV}/2)$.
+Since both cameras observe the same depth $Z$, it cancels in
+the ratio and both scale factors reduce to the depth-independent
+tangent ratio of the FOVs:
+
+\begin{align}
+  s_H &= \frac{H_{thm}^H}
+              {H_{vis}^H}
+       = \frac{Z\tan(\mathrm{FOV_{thm}^H}/2)}
+              {Z\tan(\mathrm{FOV_{vis}^H}/2)}
+       = \frac{\tan(\mathrm{FOV_{thm}^H}/2)}
+              {\tan(\mathrm{FOV_{vis}^H}/2)}
+       = \frac{\tan(22.5^\circ)}{\tan(31.85^\circ)}
+       = 0.667 \\[6pt]
+  s_V &= \frac{H_{thm}^V}
+              {H_{vis}^V}
+       = \frac{Z\tan(\mathrm{FOV_{thm}^V}/2)}
+              {Z\tan(\mathrm{FOV_{vis}^V}/2)}
+       = \frac{\tan(\mathrm{FOV_{thm}^V}/2)}
+              {\tan(\mathrm{FOV_{vis}^V}/2)}
+       = \frac{\tan(18.5^\circ)}{\tan(19.30^\circ)}
+       = 0.955
+\end{align}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/pinhole_fov_scale.png}
+    \vspace{-1em}
+    \caption{
+        Illustration of pinhole model for FOV scaling in one dimension.
+    }
+    \label{fig:pinhole_fov_scale}
+\end{figure}
+
+The thermal image therefore covers 66.7\,\% of the visible frame
+horizontally and 95.6\,\% vertically. Multiplying these fractions
+by the visible resolution gives the target size of the thermal
+content on the visible canvas: $1280 \times 0.667 = 853.5$\,px
+wide and $720 \times 0.955 = 688.0$\,px tall. Stretching the
+thermal frame to this target size yields pixel-grid scale factors
+of $\mathrm{scale}_x = 853.5/640 = 1.334$ and
+$\mathrm{scale}_y = 688.0/512 = 1.344$. Assuming a shared
+optical axis, the scaled thermal region is then centred on the
+visible canvas, giving translations
+$t_x = (1280 - 853.5)/2 = 213.3$\,px and
+$t_y = (720 - 688.0)/2 = 16.0$\,px. These four values are
+combined into a single affine transformation, which is
+applied to the thermal image to align it to the visible frame:
+
+\begin{equation}
+  M =
+  \begin{pmatrix}
+    1.3335 & 0      & 213.3 \\
+    0      & 1.3436 &  16.0
+  \end{pmatrix}
+\end{equation}
+
+\paragraph{Boresight Error}
+
+After FOV-based alignment, a residual constant pixel offset persists 
+across all scene depths. This indicates a boresight error, an angular 
+misalignment between the optical axes of the two cameras.
+Such misalignment introduces a constant angular offset in the observed 
+scene, which manifests as a constant pixel offset in the images regardless 
+of object depth. The offset is depth-independent because each pixel subtends 
+a fixed solid angle. As distance increases, the physical separation between 
+pixel rays grows at the same rate as the inter-camera displacement of an 
+object caused by boresight offset. Therefore, the displacement measured 
+in pixels remains constant. Consequently, a boresight error is equivalent 
+to a uniform shift in pixel space.
+
+The pixel offsets were empirically measured as $\Delta x = -30$\,px and
+$\Delta y = -10$\,px. These are added directly to the centering
+translation, yielding the corrected affine transformation:
+
+\begin{equation}
+  M =
+  \begin{pmatrix}
+    1.3335 & 0      & 183.3 \\
+    0      & 1.3436 &   6.0
+  \end{pmatrix}
+\end{equation}
+
+From the empirical pixel offsets, the corresponding angular misalignment can be estimated using the 
+pinhole camera model. The focal length in pixels is derived from the FOV and resolution as shown in
+Figure~\ref{fig:boresight_misalignment_approximation}a:
+%
+\begin{equation}
+  f_{\mathrm{px}} = \frac{\text{resolution}/2}{\tan(\text{FOV}/2)}
+\end{equation}
+%
+Evaluating for each axis gives $f_{\mathrm{vis},H} = 1030.2$\,px and $f_{\mathrm{vis},V} = 1028.6$\,px.
+The angular offsets then follow from the pixel offset and focal length as illustrated in
+Figure~\ref{fig:boresight_misalignment_approximation}b, which can lie well
+within typical manufacturing tolerances for camera alignment:
+
+\begin{equation}
+  \theta_H = \arctan\!\left(\tfrac{30}{1030.2}\right) = 1.67^\circ, \qquad
+  \theta_V = \arctan\!\left(\tfrac{10}{1028.6}\right) = 0.56^\circ
+\end{equation}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/boresight_misalignment_approximation.png}
+    \vspace{-1em}
+    \caption{
+        Illustration of the pinhole model for boresight angle approximation.
+        (a) Focal length in pixels derived from FOV and resolution.
+        (b) Angular misalignment derived from pixel offset and focal length.
+    }
+    \label{fig:boresight_misalignment_approximation}
+\end{figure}
+
+
+\paragraph{Parallax Error}
+
+Even after applying the corrected affine transformation, a residual 
+misalignment remains, especially for objects that are close to the 
+camera. This effect is known as parallax. Parallax occurs 
+because the two camera lenses are physically separated by a small 
+distance, the baseline $b$. As a result, each lens observes the same 
+scene from a slightly different viewpoint. While distant objects 
+appear almost identical in both views, nearby objects shift noticeably 
+between them due to this change in perspective.
+The resulting pixel shift depends on both the baseline $b$ and the 
+distance to the observed object $d$. As illustrated in 
+Figure~\ref{fig:parallax_error}, the shift can be approximated as:
+
+\begin{equation}
+\Delta\mathrm{px} = \tan(\theta) \times f_{\mathrm{vis,px}}
+= \frac{b}{d} \times f_{\mathrm{vis,px}}
+\label{eq:parallax_shift}
+\end{equation}.
+\cite[pp.~701]{torralba2024foundationsComputerVision}
+
+This relationship shows that the pixel shift decreases with 
+increasing distance $d$, and approaches zero as $d \to \infty$. 
+Consequently, a constant boresight correction provides a good 
+approximation for distant scenes, but becomes increasingly 
+inaccurate for nearby objects. For the drone application considered 
+here, the camera baseline is $b = 0.10$,m and the operating distance 
+is about $d = 25$,m. Substituting these values into 
+Equation~\ref{eq:parallax_shift} yields a maximum parallax shift 
+of $4.12~\text{px}$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/parallax_shift.png}
+    \vspace{-1em}
+    \caption{
+        Illustration of the pinhole camera model used to approximate
+        the parallax-induced pixel shift $\Delta\mathrm{px}$.
+    }
+    \label{fig:parallax_error}
+\end{figure}
+
+Although the maximum parallax error this is relatively small, it 
+is not negligible. Accurately correcting parallax across 
+a scene would require depth information for each pixel, which can 
+only be obtained using a depth sensor or stereo reconstruction. 
+Such corrections cannot be achieved with a single global affine 
+transformation. For this reason, the residual error is considered 
+acceptable for the current application and is ignored. However, it 
+should be taken into account if the drone operates at significantly 
+shorter distances in the future.
+
+Figure~\ref{fig:camera_alignment_result} shows qualitative results of the 
+final RGB--thermal alignment. The alignment is not perfect but 
+provides a good approximation across the scene. In particular, 
+Figure~\ref{fig:camera_alignment_result}(a) illustrates the parallax effect 
+for nearby objects. In contrast, 
+distant objects, such as the vehicles in (b), are well aligned. 
+Minor residual errors can still be observed as shown in (c), which are 
+mainly attributed to drone oscillations combined with slight differences in 
+frame capture times, as well as differing camera-dependent distortions 
+near the image edges visible for the vehicle near the top.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/camera_alignment_results.png}
+    \vspace{-1em}
+    \caption{
+        Qualitative RGB--thermal alignment results (thermal in BWRGB).
+        (a) Near-object parallax on a bench.
+        (b) Accurate vehicle alignment.
+        (c) Occasional residual misalignment after correction.
+    }
+    \label{fig:camera_alignment_result}
+\end{figure}
 
 Image alignment is one of the issues that should be considered in cross-modal
 image applications. Existing methods [11,16,40,29,6,38,39] usually assume that
