@@ -1741,15 +1741,33 @@ Lorem ipsum
 \label{chap:dataset}
 
 Dataset collection I found that is usable:
-- VisDrone Dronevehicle
-- KAIST?
-- DAWN Dataset
-- RASMD Dataset (SWIR but maybe usable as pretraining data for our LWIR)
-- ACDC
-- FLIR ADAS v2 vey good
-- FLIR OEM
+
+- VisDrone Dronevehicle (UAV large, fleight height 80-120m)
+\cite{sun2022droneVehicleRGBThermalUAVDataset}
+- LLVIP <- 16836 aligned RGB/thermal image pairs of mostly night/low-light pedestrian-only data, overhead view from surveillance cameras
+\cite{jia2021llvip}
+- KAIST ADAS (beam splitter aligned day/night rgb/thermal/lidar 95,000 image pairs, but mostly pedestrian/bicycle focused and with only one car class, no specific focus on adverse weather conditions)
+\cite{choi2018kaist}
+- DAWN Dataset (Only RGB with adverse conditions vehicle perspective)
+\cite{kenk2020dawn}
+- RASMD Dataset (vehicle perspective RGB/SWIR dataset with 100K day image pairs and adverse weather conditions and classes car/truck/bus/bicycle/motorcycle/person)
+\cite{youngwan2026rasmd}
+- ACDC (Only RGB with adverse conditions vehicle perspective)
+\cite{sakaridis2025acdcDatasetAdverseConditions}
+- FLIR ADAS v2 very good (but train images are not aligned and not time synchronized)
 - M3FD <- not so big and multispectral focused
 - VTUAV <- is rather tracking focussed than detection
+- M3VSD <- rgb/thermal with 153,797 images
+- VAID <- UAV based and multiple similar classes to BAsT classification, but only overhead perspective, only RGB, no nighttime, 5,937 images
+\cite{li2020aerialVehicleDetectionVAIDDataset}
+- Multispectral dataset <- 7,512 aligned RGB/thermal/NIR/MIR image pairs of day/night, but only bike, car, person classes
+\cite{takumi2017multispectralDatasetAutonomousVehicles}
+- VEDAI <- UAV based RGB/thermal dataset with day/night but small with aligned 1,210 image pairs
+- MSRS <- vehicle perspective RGB/thermal dataset with day/night but small with aligned 1,444 image pairs
+- LSOTB-TIR <- multi-perspective thermal dataset with day/night 600k frames but no RGB and 22 classes with many images of not vehicles (animals/boats)
+- Infraparis <- vehicle perspective RGB/Depth/thermal dataset with 12,084 image pairs in day and night calibrated with car/person/rider/bus/truck/bicycle/motorcycle classes, but image segmentation masks and bounding boxes, no focus on adverse weather conditions
+\cite{franchi2024infraparisRGBDepthThermalDataset}
+
 Look in table 1 of RASMD dataset for others that can be used for pretraining
 
 Though I need to consider that most of the datasets are for pedestrian detection, 
