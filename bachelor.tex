@@ -14,6 +14,7 @@
 \usepackage{booktabs}
 \usepackage{pifont}
 \usepackage{siunitx}
+\usepackage{amssymb}
 
 \newcommand{\cmark}{\ding{51}}
 
@@ -297,7 +298,7 @@ connected peripherals.
 The Hailo accelerator (e.g., Hailo-8) is a dedicated deep 
 learning inference processor designed for edge applications. 
 It delivers up to 26 tera-operations per second (TOPS) while 
-maintaining low power consumption (typically 2.5–3.5\,W under 
+maintaining low power consumption (typically 2.5\textemdash3.5\,W under 
 load). The accelerator is optimized for convolutional neural 
 networks (CNNs) and supports common deep learning frameworks 
 through a dedicated software development kit (SDK).
@@ -1717,6 +1718,9 @@ upscaling, either dropping beneficial information or introducing redundancy and 
 computational overhead.
 \cite{he2023misalignedRGBTadaptiveCalibration}
 
+Explanation in Multi-Perspective RGB and Infrared Dataset
+for UAV Detection IEEE Access 2025 is good
+
 \section{Early Fusion}
 
 \section{Mid (Feature-level) Fusion}
@@ -1742,7 +1746,7 @@ Lorem ipsum
 
 Dataset collection I found that is usable:
 
-- VisDrone Dronevehicle (UAV large, fleight height 80-120m)
+DroneVehicle \textemdash UAV-based large-scale RGB + infrared aligned dataset captured from flight altitudes of 80-120m, 28,439 aligned RGB/thermal image pairs, with 953,087 oriented bounding boxes across 5 vehicle classes (Car, Truck, Bus, Van, Freight Car), includes day, night, and dark night conditions with varying viewing angles (15°, 30°, 45°)
 \cite{sun2022droneVehicleRGBThermalUAVDataset}
 - LLVIP <- 16836 aligned RGB/thermal image pairs of mostly night/low-light pedestrian-only data, overhead view from surveillance cameras
 \cite{jia2021llvip}
@@ -1750,25 +1754,108 @@ Dataset collection I found that is usable:
 \cite{choi2018kaist}
 - DAWN Dataset (Only RGB with adverse conditions vehicle perspective)
 \cite{kenk2020dawn}
-- RASMD Dataset (vehicle perspective RGB/SWIR dataset with 100K day image pairs and adverse weather conditions and classes car/truck/bus/bicycle/motorcycle/person)
+- RASMD Dataset (vehicle perspective RGB/SWIR dataset with 100K day image pairs and focus on adverse weather conditions and classes car/truck/bus/bicycle/motorcycle/person)
 \cite{youngwan2026rasmd}
 - ACDC (Only RGB with adverse conditions vehicle perspective)
 \cite{sakaridis2025acdcDatasetAdverseConditions}
-- FLIR ADAS v2 very good (but train images are not aligned and not time synchronized)
-- M3FD <- not so big and multispectral focused
-- VTUAV <- is rather tracking focussed than detection
-- M3VSD <- rgb/thermal with 153,797 images
-- VAID <- UAV based and multiple similar classes to BAsT classification, but only overhead perspective, only RGB, no nighttime, 5,937 images
+- FLIR ADAS v2 -  RGB + thermal ADAS driving dataset with 26,442 fully frames and ~520,000 bounding boxes across a person and 9 vehicle categories (Person, Bike, Car, Motorcycle, Bus, Train, Truck, Skateboard, Scooter, Other Vehicle). Includes 9,711 thermal + 9,233 RGB training/validation images that are not spatially or temporally aligned, and 7,498 test set video frames are 1:1 aligned between thermal and visible. Contains >375,000 frame annotations and >145,000 video annotations captured under day and night, fog, inclement weather, and glare conditions.
+\cite{teledyne_2022_flirAdasV2Dataset}
+- M3FD ← 4,200 aligned RGB/thermal infrared vehicle perspective image pairs (1024×768 RGB, 640×512 IR) across 6 classes (People, Car, Bus, Motorcycle, Truck, Lamp). Captured from a synchronized binocular RGB + IR system under four major scenario categories (Daytime, Overcast, Night, Challenge) covering diverse environments, illumination, and weather.
+\cite{liu2022m3fdDataset}
+- VTUAV ← UAV-based visible + thermal paired dataset with 500 RGB-T sequences (~1.7 million high-resolution frame pairs) captured from UAVs at low to moderate altitudes (~5-20m) with various viewing angles (nadir and oblique), annotated for visible‑thermal object tracking across multiple object categories and scenes (diverse generic object classes), but primarily designed for tracking rather than static detection and not focused on adverse weather conditions.
+\cite{zhang2022VTUAVDataset}
+- VAID <- UAV based and multiple vehicle classes (Sedan,Minibus,Truck,Pickup truck,Bus,Cement truck,Trailer), but only 90m altitude overhead (birds-eye-view) perspective, only RGB, no nighttime, 5,937 images
 \cite{li2020aerialVehicleDetectionVAIDDataset}
 - Multispectral dataset <- 7,512 aligned RGB/thermal/NIR/MIR image pairs of day/night, but only bike, car, person classes
 \cite{takumi2017multispectralDatasetAutonomousVehicles}
-- VEDAI <- UAV based RGB/thermal dataset with day/night but small with aligned 1,210 image pairs
-- MSRS <- vehicle perspective RGB/thermal dataset with day/night but small with aligned 1,444 image pairs
-- LSOTB-TIR <- multi-perspective thermal dataset with day/night 600k frames but no RGB and 22 classes with many images of not vehicles (animals/boats)
+- VEDAI ← UAV/aerial RGB + infrared dataset with aligned image variants across 1,210 images, captured from an overhead bird’s‑eye perspective at high altitude (unspecified). Contains six annotated vehicle categories: car, pick‑up, truck, camping car, tractor, van; includes both RGB and infrared imagery variants but not focused on nighttime/adverse weather conditions.
+\cite{razakarivony2016VEDAIdataset}
+- MSRS ← vehicle‑perspective RGB + thermal dataset with 1,444 aligned image pairs captured from road scenes under both day and night conditions, three object classes, only 1 vehicle class(person, bicycle, car), and not focused on adverse weather conditions.
+\cite{tang2022piafusionMSRSDataset}
 - Infraparis <- vehicle perspective RGB/Depth/thermal dataset with 12,084 image pairs in day and night calibrated with car/person/rider/bus/truck/bicycle/motorcycle classes, but image segmentation masks and bounding boxes, no focus on adverse weather conditions
 \cite{franchi2024infraparisRGBDepthThermalDataset}
+- M3OT <- UAV based RGB/thermal day/night 21,580 image pairs dataset, from hight altitudes (100-200m) and with a focus on small objects, but only 1 single vehicle class and no specific focus on adverse weather conditions
+\cite{nie2025m3ot}
+- UAVDT <- UAV based RGB detection dataset with day/night and adverse weather conditions but no thermal and only 80,000 images of multiple vehicle classes (car/truck/bus) at varying altitudes (10~30m), (30-70m), (>70m) with varying views and side view similar to our use case, but no thermal data
+\cite{du2018UAVDTDataset}
+- AU-AIR <- UAV based RGB detection day-only dataset with low flight altitudes (5-30m) with 32,823 frames and 8 vehicle classes (car, van, truck, human, trailer, bicycle, bus, motorbike) but no thermal data and viewing angles from 45 to 90 degrees
+\cite{bozcan2020auAirDataset}
+- HIT-UAV ← UAV-based thermal-only dataset with 2,898 infrared images, captured at high altitudes (60\textemdash130 m) and camera angles (30°\textemdash90°) across day and night. Contains 5 classes (person, car, bicycle, otherVehicle, dontCare) but only 1 real vehicle class for car and no RGB modality, no focus on adverse weather conditions.
+\cite{suo2023hitUAVDataset}
+
+
+Dataset | Modality | Aligned | scenario | Altitude | Viewing angle | Daytime | Weather conditions | Vehicle Classes | Size
+
+\newpage
+\begin{table}[htbp]
+\centering
+\caption{Comparison of RGB/Thermal vehicle and pedestrian datasets with UAV and vehicle perspectives.}
+\label{tab:rgb_thermal_full}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{|p{2.5cm}|c{2cm}|c{1.8cm}|p{2.5cm}|p{1.2cm}|p{1.2cm}|c{1.8cm}|c|c|c{1.8cm}|c|}
+\hline
+\textbf{Dataset} & \textbf{Modality} & \textbf{Capture Setup} & \textbf{Perspective} & \textbf{Altitude (m)} & \textbf{Viewing Angle} & \textbf{Vehicle Classes} & \textbf{Pedestrian} & \textbf{Night} & \textbf{Adverse Weather} & \textbf{Frames / Images} \\
+\hline
+DroneVehicle \cite{sun2022droneVehicleRGBThermalUAVDataset} & RGB+T & UAV & Overhead / Angled & 80\textemdash120 & 15°\textemdash45° & 5 & \textemdash & \checkmark & \textemdash & 28,439 \\
+\hline
+VTUAV \cite{zhang2022VTUAVDataset} & RGB+T & UAV & Nadir/Oblique / Tracking & 5\textemdash20 & Varies & Multi & \checkmark & \checkmark & \textemdash & 1,700,000 \\
+\hline
+VAID \cite{li2020aerialVehicleDetectionVAIDDataset} & RGB & UAV & Overhead / Birds-eye & 90 & 45\textemdash90° & 7 & \textemdash & \textemdash & \textemdash & 5,937 \\
+\hline
+VEDAI \cite{razakarivony2016VEDAIdataset} & RGB+T & UAV & Overhead / Birds-eye & \textemdash & \textemdash & 6 & \textemdash & \textemdash & \textemdash & 1,210 \\
+\hline
+M3OT \cite{nie2025m3ot} & RGB+T & UAV & Overhead / Birds-eye & 100\textemdash200 & \textemdash & 1 & \textemdash & \checkmark & \textemdash & 21,580 \\
+\hline
+HIT-UAV \cite{suo2023hitUAVDataset} & T & UAV & Overhead / Angled & 60\textemdash130 & 30°\textemdash90° & 1 & \checkmark & \checkmark & \textemdash & 2,898 \\
+\hline
+UAVDT \cite{du2018UAVDTDataset} & RGB & UAV & Forward / Side & 10\textemdash30, 30\textemdash70, >70 & Varies & 3 & \textemdash & \checkmark & \checkmark & 80,000 \\
+\hline
+AU-AIR \cite{bozcan2020auAirDataset} & RGB & UAV & Forward / Angled & 5\textemdash30 & 45°\textemdash90° & 8 & \textemdash & \textemdash & \textemdash & 32,823 \\
+\hline
+FLIR ADAS v2 \cite{teledyne_2022_flirAdasV2Dataset} & RGB+T & Vehicle & Forward & \textemdash & \textemdash & 9 & \checkmark & \checkmark & \checkmark & 26,442 \\
+\hline
+KAIST ADAS \cite{choi2018kaist} & RGB+T+LiDAR & Vehicle & Forward & \textemdash & \textemdash & 1 & \checkmark & \checkmark & \textemdash & 95,000 \\
+\hline
+M3FD \cite{liu2022m3fdDataset} & RGB+T & Vehicle & Forward & \textemdash & \textemdash & 5 & \checkmark & \textemdash & \textemdash & 4,200 \\
+\hline
+MSRS \cite{tang2022piafusionMSRSDataset} & RGB+T & Vehicle & Forward & \textemdash & \textemdash & 1 & \checkmark & \checkmark & \textemdash & 1,444 \\
+\hline
+Infraparis \cite{franchi2024infraparisRGBDepthThermalDataset} & RGB+T+Depth & Vehicle & Forward & \textemdash & \textemdash & 6 & \checkmark & \checkmark & \textemdash & 12,084 \\
+\hline
+Multispectral \cite{takumi2017multispectralDatasetAutonomousVehicles} & RGB+T+NIR+MIR & Vehicle & Forward & \textemdash & \textemdash & 3 & \checkmark & \textemdash & \textemdash & 7,512 \\
+\hline
+RASMD \cite{youngwan2026rasmd} & RGB+SWIR & Vehicle & Forward & \textemdash & \textemdash & 5 & \checkmark & \textemdash & \checkmark & 100,000 \\
+\hline
+DAWN \cite{kenk2020dawn} & RGB & Vehicle & Forward & \textemdash & \textemdash & Multi & \checkmark & \textemdash & \checkmark & \textemdash \\
+\hline
+ACDC \cite{sakaridis2025acdcDatasetAdverseConditions} & RGB & Vehicle & Forward & \textemdash & \textemdash & Multi & \checkmark & \checkmark & \checkmark & \textemdash \\
+\hline
+LLVIP \cite{jia2021llvip} & RGB+T & Surveillance & Overhead / Fixed & \textemdash & \textemdash & \textemdash & \checkmark & \checkmark & \textemdash & 16,836 \\
+\hline
+\end{tabular}
+}
+\end{table}
 
 Look in table 1 of RASMD dataset for others that can be used for pretraining
+
+M3FD dataset contains
+4200 pairs of RGB and thermal images. These image pairs are
+well aligned. The dataset contains 6 classes of objects: ‘Per-
+son’, ‘Car’, ‘Bus’, ‘Motorcycle’, ‘Traffic Light’, and ‘Truck’.
+Since this dataset doesn’t provide unified data splits, previous
+works have used a random splitting approach to determine
+the train and validation sets [1]. However, images in this
+dataset are sampled from video sequences, meaning that two
+adjacent frames may contain identical content. In this context,
+the random splitting approach results in information leakage
+between the train and validation sets. To address this problem,
+we first manually divide the dataset into 73 video segments
+based on different scenes. Then, we collect the first 70%
+of images in each video segment as the train set and the
+remaining images as the validation set. Finally, we obtain
+2905 and 1295 pairs of RGB-T images in the train and
+validation sets, respectively. We name this data split ‘M3FD-
+zxSplit’ and release it to the public
 
 Though I need to consider that most of the datasets are for pedestrian detection, 
 and I need to focus on vehicle detection, so I need to find datasets that have a 
