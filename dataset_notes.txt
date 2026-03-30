@@ -1,0 +1,43 @@
+
+DroneVehicle \textemdash UAV-based large-scale RGB + infrared aligned dataset captured from flight altitudes of 80-120m, 28,439 aligned RGB/thermal image pairs, with 953,087 oriented bounding boxes across 5 vehicle classes (Car, Truck, Bus, Van, Freight Car), includes day, night, and dark night conditions with varying viewing angles (15°, 30°, 45°)
+\cite{sun2022droneVehicleRGBThermalUAVDataset}
+- LLVIP <- 16836 aligned RGB/thermal image pairs of mostly night/low-light pedestrian-only data, overhead view from surveillance cameras
+\cite{jia2021llvip}
+- KAIST ADAS (beam splitter aligned day/night rgb/thermal/lidar 95,000 image pairs, but mostly pedestrian/bicycle focused and with only one car class, no specific focus on adverse weather conditions)
+\cite{choi2018kaist}
+- DAWN Dataset (Only RGB with adverse conditions vehicle perspective)
+\cite{kenk2020dawn}
+- RASMD Dataset (vehicle perspective RGB/SWIR dataset with 100K day image pairs and focus on adverse weather conditions and classes car/truck/bus/bicycle/motorcycle/person)
+\cite{youngwan2026rasmd}
+- RTDOD ← UAV-based aligned RGB + thermal dataset captured using a DJI Matrice 300 RTK with Zenmuse H20T sensor, containing 16,192 RGB-thermal image pairs across diverse environments (suburbs, highways, bridges) and conditions including day, night, sunny, rainy, and foggy weather. The dataset includes 10 object classes (person, bicycle, car, motorcycle, bus, truck, boat, dog, sports ball, baby carriage) annotated with horizontal bounding boxes, and is designed for domain-incremental detection with weather-based splits (Sunny, Evening, Foggy, Night).
+\cite{feng2023rtdodDataset}
+- ACDC (Only RGB with adverse conditions vehicle perspective)
+\cite{sakaridis2025acdcDatasetAdverseConditions}
+- FLIR ADAS v2 -  RGB + thermal ADAS driving dataset with 26,442 fully frames and ~520,000 bounding boxes across a person and 9 vehicle categories (Person, Bike, Car, Motorcycle, Bus, Train, Truck, Skateboard, Scooter, Other Vehicle). Includes 9,711 thermal + 9,233 RGB training/validation images that are not spatially or temporally aligned, and 7,498 test set video frames are 1:1 aligned between thermal and visible. Contains >375,000 frame annotations and >145,000 video annotations captured under day and night, fog, inclement weather, and glare conditions.
+\cite{teledyne_2022_flirAdasV2Dataset}
+- M3FD ← 4,200 aligned RGB/thermal infrared vehicle perspective image pairs (1024×768 RGB, 640×512 IR) across 6 classes (People, Car, Bus, Motorcycle, Truck, Lamp). Captured from a synchronized binocular RGB + IR system under four major scenario categories (Daytime, Overcast, Night, Challenge) covering diverse environments, illumination, and weather.
+\cite{liu2022m3fdDataset}
+- VTUAV ← UAV-based visible + thermal paired dataset with 500 RGB-T sequences (~1.7 million high-resolution frame pairs) captured from UAVs at low to moderate altitudes (~5-20m) with various viewing angles (nadir and oblique), annotated for visible‑thermal object tracking across multiple object categories and scenes (diverse generic object classes), but primarily designed for tracking rather than static detection and not focused on adverse weather conditions.
+\cite{zhang2022VTUAVDataset}
+- VTUAV-det adapts the VTUAV tracking dataset for detection, but only includes the person class.
+\cite{zhang2023RGBTTinyPersonDetectionVTUAVDetDataset}
+- VAID <- UAV based and multiple vehicle classes (Sedan,Minibus,Truck,Pickup truck,Bus,Cement truck,Trailer), but only 90m altitude overhead (birds-eye-view) perspective, only RGB, no nighttime, 5,937 images
+\cite{li2020aerialVehicleDetectionVAIDDataset}
+- Multispectral dataset <- 7,512 aligned RGB/thermal/NIR/MIR image pairs of day/night, but only bike, car, person classes
+\cite{takumi2017multispectralDatasetAutonomousVehicles}
+- VEDAI ← UAV/aerial RGB + infrared dataset with aligned image variants across 1,210 images, captured from an overhead bird’s‑eye perspective at high altitude (unspecified). Contains six annotated vehicle categories: car, pick‑up, truck, camping car, tractor, van; includes both RGB and infrared imagery variants but not focused on nighttime/adverse weather conditions.
+\cite{razakarivony2016VEDAIdataset}
+- MSRS ← vehicle‑perspective RGB + thermal dataset with 1,444 aligned image pairs captured from road scenes under both day and night conditions, three object classes, only 1 vehicle class(person, bicycle, car), and not focused on adverse weather conditions.
+\cite{tang2022piafusionMSRSDataset}
+- Infraparis <- vehicle perspective RGB/Depth/thermal dataset with 12,084 image pairs in day and night calibrated with car/person/rider/bus/truck/bicycle/motorcycle classes, but image segmentation masks and bounding boxes, no focus on adverse weather conditions
+\cite{franchi2024infraparisRGBDepthThermalDataset}
+- M3OT <- UAV based RGB/thermal day/night 21,580 image pairs dataset, from hight altitudes (100-200m) and with a focus on small objects, but only 1 single vehicle class and no specific focus on adverse weather conditions
+\cite{nie2025m3ot}
+- UAVDT <- UAV based RGB detection dataset with day/night and adverse weather conditions but no thermal and only 80,000 images of multiple vehicle classes (car/truck/bus) at varying altitudes (10~30m), (30-70m), (>70m) with varying views and side view similar to our use case, but no thermal data
+\cite{du2018UAVDTDataset}
+- AU-AIR <- UAV based RGB detection day-only dataset with low flight altitudes (5-30m) with 32,823 frames and 8 vehicle classes (car, van, truck, human, trailer, bicycle, bus, motorbike) but no thermal data and viewing angles from 45 to 90 degrees
+\cite{bozcan2020auAirDataset}
+- HIT-UAV ← UAV-based thermal-only dataset with 2,898 infrared images, captured at high altitudes (60\textemdash130 m) and camera angles (30°\textemdash90°) across day and night. Contains 5 classes (person, car, bicycle, otherVehicle, dontCare) but only 1 real vehicle class for car and no RGB modality, no focus on adverse weather conditions.
+\cite{suo2023hitUAVDataset}
+- MONET ← UAV-based thermal dataset recorded in rural environments, containing approximately 53,000 timestamp-aligned frames with 162,000 manually annotated bounding boxes. Captured at altitudes of 20–130 m with angled camera views, the dataset includes day and night conditions and provides rich drone metadata such as GPS, altitude, speed, and gimbal orientation (pitch, roll, yaw). MONET contains two primary object classes (person, vehicle) plus an ignore region category, with identity annotations for multi-object tracking applications. RGB data was also collected but not released due to privacy concerns.
+\cite{riz2023monetDataset}
