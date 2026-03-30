@@ -1786,6 +1786,11 @@ the person class. The M3OT dataset \cite{nie2025m3ot} provides 21,580
 aligned RGB-thermal UAV image pairs captured from high altitudes 
 between 100 and 200 meters during day and night, focusing on small 
 object detection and containing only a single vehicle class. 
+TrafficNight is an aligned RGB, thermal, and depth dataset comprising 
+2,200 annotated samples captured from high altitude nadir perspective, spanning six 
+vehicle classes with a particular emphasis on trucks and semi-trailers 
+in low-light and nighttime traffic scenarios.
+\cite{zhang2024trafficNightDataset}
 
 Other UAV datasets provide only one of the two modalities. Thermal-only 
 datasets include HIT-UAV \cite{suo2023hitUAVDataset}, which contains 2,898 
@@ -1854,6 +1859,9 @@ summarizes the characteristics of all discussed datasets.
 
 % TODO: add bounding box number column
 
+% TODO: have better classification of datasets with low-altitude, high-altitude,
+% ground-level like in \cite{becker2025fusionOrConfusionDatasetPooling}
+
 \newpage
 \begin{table}[H]
 \centering
@@ -1879,6 +1887,8 @@ VEDAI \cite{razakarivony2016VEDAIdataset} & RGB+T & UAV & Overhead / Birds-eye &
 M3OT \cite{nie2025m3ot} & RGB+T & UAV & Overhead / Angled & 100\textemdash200 & \textemdash & 1 & \textemdash & \checkmark & \textemdash & 21,580 \\
 \hline
 RTDOD \cite{feng2023rtdodDataset} & RGB+T & UAV & Forward / Angled & \textemdash & \textemdash & 5 & \checkmark & \checkmark & \checkmark & 16,192 \\
+\hline
+TrafficNight \cite{zhang2024trafficNightDataset} & RGB+T+D & UAV & Overhead / Birds-eye & \textemdash & 90° & 6 & \textemdash & \checkmark & \textemdash & 2,200 \\
 \hline
 HIT-UAV \cite{suo2023hitUAVDataset} & T & UAV & Overhead / Angled & 60\textemdash130 & 30°\textemdash90° & 1 & \checkmark & \checkmark & \textemdash & 2,898 \\
 \hline
@@ -1911,6 +1921,8 @@ LLVIP \cite{jia2021llvip} & RGB+T & CCTV & Overhead / Fixed & \textemdash & \tex
 \end{tabular}
 \end{adjustbox}
 \end{table}
+% TODO: look in Fusion or Confusion? A Look at Dataset Pooling for Infrared Object Detection
+% for good table formatting
 
 Overall, numerous datasets exist across UAV-based and 
 vehicle-mounted perspectives. Yet, each dataset lacks at least one 
@@ -1923,6 +1935,9 @@ by combining existing datasets that contain the most relevant data
 and supplementing them with additional data collection specifically
 using our drone setup.
 
+In this work, a data pool consisting of multiple datasets is designed to build a gen-
+eral person and vehicle detector in the combined visible and thermal-infrared 
+spectrum. 
 The chosen datasets for training include the RTDOD dataset, which 
 provides a modest number of aligned RGB-thermal pairs from varying 
 altitudes in a side-view UAV perspective with multiple vehicle classes 
@@ -1933,9 +1948,14 @@ high altitude UAV, partially from  side-view
 perspective with multiple vehicle classes in day and night, and the 
 M3FD dataset, which offers aligned RGB-thermal data from a 
 vehicle-top-mounted perspective with several vehicle classes in diverse
-weather conditions to increase the amount of close side-view vehicle data
+weather conditions to increase the amount of close side-view as well
+as front- and back-facing vehicle data
 more similar to the 20m flight height in our scenario than the high altitude
 perspective present in DroneVehicle and partially in RTDOD.
+This aims at building a more general model that can perform well across different
+scenarios and perspectives as shown in \cite{becker2025fusionOrConfusionDatasetPooling},
+though the performance in each specific domain was not increased, but matched
+across all domains on a single detector.
 
 The DroneVehicle
 dataset could not be downloaded from the official Baidu Yun dataset.
@@ -1950,21 +1970,21 @@ on Google Drive and Huggingface contained only a small subset of
 the original dataset. For this reason, the paid platform Baidu 
 Erranium was used to download the full RTDOD dataset.
 
-After acquiring the full datasets, the unified dataset is constructed 
-by first converting the label schemas 
-and annotation formats of each dataset into a common format. The oriented
-bounding box annotations of the DroneVehicle dataset were converted to min-max
-corner coordinates non-oriented bounding 
-box format to match the RTDOD and M3FD datasets. 
-The classes were unified across datasets by mapping the original 
-class labels to the most general class definition respectively in
-order to avoid conflicts between classes and model confusion. 
+The, various visible-infrared datasets differ in their annotation formats 
+and class definitions.
+To standardize object labels across datasets, we map
+different sub-categories of vehicles to the more general 
+super-category spanning the datasets as seen in Table~\ref{tab:dataset_class_merge}
+ in order to avoid
+conflicts between classes and model confusion following
+\cite{becker2025fusionOrConfusionDatasetPooling}.
+The oriented
+bounding box annotations defined using 4 points of the DroneVehicle dataset 
+were converted to 
+horizontal bounding box annotations by calculating the minimum bounding 
+rectangle that encompasses the oriented box to match the horizontal bounding
+box format of the RTDOD and M3FD datasets.
 
-DroneVehicle: car, truck, bus, van and freight car.
-RTDOD: person, bicycle, car, motorcycle, bus, truck, boat, dog, sports ball, baby carriage.
-M3FD: People, Car, Bus, Motorcycle, Truck and Lamp.
-
-Merged: car, bus, truck, motorcycle, person
 
 \begin{table}[H]
 \footnotesize
@@ -1994,50 +2014,55 @@ Discarded & -- &
 \hline
 \end{tabular}
 \caption{Unified vehicle-centric class mapping across DroneVehicle, RTDOD, and M3FD datasets. Non-relevant classes are discarded.}
-\label{tab:dataset_merge}
+\label{tab:dataset_class_merge}
 \end{table}
 
-For example, the 'car' class in one dataset may be mapped to 
-'vehicle' in another dataset. The datasets were then combined 
-and shuffled to create a single training dataset. Finally, 
-the dataset was split into training and validation sets 
-using a stratified sampling approach to ensure that the 
-distribution of classes is similar in both sets.
 
-M3FD dataset contains
-4200 pairs of RGB and thermal images. These image pairs are
-well aligned. The dataset contains 6 classes of objects: ‘Per-
-son’, ‘Car’, ‘Bus’, ‘Motorcycle’, ‘Traffic Light’, and ‘Truck’.
-Since this dataset doesn’t provide unified data splits, previous
-works have used a random splitting approach to determine
-the train and validation sets [1]. However, images in this
-dataset are sampled from video sequences, meaning that two
-adjacent frames may contain identical content. In this context,
-the random splitting approach results in information leakage
-between the train and validation sets. To address this problem,
-we first manually divide the dataset into 73 video segments
-based on different scenes. Then, we collect the first 70%
-of images in each video segment as the train set and the
-remaining images as the validation set. Finally, we obtain
-2905 and 1295 pairs of RGB-T images in the train and
-validation sets, respectively. We name this data split ‘M3FD-
-zxSplit’ and release it to the public
+The datasets splits were created by using the individual splits 
+provided by each dataset, where possible. The DroneVehicle dataset 
+provides official train, validation and test splits, which were used 
+directly. 
+The M3FD dataset does not provide unified data splits.
+The images in this dataset are sampled from video sequences,
+which means adjacent frames may contain identical content.
+In this context, a random splitting approach results in information leakage
+between the train and validation sets. Therefore, we utilize the
+M3FD-zxSplit proposed by \cite{zhang2024rethinkingEarlyFusion}, 
+which splits the dataset based on video segments to avoid information leakage.
+The first 70\% of images in each video segment are collected as the 
+train set and the remaining 30\% of images are used as the validation set.
+In this work, the validation set is further split into validation and test
+sets, where the first 50\% of the validation set is used for validation 
+and the remaining 50\% is used for testing so that the test set is 
+further apart from the train set.
+The RTDOD dataset provides official trainval and test splits.
+The trainval split was split in the same way as the M3FD dataset,
+where the last 10\% of the images in each video segment belonging
+to the trainval set were used as 
+the validation set, and the rest were used for training.
 
-Though I need to consider that most of the datasets are for pedestrian detection, 
-and I need to focus on vehicle detection, so I need to find datasets that have a 
-good amount of vehicle data in them.
+% TODO: paragraph about why thermal preprocessing not done
+% \cite{becker2025fusionOrConfusionDatasetPooling}
 
-Also the viewing angle from the drone is from the side view primarily while mounted
-on a car is mostly from front facing other cars.
+% TODO: paragraph differing alignment quality of the datasets
 
-Describe Process of converting label schemas and annotation formats, and the challenges of doing so
+The three datasets were uploaded to an Amazon S3-compatible bucket 
+hosted on the PlusServer cloud platform, which serves as the centralized 
+remote storage backend for FiftyOne, an open-source dataset curation and 
+visualization tool that organizes machine learning datasets by storing 
+sample-level annotations, metadata, and file references (URLs) in a 
+structured, queryable format. Maintaining the datasets in a 
+cloud-accessible location is important for the remote training pipeline 
+managed by ClearML, an open-source machine learning operations (MLOps) 
+platform responsible for orchestrating and monitoring machine learning 
+experiments. During training runs, ClearML dispatches workloads to the 
+GPU workers hosted on Bernard's GPU Rack. The workers must retrieve the 
+required dataset assets at runtime from the S3 bucket through FiftyOne.
 
-Describe the process of creating fiftyone dataset and uploading to s3 plusserver
-and then running the model training on clearmls with the data stored on s3 through fiftyone
-
-Evaluation of the dataset, including statistics on the number of images, distribution of classes, and examples of challenging scenarios (e.g., low-light, occlusions, weather conditions).
-Inspire the evaluation from other dataset papers that I used to create
-the training dataset
+% TODO:
+% Evaluation of the dataset, including statistics on the number of images, distribution of classes, and examples of challenging scenarios (e.g., low-light, occlusions, weather conditions).
+% Inspire the evaluation from other dataset papers that I used to create
+% the training dataset
 
 \newpage
 \chapter{Detection Implementation}
