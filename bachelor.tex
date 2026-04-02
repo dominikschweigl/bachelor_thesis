@@ -1354,6 +1354,10 @@ late part of the paper, where they compare early, mid and late fusion approaches
 % Use section 6 for fusion approaches \cite{bustos2023reviewObjectDetectionIR}
 % Use section 7 for challenges \cite{bustos2023reviewObjectDetectionIR}
 
+% Very good paper for fusion approaches:
+% Human Detection in UAV Thermal Imagery: Dataset Extension
+% and Comparative Evaluation on Embedded Platforms
+
 Appearance change. Figure 7 shows several examples of
 pedestrians in the day and night time. The color image in
 daytime shows a distinct human shape due to the strong
@@ -1738,7 +1742,20 @@ for UAV Detection IEEE Access 2025 is good
 \newpage
 \chapter{Object Detection}
 \label{chap:object_detection}
-Lorem ipsum
+
+Justification for the choice of CNN instead of transformers-based models:
+
+4.1.3. Training Data Limitations
+Our dataset, while extensive at 75,000+ images, combines heterogeneous sources
+with substantial domain shifts (urban vs. mountainous, varying altitudes, different sensor
+characteristics). Transformer-based detectors typically require larger and more consistent
+training datasets to effectively learn their attention mechanisms. The relatively limited size
+and high heterogeneity of thermal datasets compared to RGB benchmarks like COCO may
+J. Imaging 2025, 11, 436 14 of 26
+disproportionately affect RT-DETR’s performance. This appears to be supported by our
+finding that the RT-DETR model achieved lower average precision than the YOLO models
+% from Human Detection in UAV Thermal Imagery: Dataset Extension
+% and Comparative Evaluation on Embedded Platforms
 
 \section{Single Stage Detectors}
 
@@ -1762,6 +1779,37 @@ use high altitude aerial imagery that targets small object
 detection. The following section provides an overview of the 
 most relevant datasets and afterwards explains how the dataset 
 for this project is constructed.
+
+\section{Data Collection}
+
+As previously described in Chapter~\ref{chap:hardware}, the data collection is performed using the
+Workswell WIRIS Enterprise multi-sensor system, which provides unaligned RGB and thermal 
+video streams. The data collection process involves flying the drone equipped 
+with the WIRIS camera next to road segments. The primary location for
+data collection is the IG-Modellflugplatz Häusern in Ampass, a model airfield in the 
+Austrian Alps that features a road with regular traffic and flight permission
+without drone flight prohibition or the need for special permits in contrast to many other locations
+in the Innsbruck area due to the Innsbruck airport.
+
+The WIRIS camera was configured to capture optimal thermal data.
+Material emissivity was set to 0.95, the standard value for rubber tires and
+automotive paint as the primary materials of interest in vehicle 
+detection~\cite{hu2026VehicleTireTankTemperatureMonitoringThermalCameras}
+as previously seen in \ref{fig:vehicle_thermal_radiation}.
+The camera system automatically adjusts the temperature range to the minimum and maximum
+of the current scene to maximize image contrast.
+Since per-flight reconfiguration to environmental conditions is not foreseen,
+ambient temperature and relative humidity were left at their default values of
+20\,\textdegree C and 50\,\%.
+The object distance was set to 25\,m to match the typical operating altitude of the drone.
+
+% TODO: add more details on data collection, such as flight patterns, duration, 
+% and conditions, as well as labeling process and tools used for annotation
+
+% TODO: add dataset statistics such as number of frames, number of annotated vehicles, 
+% and class distribution
+
+\section{Public Visible-Thermal Datasets}
 
 Among UAV-based RGB-thermal datasets, the DroneVehicle dataset 
 \cite{sun2022droneVehicleRGBThermalUAVDataset} is one of the largest, 
@@ -1924,6 +1972,8 @@ LLVIP \cite{jia2021llvip} & RGB+T & CCTV & Overhead / Fixed & \textemdash & \tex
 % TODO: look in Fusion or Confusion? A Look at Dataset Pooling for Infrared Object Detection
 % for good table formatting
 
+\section{Dataset Composition}
+
 Overall, numerous datasets exist across UAV-based and 
 vehicle-mounted perspectives. Yet, each dataset lacks at least one 
 component for the targeted application, such as low-altitude 
@@ -1954,7 +2004,8 @@ more similar to the 20m flight height in our scenario than the high altitude
 perspective present in DroneVehicle and partially in RTDOD.
 This aims at building a more general model that can perform well across different
 scenarios and perspectives as shown in \cite{becker2025fusionOrConfusionDatasetPooling},
-though the performance in each specific domain was not increased, but matched
+though the performance in each specific domain was not significantly increased
+by increasing data diversity and volume through data pooling, but matched
 across all domains on a single detector.
 
 The DroneVehicle
@@ -1970,20 +2021,20 @@ on Google Drive and Huggingface contained only a small subset of
 the original dataset. For this reason, the paid platform Baidu 
 Erranium was used to download the full RTDOD dataset.
 
-The, various visible-infrared datasets differ in their annotation formats 
-and class definitions.
-To standardize object labels across datasets, we map
-different sub-categories of vehicles to the more general 
-super-category spanning the datasets as seen in Table~\ref{tab:dataset_class_merge}
- in order to avoid
-conflicts between classes and model confusion following
-\cite{becker2025fusionOrConfusionDatasetPooling}.
-The oriented
-bounding box annotations defined using 4 points of the DroneVehicle dataset 
-were converted to 
-horizontal bounding box annotations by calculating the minimum bounding 
-rectangle that encompasses the oriented box to match the horizontal bounding
-box format of the RTDOD and M3FD datasets.
+The visible-infrared datasets differ in their annotation formats and class definitions.
+To standardize labels across datasets, we map sub-categories to unified super-categories
+as shown in Table~\ref{tab:dataset_class_merge}, following~\cite{becker2025fusionOrConfusionDatasetPooling}.
+For DroneVehicle, the van class is merged into car, as vans are visually similar to cars, 
+a grouping consistent with community derivations of the dataset
+for YOLO~\cite{redzapdos123_droneVehicleYOLOv11OBB} that collapse both into a
+single small-vehicle category.
+Similarly, the freight car class is merged into truck, as both designate large
+cargo-carrying vehicles.
+Motorcycle and person classes, present only in RTDOD and M3FD, are included without modification
+and non-vehicle classes are discarded.
+The OBB annotations of DroneVehicle, defined by four corner points, are converted to
+horizontal bounding boxes (HBB) by computing the minimum enclosing axis-aligned rectangle,
+matching the HBB format of RTDOD and M3FD.
 
 
 \begin{table}[H]
@@ -2018,7 +2069,7 @@ Discarded & -- &
 \end{table}
 
 
-The datasets splits were created by using the individual splits 
+The dataset splits were created by using the individual splits 
 provided by each dataset, where possible. The DroneVehicle dataset 
 provides official train, validation and test splits, which were used 
 directly. 
@@ -2041,10 +2092,57 @@ where the last 10\% of the images in each video segment belonging
 to the trainval set were used as 
 the validation set, and the rest were used for training.
 
-% TODO: paragraph about why thermal preprocessing not done
-% \cite{becker2025fusionOrConfusionDatasetPooling}
+\subsection{Thermal Preprocessing}
+% TODO: make preprocesing section with this and the alignment section, 
 
-% TODO: paragraph differing alignment quality of the datasets
+Infrared imagery is sensitive to variations in temperature,
+sensor characteristics, and environmental conditions. Thus,
+preprocessing is a crucial step for reducing domain gaps between datasets.
+However, most publicly available infrared datasets only provide limited
+thermal range  processed images with dynamic temperature scales rather 
+than full radiometric data, which
+hinders the effectiveness of unified preprocessing across a dataset pool.
+
+In \cite{becker2025fusionOrConfusionDatasetPooling}, the three preprocessing
+techniques were evaluated to investigate their 
+impact on dataset alignment. 
+Histogram equalization is a commonly used image enhancement technique 
+that redistributes pixel intensities to
+achieve a more uniform histogram and thereby increase global contrast by 
+stretching the intensity range \cite{herrmann2018cnnInfraredPersonDetectionDomainAdaptation}.
+Contrast limited adaptive histogram equalization
+(CLAHE) \cite{pizer1987adaptiveHistogramEqualization} improves local contrast by dividing images into contextual regions
+and applying adaptive enhancement within each region. 
+FieldScale, specifically designed for thermal infrared imagery,
+applies locality-aware adaptive rescaling based on spatially varying
+intensity fields rather than global or strictly local transformations \cite{gil2024fieldscale}.
+Figure~\ref{fig:thermal_preprocessing} shows an example of HE, CLAHE,
+and FieldScale applied to an image from the FLIR(v2) dataset \cite{teledyne_2022_flirAdasV2Dataset}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{images/thermal_preprocessing_becker_2025_fusion_confusion.png}
+    \caption{
+        Examples showing the results of the preprocessing 
+        methods HE, CLAHE, and Fieldscale.
+        \cite{becker2025fusionOrConfusionDatasetPooling}
+    }
+    \label{fig:thermal_preprocessing}
+\end{figure}
+
+However, the experiments in \cite{becker2025fusionOrConfusionDatasetPooling}
+showed that applying these preprocessing techniques to already low dynamic
+range infrared images did not lead to significant performance improvements
+across datasets, and trained models appeared to internally compensate for
+contrast differences. This was further supported by dimensionality reduction
+exploration, where the average pairwise distance between dataset
+clusters remained unchanged after preprocessing.
+Consequently, 
+unified thermal preprocessing
+is not performed for the dataset pool.
+\cite{becker2025fusionOrConfusionDatasetPooling}
+
+% TODO: paragraph on the differing alignment quality of the datasets
 
 The three datasets were uploaded to an Amazon S3-compatible bucket 
 hosted on the PlusServer cloud platform, which serves as the centralized 
@@ -2058,6 +2156,22 @@ platform responsible for orchestrating and monitoring machine learning
 experiments. During training runs, ClearML dispatches workloads to the 
 GPU workers hosted on Bernard's GPU Rack. The workers must retrieve the 
 required dataset assets at runtime from the S3 bucket through FiftyOne.
+
+\subsection{Dataset Statistics}
+
+For the Visdrone Dronevehicle dataset, the bounding box annotations on the
+thermal images are used instead of the RGB images, as these are a superset 
+of the RGB annotations.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{images/dataset_class_distribution.png}
+    \caption{
+        Class distribution of the dataset pool after merging the classes as 
+        shown in Table~\ref{tab:dataset_class_merge}.
+    }
+    \label{fig:dataset_class_distribution}
+\end{figure}
 
 % TODO:
 % Evaluation of the dataset, including statistics on the number of images, distribution of classes, and examples of challenging scenarios (e.g., low-light, occlusions, weather conditions).
@@ -2076,11 +2190,27 @@ required dataset assets at runtime from the S3 bucket through FiftyOne.
 
 Lorem ipsum
 
+% TODO: explain decision for fine-tuning backbone because was found better
+% First, fully fine-tuning the model when train-
+% ing on combined infrared datasets will likely result in bet-
+% ter generalization across datasets compared to freezing the
+% pre-trained backbone of a detection model.
+\cite{becker2025fusionOrConfusionDatasetPooling}
+
+% TODO: maybe use different preprocessing techniques for data augmentation during training
+% Although previous work demonstrated that
+% combining multiple preprocessing techniques as part of data augmentation
+% can improve detection performance \cite{herrmann2018cnnInfraredPersonDetectionDomainAdaptation}, applying a single unified
+% preprocessing method across datasets showed no measurable benefit.
+% \cite{becker2025fusionOrConfusionDatasetPooling}
+
 \section{RGB-Thermal Fusion}
 
-\section{Distance Sensor integration}
+\section{Edge Server Optimization}
 
-\section{Edge Optimization}
+% Good paper showing quantization and optimization for edge devices:
+% Human Detection in UAV Thermal Imagery: Dataset Extension
+% and Comparative Evaluation on Embedded Platforms
 
 
 \newpage
