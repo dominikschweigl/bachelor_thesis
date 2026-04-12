@@ -258,7 +258,8 @@ overview of the overall system integration is provided.
 \section{UAV Platform}
 
 The aerial platform used in this work is the 
-\textit{twinFOLD KAT}, a heavy-payload hexacopter developed by 
+\textit{twinFOLD KAT}, a heavy-payload hexacopter developed 
+and provided by 
 twins GmbH. According to the official product specification 
 document \cite{twinsKATspec2021}, the system has a maximum takeoff 
 weight of 12\,kg and supports a payload of up to 5.5\,kg 
@@ -286,37 +287,137 @@ all tyrolian areas.
 
 \section{Onboard Processing Unit}
 
-Onboard data processing is performed using a 
-\textit{Raspberry Pi 5} in combination with a 
-\textit{Hailo AI accelerator}. This configuration enables 
-real-time processing of multimodal sensor data directly on 
-the UAV.
+Onboard data processing requires a platform capable of
+real-time multimodal inference under strict weight, size, and power
+constraints imposed by the UAV, while also matching
+organizational experience and existing infrastructure.
+Three candidate platforms were evaluated, namely the
+\textit{NVIDIA Jetson Nano}, the \textit{NVIDIA Jetson Xavier NX},
+and a \textit{Raspberry Pi 5} paired with a \textit{Hailo-8}
+AI accelerator, all of which are actively used within the
+organization.
 
-The Raspberry Pi 5 is equipped with a quad-core ARM 
-Cortex-A76 CPU (up to 2.4\,GHz) and provides improved I/O 
-performance compared to previous generations. It supports 
-high-speed interfaces such as PCIe 2.0, which allows direct 
-integration of external AI accelerators. Depending on the 
-configuration, the system is available with up to 8\,GB of 
-LPDDR4X RAM. Typical power consumption of the Raspberry Pi 5 
-ranges between 5\,W and 12\,W, depending on workload and 
-connected peripherals.
+Both NVIDIA Jetson platforms natively support standard
+inference frameworks such as ONNX Runtime and TensorRT
+without hardware- or model-specific compilation steps. The
+entry-level \textit{Jetson Nano} delivers 512\,GFLOPS of AI
+throughput with 4\,GB of RAM at a peak TDP of 10\,W~\cite{jetsonNanoComputeModuleDatasheet2024},
+supporting FP32 and FP16 but lacking GPU hardware for INT8 inference,
+which proves limiting for real-time processing of fused RGB
+and thermal detection pipelines. The \textit{Jetson Xavier
+NX} provides substantially higher
+compute at 21\,TOPS and adds INT8 hardware support with 8\,GB of RAM but at 15\,W~\cite{jetsonXavierNXDatasheet2020}.
+As systems-on-module, both Jetson variants require a
+separate carrier board, heatsink, and fan assembly for deployment, bringing
+the developer kit dimensions and weights to
+100$\times$79$\times$29\,mm at 141\,g for the Nano and
+130$\times$90$\times$34\,mm at 172\,g for the Xavier
+NX~\cite{jetsonNanoDeveloperKitWeight2019,jetsonXavierNXDevkitWeight,jetsonNanoDeveloperKitSpecification2020,jetsonXavierNXDevKitSpecification2020}.
+This footprint presents an integration challenge for small
+rotary-wing UAVs with limited payload budgets. The third candidate, a
+\textit{Raspberry Pi 5} paired with a \textit{Hailo-8} AI
+accelerator achieves 26\,TOPS of dedicated INT8 neural network
+inference, measures 86$\times$58$\times$14\,mm and weighs 89\,g at a peak
+power consumption of
+8.65\,W with an average power consumption during active inference of 7\,W
+as found by \citet{pereira2025PerformanceRaspberryPiAIHAT}.~\cite{raspberryPi5datasheet2026,hailo8_m2datasheet2021,hailo8_productBrief2023}
+The Hailo-8 attaches directly via the Raspberry Pi 5's
+native PCIe 2.0 interface through an M.2 HAT\texttt{+}
+carrier board, while the Raspberry Pi 5 itself provides up to 8\,GB of LPDDR4X
+RAM~\cite{raspberryPi5datasheet2026}.
+Table~\ref{tab:opu_comparison} summarises these platforms
+quantitatively across the metrics most relevant to UAV
+deployment.
 
-The Hailo accelerator (e.g., Hailo-8) is a dedicated deep 
-learning inference processor designed for edge applications. 
-It delivers up to 26 tera-operations per second (TOPS) while 
-maintaining low power consumption (typically 2.5\textemdash3.5\,W under 
-load). The accelerator is optimized for convolutional neural 
-networks (CNNs) and supports common deep learning frameworks 
-through a dedicated software development kit (SDK).
+\begin{table}[H]
+    \centering
+    \caption{Comparison of evaluated onboard processing platforms for UAV deployment. RPi weight determined ourselves.~\cite{raspberryPi5datasheet2026,hailo8_m2datasheet2021,jetsonNanoComputeModuleDatasheet2024,jetsonNanoDeveloperKitSpecification2020, jetsonNanoDeveloperKitWeight2019, jetsonXavierNXDatasheet2020, jetsonXavierNXDevKitSpecification2020, jetsonXavierNXDevkitWeight}}
+    \label{tab:opu_comparison}
+    \footnotesize
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{lccc}
+        \toprule
+        \textbf{Specification} & \textbf{RPi 5 + Hailo-8} & \textbf{Jetson Nano} & \textbf{Jetson Xavier NX} \\
+        \midrule
+        AI Performance  & 26\,TOPS           & 512\,GFLOPS         & 21\,TOPS, 1.3\,TFLOPS                   \\ % verified
+        RAM             & 8\,GB              & 4\,GB               & 8\,GB                       \\ % verified
+        Peak TDP        & 8.65\,W   & 10\,W      & 15\,W                       \\ % verified
+        Weight          & 89\,g    & 141\,g     & 172\,g                      \\ % verified
+        Dimensions (mm) & 86$\times$58$\times$14 (TODO: Measure)      & 100$\times$79$\times$29        & 130$\times$90$\times$34                \\
+        Number Types & INT8         & FP32, FP16          & FP32, FP16, INT8                   \\
+        Framework support & Compilation      & ONNX/TRT     & ONNX/TRT             \\
+        \bottomrule
 
-The combination of the Raspberry Pi 5 and the Hailo accelerator 
-provides a compact and energy-efficient embedded computing 
-platform capable of executing neural network-based vehicle 
-detection algorithms in real time. This architecture enables 
-onboard inference, reducing the need for high-bandwidth data 
-transmission to a ground station and thereby increasing 
-operational autonomy and system responsiveness.
+    \end{tabular}
+\end{table}
+
+One trade-off of the Hailo ecosystem is that models must be
+compiled and quantized using the Hailo Dataflow Compiler as ,
+introducing longer iteration cycles during development as the
+quantization process requires 21 hours on the GPU workers employed
+with Nvidia 2080Ti GPUs.
+In practice, however, quantization is equally necessary on
+the Jetson platforms to achieve competitive throughput.
+\citet{filippou2025edge} show that FP16 quantization of
+YOLOv8 yields 1.2$\times$ faster inference with a
+mAP50-95 drop below 0.5\,\%. Quantization is therefore a
+shared requirement across all platforms.
+
+No literature was found that benchmarks all three platforms
+against each other directly on computer vision tasks.
+However, \citet{filippou2025edge} compare the Hailo-8 to the Jetson Nano
+and report a 4.58$\times$ throughput improvement for the Hailo-8 on the
+YOLOv8n model with 2 million parameters~\cite{yaseen2024yolov8indepthexplorationinternal}
+and a 3.42$\times$ advantage on the larger YOLOv8s model with 9 million
+parameters~\cite{yaseen2024yolov8indepthexplorationinternal}.
+For the Jetson Xavier NX relative to the Jetson Nano,
+\citet{feng2022benchmarkPerformanceYoloEdgeDevices} report a
+3.65$\times$ throughput gain on the YOLOv3-tiny model with 8.8 million
+parameters~\cite{li2020systematicStudyTinyYOLO3Inference}.
+In both studies, the Jetson measurements were obtained using Float16
+quantization and batch sizes of 1 were used to simulate realtime
+performance. Since INT8 quantization can yield further throughput gains
+over FP16 depending on the GPU architecture, the Xavier NX figures may 
+underestimate its true advantage
+over the Nano, as INT8 inference time was not tested.
+Although the two studies use different YOLO versions, the YOLOv8s and
+YOLOv3-tiny models share a similar parameter count, making the
+comparisons roughly compatible.
+\citet{lema2024quantitativeComparisonObjectDetectionEdgeDevices} further
+show that inference time scales roughly linearly with the number of model
+parameters across multiple YOLO versions and platforms including the
+Jetson Nano, which makes parameter count is the dominant factor even when
+architectures differ.
+These empirical results are also consistent with the published
+operations-per-second specifications of the respective platforms.
+
+Based on this comparison, the Raspberry Pi 5 with Hailo-8 was selected
+over the Jetson alternatives. It achieves throughput comparable to the
+Jetson Xavier NX while being lighter and more power-efficient.
+Although the heavy-payload twinFOLD KAT used in this project is not
+constrained by these margins, future production deployments on smaller
+UAVs with limited payload capacity would benefit from the reduced weight
+and power draw, as smaller platforms are both cheaper and easier to
+operate under current regulatory frameworks.
+
+To facilitate secure attachment of the processing unit to
+the UAV airframe, a custom bracket was designed and
+fabricated using fused deposition modelling (FDM) 3D
+printing, mounting the Raspberry Pi 5 together with the
+M.2 HAT\texttt{+} Hailo-8 module on the UAV as seen in 
+Figure~\ref{fig:raspberryPiBracket}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{images/raspberryPi_mount.jpg}
+    \caption{
+        The raspberry Pi 5 with Hailo-8 mounted on the 3D-printed 
+        bracket attached to the twinFOLD KAT UAV.
+    }
+    \label{fig:raspberryPiBracket}
+\end{figure}
+
+% TODO: Request 3D model file from Vojtech for potential inclusion or reference.
 
 \section{Sensor System}
 
