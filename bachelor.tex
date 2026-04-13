@@ -297,6 +297,19 @@ and a \textit{Raspberry Pi 5} paired with a \textit{Hailo-8}
 AI accelerator, all of which are actively used within the
 organization.
 
+\begin{figure}[H]
+    \centering
+    \setlength{\tabcolsep}{0pt}
+    \begin{tabular}{ccc}
+        \includegraphics[width=0.333\textwidth]{images/jetson_nano_dev_kit} &
+        \includegraphics[width=0.333\textwidth]{images/jetson_xavier_nx_dev_kit} &
+        \includegraphics[width=0.333\textwidth]{images/raspberry_hailo_kit}
+    \end{tabular}
+    \caption{The three evaluated onboard processing platforms. Left: Jetson Nano Developer Kit~\cite{img_jetsonnano_devkit}. Centre: Jetson Xavier NX Developer Kit~\cite{img_jetsonxaviernx_devkit}. Right: Raspberry Pi 5 with Hailo-8 AI HAT\texttt{+}~\cite{img_raspberrypi_aihat}.}
+    \label{fig:processing_units}
+\end{figure}
+
+
 Both NVIDIA Jetson platforms natively support standard
 inference frameworks such as ONNX Runtime and TensorRT
 without hardware- or model-specific compilation steps. The
@@ -317,7 +330,7 @@ This footprint presents an integration challenge for small
 rotary-wing UAVs with limited payload budgets. The third candidate, a
 \textit{Raspberry Pi 5} paired with a \textit{Hailo-8} AI
 accelerator achieves 26\,TOPS of dedicated INT8 neural network
-inference, measures 86$\times$58$\times$14\,mm and weighs 89\,g at a peak
+inference, measures 86$\times$58$\times$26\,mm and weighs 89\,g at a peak
 power consumption of
 8.65\,W with an average power consumption during active inference of 7\,W
 as found by \citet{pereira2025PerformanceRaspberryPiAIHAT}.~\cite{raspberryPi5datasheet2026,hailo8_m2datasheet2021,hailo8_productBrief2023}
@@ -343,7 +356,7 @@ deployment.
         RAM             & 8\,GB              & 4\,GB               & 8\,GB                       \\ % verified
         Peak TDP        & 8.65\,W   & 10\,W      & 15\,W                       \\ % verified
         Weight          & 89\,g    & 141\,g     & 172\,g                      \\ % verified
-        Dimensions (mm) & 86$\times$58$\times$14 (TODO: Measure)      & 100$\times$79$\times$29        & 130$\times$90$\times$34                \\
+        Dimensions (mm) & 86$\times$58$\times$26      & 100$\times$79$\times$29        & 130$\times$90$\times$34                \\
         Number Types & INT8         & FP32, FP16          & FP32, FP16, INT8                   \\
         Framework support & Compilation      & ONNX/TRT     & ONNX/TRT             \\
         \bottomrule
