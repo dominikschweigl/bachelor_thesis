@@ -1499,6 +1499,129 @@ Fusion Degradation - Rethinking Multi-modal Object Detection from the Perspectiv
 Mono-Modality Feature Learning (Drive)
 
 \section{Sensor Alignment}
+
+Image alignment is one of the issues that should be considered in cross-modal
+image applications. Existing methods [11,16,40,29,6,38,39] usually assume that
+visible-infrared image pairs are perfectly geometrically aligned, and they directly
+perform the multi-modal fusion methods. 
+Actually, after the image registration
+algorithm, the paired images are just weakly aligned (shown in Fig. 1(a)). However, 
+objects differ not only
+in position, but also in scale and angle. These three deviations (position, size and
+angle) of the paired arbitrary oriented objects are closely coupled, changing one
+will affect another one, which makes the alignment operation more complicated.
+As shown in Fig. 1(b), the dashed boxes represent the position of the corresponding 
+bounding-boxes in the infrared images. We find that the same object
+on image pairs differs in location, scale and angle. Therefore, weakly misalignment 
+in cross-modal aerial images is a common issue that needs to be addressed.
+To demonstrate the generality of the misalignment 
+problem in aerial
+imagery, we also obtain the statistics information of DroneVehicle dataset,
+a dataset that provides RGBT data taken from the UAV drone perspective. we
+separately count the number of bounding-boxes with deviations (position and
+size offset by 3 pixels, angle offset by 3 degrees) in the DroneVehicle dataset.
+More than 20\% of the bounding-boxes have the misalignment 
+problem.
+\cite{yuan2022crossModalAlignmentVehicleDetection}
+
+Spatial misalignment: Since RGB and infrared sensors have different coordinate systems,
+fields of view, and sampling frequencies, pairs of RGB and infrared images usually are spatial
+misaligned [21], resulting in low-quality bounding boxes predicted by RGB and infrared fusion
+object detection, as shown in Figure 1a. Figure 1b indicates that the fusion of original RGB
+and infrared images via the image fusion algorithm [22] will take in a significantly misaligned
+ghost, which will also disturb localization. The downsampling may decrease the degree of
+misalignment [8], yet the situation still exists, as shown in Figure 1c. The performance of
+RGB and infrared fusion detection methods that directly fuse misaligned features is not ideal.
+Therefore, achieving spatial alignment between RGB and infrared modalities is crucial. The
+training process of existing RGB and infrared fusion object-detection networks [7,19] relies on
+manually aligned datasets in advance. However, manual alignment is a labor-intensive task
+[13,23], and there will still be subtle misalignments after manual processing, such as the FLIR
+dataset [24]. A more feasible way is to take misaligned RGB and infrared images as input
+directly, and how to adaptively perform spatial alignment at the feature level is the concern of
+our work. Furthermore, RGB and infrared images usually have different resolutions. Existing
+works [22,25] directly resize different modal images to the same size through downscaling or
+upscaling, either dropping beneficial information or introducing redundancy and increasing
+computational overhead.
+\cite{he2023misalignedRGBTadaptiveCalibration}
+
+Explanation in Multi-Perspective RGB and Infrared Dataset
+for UAV Detection IEEE Access 2025 is good
+
+\section{Early Fusion}
+
+\section{Mid (Feature-level) Fusion}
+
+\section{Late Fusion}
+
+
+\newpage
+\chapter{Object Detection}
+\label{chap:object_detection}
+
+Justification for the choice of CNN instead of transformers-based models:
+
+4.1.3. Training Data Limitations
+Our dataset, while extensive at 75,000+ images, combines heterogeneous sources
+with substantial domain shifts (urban vs. mountainous, varying altitudes, different sensor
+characteristics). Transformer-based detectors typically require larger and more consistent
+training datasets to effectively learn their attention mechanisms. The relatively limited size
+and high heterogeneity of thermal datasets compared to RGB benchmarks like COCO may
+J. Imaging 2025, 11, 436 14 of 26
+disproportionately affect RT-DETR’s performance. This appears to be supported by our
+finding that the RT-DETR model achieved lower average precision than the YOLO models
+% from Human Detection in UAV Thermal Imagery: Dataset Extension
+% and Comparative Evaluation on Embedded Platforms
+
+\section{Single Stage Detectors}
+
+\section{Two Stage Detectors}
+
+\section{Tracking-by-Detection}
+
+
+\newpage
+\chapter{Dataset}
+\label{chap:dataset}
+
+There are several existing large scale datasets that 
+contain RGB and thermal data for object detection. However, 
+none of them to the best of our knowledge fully match the ideal 
+large scale RGB and LWIR low altitude side view UAV perspective 
+with a focus on vehicle detection under diverse conditions 
+including adverse weather and nighttime. Many existing datasets 
+focus on pedestrian detection rely on vehicle mounted cameras or 
+use high altitude aerial imagery that targets small object 
+detection. The following section provides an overview of the 
+most relevant datasets and afterwards explains how the dataset 
+for this project is constructed.
+
+\section{Data Collection}
+
+As previously described in Chapter~\ref{chap:hardware}, the data collection is performed using the
+Workswell WIRIS Enterprise multi-sensor system, which provides unaligned RGB and thermal 
+video streams. The data collection process involves flying the drone equipped 
+with the WIRIS camera next to road segments. The primary location for
+data collection is the IG-Modellflugplatz Häusern in Ampass, a model airfield in the 
+Austrian Alps that features a road with regular traffic and flight permission
+without drone flight prohibition or the need for special permits in contrast to many other locations
+in the Innsbruck area due to the Innsbruck airport.
+
+The WIRIS camera was configured to capture optimal thermal data.
+Material emissivity was set to 0.95, the standard value for rubber tires and
+automotive paint as the primary materials of interest in vehicle 
+detection~\cite{hu2026VehicleTireTankTemperatureMonitoringThermalCameras}
+as previously seen in \ref{fig:vehicle_thermal_radiation}.
+The camera system automatically adjusts the temperature range to the minimum and maximum
+of the current scene to maximize image contrast.
+Since per-flight reconfiguration to environmental conditions is not foreseen,
+ambient temperature and relative humidity were left at their default values of
+20\,\textdegree C and 50\,\%.
+The object distance was set to 25\,m to match the typical operating altitude of the drone.
+
+% TODO: add more details on data collection, such as flight patterns, duration, 
+% and conditions
+
+\subsection{Sensor Alignment}
 \label{chap:sensor_alignment}
 
 The sensor data exhibited two main issues that needed to be addressed:
@@ -1799,131 +1922,167 @@ near the image edges visible for the vehicle near the top.
     \label{fig:camera_alignment_result}
 \end{figure}
 
-Image alignment is one of the issues that should be considered in cross-modal
-image applications. Existing methods [11,16,40,29,6,38,39] usually assume that
-visible-infrared image pairs are perfectly geometrically aligned, and they directly
-perform the multi-modal fusion methods. 
-Actually, after the image registration
-algorithm, the paired images are just weakly aligned (shown in Fig. 1(a)). However, 
-objects differ not only
-in position, but also in scale and angle. These three deviations (position, size and
-angle) of the paired arbitrary oriented objects are closely coupled, changing one
-will affect another one, which makes the alignment operation more complicated.
-As shown in Fig. 1(b), the dashed boxes represent the position of the corresponding 
-bounding-boxes in the infrared images. We find that the same object
-on image pairs differs in location, scale and angle. Therefore, weakly misalignment 
-in cross-modal aerial images is a common issue that needs to be addressed.
-To demonstrate the generality of the misalignment 
-problem in aerial
-imagery, we also obtain the statistics information of DroneVehicle dataset,
-a dataset that provides RGBT data taken from the UAV drone perspective. we
-separately count the number of bounding-boxes with deviations (position and
-size offset by 3 pixels, angle offset by 3 degrees) in the DroneVehicle dataset.
-More than 20\% of the bounding-boxes have the misalignment 
-problem.
-\cite{yuan2022crossModalAlignmentVehicleDetection}
+\subsection{Annotation}
 
-Spatial misalignment: Since RGB and infrared sensors have different coordinate systems,
-fields of view, and sampling frequencies, pairs of RGB and infrared images usually are spatial
-misaligned [21], resulting in low-quality bounding boxes predicted by RGB and infrared fusion
-object detection, as shown in Figure 1a. Figure 1b indicates that the fusion of original RGB
-and infrared images via the image fusion algorithm [22] will take in a significantly misaligned
-ghost, which will also disturb localization. The downsampling may decrease the degree of
-misalignment [8], yet the situation still exists, as shown in Figure 1c. The performance of
-RGB and infrared fusion detection methods that directly fuse misaligned features is not ideal.
-Therefore, achieving spatial alignment between RGB and infrared modalities is crucial. The
-training process of existing RGB and infrared fusion object-detection networks [7,19] relies on
-manually aligned datasets in advance. However, manual alignment is a labor-intensive task
-[13,23], and there will still be subtle misalignments after manual processing, such as the FLIR
-dataset [24]. A more feasible way is to take misaligned RGB and infrared images as input
-directly, and how to adaptively perform spatial alignment at the feature level is the concern of
-our work. Furthermore, RGB and infrared images usually have different resolutions. Existing
-works [22,25] directly resize different modal images to the same size through downscaling or
-upscaling, either dropping beneficial information or introducing redundancy and increasing
-computational overhead.
-\cite{he2023misalignedRGBTadaptiveCalibration}
+The aligned RGB and thermal video streams were sampled to extract individual frames for annotation.
+Every third frame was selected from each video, yielding a total of \{N\_frames\} image pairs.
+Sampling at this rate reduces the redundancy inherent in high-frame-rate recordings, where consecutive
+frames differ very little in content.
+At a camera rate of 20\,fps, every third frame corresponds to an inter-sample interval of 0.15\,s.
+At a typical road speed of 70\,km/h ($\approx 19.4$\,m/s), a vehicle at the nominal operating
+distance of 30\,m travels 2.92\,m during this interval.
+Assuming motion perpendicular to the camera's optical axis and using similar triangles with the
+focal length derived in Section~\ref{chap:sensor_alignment} ($f_\mathrm{px} \approx 1030$\,px),
+this corresponds to a pixel shift of
+%
+\begin{equation}
+  \Delta\mathrm{px} = \frac{2.92}{30} \times 1030 \approx 100\,\mathrm{px},
+\end{equation}
+%
+which is sufficient to ensure that adjacent samples show the vehicle in substantially
+different positions, thereby avoiding dataset redundancy.
+In practice, this value represents an upper bound, as the drone was often oriented with a forward
+component relative to the road. This reduced the lateral displacement
+and consequently increased the number of consecutive samples in which vehicles remain within the field of view.
 
-Explanation in Multi-Perspective RGB and Infrared Dataset
-for UAV Detection IEEE Access 2025 is good
-
-\section{Early Fusion}
-
-\section{Mid (Feature-level) Fusion}
-
-\section{Late Fusion}
+Because the recordings consist of continuous roadside footage, the sampled frames include long
+sequences showing only the static road background with no vehicles present.
+These \{N\_background\} background-only frames are largely redundant, as hundreds of near-identical
+images represent the same empty scene.
+To reduce this imbalance, 90\,\% of all frames containing no annotated objects were removed at
+random, retaining a representative fraction of background context.
 
 
-\newpage
-\chapter{Object Detection}
-\label{chap:object_detection}
+Annotations were produced using a combination of the FiftyOne dataset management
+library~\cite{moore2020fiftyone} and the Computer Vision Annotation Tool
+(CVAT)~\cite{cvat2019} as the annotation backend.
+FiftyOne organises samples in a queryable format and allows arbitrary metadata fields such as
+recording session, date, and dataset split to be attached to each sample, making it straightforward
+to filter, modify, and access the dataset both programmatically and via a web interface.
+CVAT provides a web-based labeling interface that enables annotators to draw detection bounding boxes
+quickly over image sequences using keyboard shortcuts.
+FiftyOne was used to prepare and push annotation tasks to CVAT and to import the completed labels back
+into the dataset.
+The raw images were stored in an S3-compatible object storage bucket hosted on the Plusserver cloud.
+Figure~\ref{fig:annotation_tools} shows the interfaces of both tools.
 
-Justification for the choice of CNN instead of transformers-based models:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/cvat_fiftyone_showcase.png}
+    \vspace{-1em}
+    \caption{
+        Left: CVAT annotation interface with a car bounding box drawn on a sample frame.
+        Right: FiftyOne dataset browser showing per-sample metadata fields including
+        recording location, date, and dataset split.
+    }
+    \label{fig:annotation_tools}
+\end{figure}
 
-4.1.3. Training Data Limitations
-Our dataset, while extensive at 75,000+ images, combines heterogeneous sources
-with substantial domain shifts (urban vs. mountainous, varying altitudes, different sensor
-characteristics). Transformer-based detectors typically require larger and more consistent
-training datasets to effectively learn their attention mechanisms. The relatively limited size
-and high heterogeneity of thermal datasets compared to RGB benchmarks like COCO may
-J. Imaging 2025, 11, 436 14 of 26
-disproportionately affect RT-DETR’s performance. This appears to be supported by our
-finding that the RT-DETR model achieved lower average precision than the YOLO models
-% from Human Detection in UAV Thermal Imagery: Dataset Extension
-% and Comparative Evaluation on Embedded Platforms
+The six annotation classes are car, truck, bus, motorcycle, bicycle, and person, chosen to align
+with the public datasets used for training as described in Section~\ref{chap:public_datasets}.
+To reduce inter-annotator ambiguity, vehicles were classified using the Bernard Gruppe 12+1
+taxonomy~\cite{bernardGruppe12plus1Classification}, which extends the BASt 8+1
+system~\cite{bastVehicleClassification} and is already familiar to all annotators in the team.
+This internal taxonomy was then mapped to the six dataset classes as specified in full in 
+Appendix~\ref{app:labeling_guidelines}.
 
-\section{Single Stage Detectors}
+The annotation was performed by a team of three annotators, including the author, each with at least
+one year of prior annotation experience at Bernard Gruppe.
+Samples were organised into tasks of 200 frames, and annotators were instructed to take a break after
+completing each task to prevent fatigue and maintain consistency.
+Before work began, a labeling guideline was prepared and distributed to the full team, it is reproduced
+in Appendix~\ref{app:labeling_guidelines}.
+The combined annotation effort amounted to approximately \{N\_hours\} hours.
+After the initial annotation pass, the author reviewed all samples to identify and correct
+inconsistencies.
 
-\section{Two Stage Detectors}
+The most consequential rules from the labeling guidelines are as follows.
+A vehicle is annotated only when it occupies at least $16 \times 12$ pixels, at least 30\,\% of it is
+visible within the frame, and its class can be determined from the current frame alone without
+consulting neighbouring frames.
+Bounding boxes must be axis-aligned with the image, enclose only the visible portion of a vehicle, and
+stop at the image boundary rather than estimating the occluded extent.
+In low-light frames where the RGB channel is ambiguous, annotators were instructed to consult the
+co-registered thermal image, as vehicles and people are thermally distinct from their surroundings
+even at night.
 
-\section{Tracking-by-Detection}
+Only the RGB frames were annotated in CVAT, with the same bounding boxes and class labels then applied
+to the spatially aligned thermal frames.
+Adding the thermal images as contextual side-by-side views within CVAT was considered to assist
+annotators in low-light frames, but FiftyOne does not yet support this CVAT feature at the time of
+writing. % FiftyOne Feature Request: https://github.com/voxel51/fiftyone/issues/3673
+As an alternative, annotators were instructed to access the corresponding thermal image via the S3 URL
+when the visible channel was ambiguous.
+A limitation of this approach is that the residual spatial misalignment discussed in
+Section~\ref{chap:sensor_alignment} may cause bounding boxes to fit the thermal channel less precisely.
+
+\subsection{Thermal Color Format Conversion}
+
+During the first data collection flight session, the camera was set to BWRGB mode, which encodes
+the recordings in a non-standard format where the thermal data moves as thermal intensity increases
+from black to white to blue to green to red and then pink as the hottest pixels. This format is not ideal
+as most other RGB-thermal datasets use a standard grayscale format for the thermal channel. Therefore,
+the thermal data of the first flight session was postprocessed to convert it from BWRGB to grayscale. 
+This was done using the palette file provided by the Workswell Support for the WIRIS camera, which maps 256 BWRGB 
+colors to their corresponding thermal intensity values. 
+
+The data postprocessing script reads the BWRGB thermal images, applies the palette mapping to convert each 
+pixel's BWRGB value to its corresponding grayscale intensity, and saves the resulting grayscale thermal 
+images. If a color value in the BWRGB image does not have a corresponding entry in the palette, it is 
+assigned a default intensity value of 0. This occurence was observed for a big number of pixels in the thermal
+images, which is expected to be due to video format compression, which introduces slight variations in 
+pixel values that may not exactly match the palette entries. Therefore, a nearest neighbour interpolation 
+was applied to assign the closest palette intensity value to each pixel. 
+This process significatntly improved the quality of the postprocessed thermal images with 
+only a small number of pixels black noise. This noise happens for areas that quickly moves from blue to white
+in the preprocessed images, as the transition in the compressed video format results in quite dark areas that are most similar to way darker areas
+in the original BWRGB palette. This can be seen in the color palette to the right of the Figure~\ref{fig:thermal_postprocessing_comparison}
+where the mentioned pixels are moved from the transition between blue and white down to the transition between black and white. An example of the resulting postprocessed thermal images
+for the original, simply mapped and interpolated versions are shown in Figure~\ref{fig:thermal_postprocessing_comparison}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/comparison_thermal_postprocessing.png}
+    \vspace{-1em}
+    \caption{
+        Right: Original BWRGB thermal image. Left: Postprocessed grayscale thermal image using the WIRIS palette mapping.
+        Center: Postprocessed grayscale thermal image using the WIRIS palette mapping with nearest neighbour interpolation.
+        The BWRGB color palette from the WIRIS Enterprise user manual \cite{worksellWIRISuserManual2023} is shown to the right.
+    }
+    \label{fig:thermal_postprocessing_comparison}
+\end{figure}
 
 
-\newpage
-\chapter{Dataset}
-\label{chap:dataset}
+\subsection{Dataset Statistics}
 
-There are several existing large scale datasets that 
-contain RGB and thermal data for object detection. However, 
-none of them to the best of our knowledge fully match the ideal 
-large scale RGB and LWIR low altitude side view UAV perspective 
-with a focus on vehicle detection under diverse conditions 
-including adverse weather and nighttime. Many existing datasets 
-focus on pedestrian detection rely on vehicle mounted cameras or 
-use high altitude aerial imagery that targets small object 
-detection. The following section provides an overview of the 
-most relevant datasets and afterwards explains how the dataset 
-for this project is constructed.
+After background reduction and annotation, the self-collected dataset comprises \{N\_total\} annotated
+image pairs containing a total of \{N\_annotations\} bounding boxes.
+Figure~\ref{fig:self_collected_stats} shows the class distribution and the day and night sample split.
+The dataset is dominated by the car class, reflecting the traffic composition at the collection site.
+No adverse weather conditions occurred during the data collection flights, so the dataset does
+not cover rain, fog, or snow scenarios.
+This is a limitation of the self-collected data that motivates the inclusion of the public
+adverse-weather datasets described in Section~\ref{chap:public_datasets}.
 
-\section{Data Collection}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/dataset_split_stats.png}
+    \vspace{-1em}
+    \caption{
+        Statistics of the self-collected dataset after background reduction and annotation.
+        Left: annotated frame and bounding box counts per train, validation, and test split.
+        Center: bounding box counts per class across all splits.
+        Right: day and night sample distribution.
+        \textit{(Adjust subfigure layout to match the actual content of dataset\_split\_stats.png.
+        If day/night split is not included, add it as a separate bar chart here.)}
+    }
+    \label{fig:self_collected_stats}
+\end{figure}
 
-As previously described in Chapter~\ref{chap:hardware}, the data collection is performed using the
-Workswell WIRIS Enterprise multi-sensor system, which provides unaligned RGB and thermal 
-video streams. The data collection process involves flying the drone equipped 
-with the WIRIS camera next to road segments. The primary location for
-data collection is the IG-Modellflugplatz Häusern in Ampass, a model airfield in the 
-Austrian Alps that features a road with regular traffic and flight permission
-without drone flight prohibition or the need for special permits in contrast to many other locations
-in the Innsbruck area due to the Innsbruck airport.
 
-The WIRIS camera was configured to capture optimal thermal data.
-Material emissivity was set to 0.95, the standard value for rubber tires and
-automotive paint as the primary materials of interest in vehicle 
-detection~\cite{hu2026VehicleTireTankTemperatureMonitoringThermalCameras}
-as previously seen in \ref{fig:vehicle_thermal_radiation}.
-The camera system automatically adjusts the temperature range to the minimum and maximum
-of the current scene to maximize image contrast.
-Since per-flight reconfiguration to environmental conditions is not foreseen,
-ambient temperature and relative humidity were left at their default values of
-20\,\textdegree C and 50\,\%.
-The object distance was set to 25\,m to match the typical operating altitude of the drone.
-
-% TODO: add more details on data collection, such as flight patterns, duration, 
-% and conditions, as well as labeling process and tools used for annotation
-
-% TODO: add dataset statistics such as number of frames, number of annotated vehicles, 
-% and class distribution
 
 \section{Public Visible-Thermal Datasets}
+\label{chap:public_datasets}
 
 Among UAV-based RGB-thermal datasets, the DroneVehicle dataset 
 \cite{sun2022droneVehicleRGBThermalUAVDataset} is one of the largest, 
@@ -2159,26 +2318,29 @@ matching the HBB format of RTDOD and M3FD.
 |>{\centering\arraybackslash}p{2.2cm}
 |>{\centering\arraybackslash}p{2.6cm}
 |>{\centering\arraybackslash}p{2.6cm}
+|>{\centering\arraybackslash}p{2.2cm}
 |>{\centering\arraybackslash}p{2.2cm}|}
 \hline
-\textbf{Unified} & \textbf{DroneVehicle} & \textbf{RTDOD} & \textbf{M3FD} \\
+\textbf{Unified} & \textbf{DroneVehicle} & \textbf{RTDOD} & \textbf{M3FD} & \textbf{Self-Collected} \\
 \hline
-Car & \makecell[tc]{Car \\ Van} & Car & Car \\
+Car & \makecell[tc]{Car \\ Van} & Car & Car & Car \\
 \hline
-Bus & Bus & Bus & Bus \\
+Bus & Bus & Bus & Bus & Bus \\
 \hline
-Truck & \makecell[tc]{Truck \\ Freight Car} & Truck & Truck \\
+Truck & \makecell[tc]{Truck \\ Freight Car} & Truck & Truck & Truck \\
 \hline
-Motorcycle & -- & Motorcycle & Motorcycle \\
+Motorcycle & -- & Motorcycle & Motorcycle & Motorcycle \\
 \hline
-Person & -- & Person & People \\
+Bicycle & -- & Bicycle & -- & Bicycle \\
 \hline
-Discarded & -- & 
-\makecell[tc]{Bicycle \\ Boat \\  Dog \\  Sports Ball \\  Baby Carriage} 
-& Lamp \\
+Person & -- & Person & People & Person \\
+\hline
+Discarded & -- &
+\makecell[tc]{Boat \\  Dog \\  Sports Ball \\  Baby Carriage}
+& Lamp & -- \\
 \hline
 \end{tabular}
-\caption{Unified vehicle-centric class mapping across DroneVehicle, RTDOD, and M3FD datasets. Non-relevant classes are discarded.}
+\caption{Unified vehicle-centric class mapping across DroneVehicle, RTDOD, M3FD, and the self-collected dataset. Non-relevant classes are discarded.}
 \label{tab:dataset_class_merge}
 \end{table}
 
@@ -2279,10 +2441,10 @@ of the RGB annotations.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.65\textwidth]{images/dataset_class_distribution.png}
+    \includegraphics[width=0.65\textwidth]{images/dataset_combined.pdf}
     \caption{
-        Class distribution of the dataset pool after merging the classes as 
-        shown in Table~\ref{tab:dataset_class_merge}.
+        Per-dataset image counts (top left) and annotation counts (bottom left) broken down by train, validation, and test split.
+        Instance counts per merged vehicle class across all datasets in the pool (right), with class mapping given in Table~\ref{tab:dataset_class_merge}.
     }
     \label{fig:dataset_class_distribution}
 \end{figure}
@@ -2359,6 +2521,80 @@ Lipsum \ldots
 \newpage
 \chapter{Conclusion and Future Work}
 \label{chap:conclusion}
+
+\newpage
+\appendix
+
+\chapter{3D-Net Labeling Guidelines}
+\label{app:labeling_guidelines}
+
+These are the labeling guidelines for the data collected in the 3D-Net 
+project. The data is collected from a drone perspective with an attached 
+camera system containing multiple optical cameras, a thermal camera, and 
+a distance sensor. 
+
+\section{Classification Mapping}
+
+The detailed vehicle classification for this project uses a simplified mapping
+from Bernard's 12+1 vehicle classification that is based on the BASt 8+1 
+taxonomy to six dataset classes.
+Classification is performed directly in the CVAT detection tasks by selecting 
+one of the classes
+car, bus, truck, motorcycle, bicycle, or person.
+
+\begin{table}[H]
+    \centering
+    \caption{Mapping from Bernard's 12+1 vehicle types to 3D-Net dataset classes.}
+    \label{tab:labeling_class_mapping}
+    \begin{tabular}{ll}
+        \toprule
+        \textbf{12+1 classification} & \textbf{3D-Net Class} \\
+        \midrule
+        Car, Minivan, Van, Car-with-Trailer, Camper, Quad & Car \\
+        Bus, Minibus                                       & Bus \\
+        Articulated-Truck, Single-Unit-Truck, Truck-with-Trailer, & \\
+        \quad Tractor, Box-Van, Flatbed-Truck-Small        & Truck \\
+        Motorcyclist                                       & Motorcycle \\
+        Cyclist, Cargo-Cyclist                             & Bicycle \\
+        Person                                             & Person \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\section{Bounding Box Rules}
+
+Bounding boxes must be axis-aligned with the image, rotated boxes are not 
+supported. Only the visible portion of an object should be annotated. The 
+estimated extent of occluded areas must not be included. If a vehicle is 
+cut off at the image boundary, the bounding box stops at that boundary.
+
+Side mirrors, open doors, and tailgates are part of the vehicle and are 
+included within the bounding box. Antennas and shadows are excluded.
+If a vehicle is towing a trailer or similar attachment, a single bounding 
+box encompasses both the towing vehicle and the trailer, even if other 
+vehicles are loaded on the trailer.
+
+\section{Minimum Requirements for Annotation}
+
+A vehicle is annotated only when all of the following conditions are met.
+
+\begin{itemize}
+    \item The object occupies at least 16$\times$12 pixels in the image.
+    \item At least 30\,\% of the vehicle is visible within the frame.
+    \item The object can be identified with confidence from the current frame alone,
+          knowledge of preceding or following frames must not be used.
+    \item The object is clear enough to determine its class with certainty.
+          If it is too blurry to classify, do not annotate it.
+\end{itemize}
+
+\section{Low-Light Conditions}
+
+Objects that are difficult to distinguish due to low light should still be labeled.
+The camera system includes a thermal camera that is unaffected by visible light and
+provides clear object boundaries even at night, where vehicles and people are
+thermally distinct from their surroundings.
+When the visible channel is ambiguous, open the corresponding thermal image via
+the S3 URL attached to the FiftyOne sample to confirm object presence and class.
 
 \newpage
 

@@ -13,13 +13,13 @@ import plotly.graph_objects as go
 # Use 0 for classes absent in a dataset.
 # Order must match CLASSES.
 
-CLASSES = ["Car", "Bus", "Truck", "Motorcycle", "Person"]
+CLASSES = ["Car", "Bus", "Truck", "Motorcycle", "Bicycle", "Person"]
 
 DATASETS = {
-    "DroneVehicle": [440_163,  16_535, 43119,     0,     0],  # car includes van; truck includes freight car
-    "RTDOD":        [78_063,  2_336,  7_580,  26_378, 57_515],
-    "M3FD":         [18_296,  700,  1_008,  521,  11_477],
-    "Ours":         [  450,   120,   230,     0,     0],  # placeholder — update when collection is complete
+    "DroneVehicle": [440_163,   16_535, 43119,  0,      0,      0],  # car includes van; truck includes freight car
+    "RTDOD":        [78_063,    2_336,  7_580,  26_378, 2_693,  57_515],
+    "M3FD":         [18_296,    700,    1_008,  521,    0,      11_477],
+    "Ours":         [  450,     120,    230,    0,      0,      0],  # placeholder — update when collection is complete
 }
 
 COLORS = {
@@ -154,5 +154,333 @@ def plot_class_distribution():
     print("Saved: images/dataset_class_distribution.{pdf,png}")
 
 
+# ── Split statistics ──────────────────────────────────────────────────────────
+# Images and annotations per dataset per split.
+# RGB counts are used where RGB and thermal differ.
+# Update "Ours" once self-collection is complete.
+
+SPLITS = ["Train", "Val", "Test", "Total"]
+
+SPLIT_IMAGES = {
+    #                   Train    Val    Test   Total
+    "DroneVehicle":  [17_951,  1_469,  8_980, 28_400],
+    # "FLIR ADAS v2":  [10_318,  1_085,  3_749, 15_152],
+    "RTDOD":         [11_003,  1_221,  3_968, 16_192],
+    "M3FD":          [ 2_905,    628,    667,  4_200],
+    "Ours":          [     0,      0,      0,      0],  # placeholder
+}
+
+SPLIT_ANNOTATIONS = {
+    #                   Train      Val     Test    Total
+    "DroneVehicle":  [286_050,  22_463, 143_330, 451_843],
+    # "FLIR ADAS v2":  [169_174,  16_909,  84_786, 270_869],
+    "RTDOD":         [108_285,  14_160,  56_576, 179_021],
+    "M3FD":          [ 24_052,   4_858,   5_497,  34_407],
+    "Ours":          [      0,       0,       0,       0],  # placeholder
+}
+
+SPLIT_COLORS = {
+    "Train": "#1D4ED8",   # blue-700
+    "Val":   "#047857",   # emerald-700
+    "Test":  "#B45309",   # amber-700
+    "Total": "#374151",   # gray-700
+}
+
+
+# ── Plot: split statistics ─────────────────────────────────────────────────────
+def plot_split_stats():
+    from plotly.subplots import make_subplots
+
+    datasets = list(SPLIT_IMAGES.keys())
+    fig = make_subplots(
+        rows=2, cols=1,
+        shared_xaxes=True,
+        vertical_spacing=0.10,
+        subplot_titles=("Images per Split", "Annotations per Split"),
+    )
+
+    shown_in_legend = set()
+
+    for row, data_dict in enumerate([SPLIT_IMAGES, SPLIT_ANNOTATIONS], start=1):
+        for split in SPLITS:
+            values = [data_dict[ds][SPLITS.index(split)] for ds in datasets]
+            show_legend = split not in shown_in_legend
+            if show_legend:
+                shown_in_legend.add(split)
+            fig.add_trace(
+                go.Bar(
+                    name=split,
+                    x=datasets,
+                    y=values,
+                    marker_color=SPLIT_COLORS[split],
+                    marker_line_color="rgba(255,255,255,0.5)",
+                    marker_line_width=0.5,
+                    marker_cornerradius=4,
+                    text=[f"{v:,}" if v > 0 else "" for v in values],
+                    textposition="outside",
+                    textfont=dict(size=9, color=GRAY_HI, family=FONT),
+                    legendgroup=split,
+                    showlegend=show_legend,
+                ),
+                row=row, col=1,
+            )
+
+    axis_style = dict(
+        tickformat=",",
+        tickfont=dict(size=11, color=GRAY_LO),
+        title_font=dict(size=12, color=GRAY_LO),
+        showgrid=True,
+        gridcolor="#e0e0e0",
+        gridwidth=1,
+        zeroline=False,
+        showline=True,
+        linecolor="#d0d0d0",
+        linewidth=1,
+    )
+
+    fig.update_layout(
+        barmode="group",
+        bargap=0.20,
+        bargroupgap=0.06,
+        template="simple_white",
+        font=dict(family=FONT, size=12, color=GRAY_HI),
+        plot_bgcolor="white",
+        paper_bgcolor="white",
+        legend=dict(
+            title=dict(text="Split", font=dict(size=12, color=GRAY_HI)),
+            bgcolor="rgba(255,255,255,0.92)",
+            bordercolor="#e0e0e0",
+            borderwidth=1,
+            font=dict(size=12),
+            orientation="h",
+            x=0.5, xanchor="center",
+            y=1.04, yanchor="bottom",
+            traceorder="normal",
+        ),
+        width=900,
+        height=680,
+        margin=dict(l=70, r=30, t=70, b=55),
+    )
+
+    fig.update_yaxes(**axis_style, title_text="Images", row=1, col=1)
+    fig.update_yaxes(**axis_style, title_text="Annotations", row=2, col=1)
+    fig.update_xaxes(
+        tickfont=dict(size=13, color=GRAY_HI),
+        showline=True, linecolor="#d0d0d0", linewidth=1,
+        ticklen=0,
+        row=2, col=1,
+    )
+
+    for annotation in fig.layout.annotations:
+        annotation.font = dict(size=13, color=GRAY_HI, family=FONT)
+
+    fig.write_image("images/dataset_split_stats.pdf")
+    fig.write_image("images/dataset_split_stats.png", scale=2)
+    print("Saved: images/dataset_split_stats.{pdf,png}")
+
+
+# ── Combined plot ─────────────────────────────────────────────────────────────
+def plot_combined():
+    from plotly.subplots import make_subplots
+
+    # Left col: images (row 1) + annotations (row 2); right col: class dist (rows 1+2)
+    fig = make_subplots(
+        rows=2, cols=2,
+        shared_xaxes=False,
+        column_widths=[0.52, 0.48],
+        vertical_spacing=0.10,
+        horizontal_spacing=0.10,
+        specs=[
+            [{"type": "bar"}, {"type": "bar", "rowspan": 2}],
+            [{"type": "bar"}, None],
+        ],
+        subplot_titles=(
+            "Images per Split", "Class Distribution",
+            "Annotations per Split", "",
+        ),
+    )
+
+    axis_style = dict(
+        tickformat=",",
+        tickfont=dict(size=10, color=GRAY_LO),
+        title_font=dict(size=11, color=GRAY_LO),
+        showgrid=True,
+        gridcolor="#e0e0e0",
+        gridwidth=1,
+        zeroline=False,
+        showline=True,
+        linecolor="#d0d0d0",
+        linewidth=1,
+    )
+
+    # ── Left: split stats ──────────────────────────────────────────────────────
+    datasets = list(SPLIT_IMAGES.keys())
+    shown_in_legend = set()
+
+    img_max  = max(v for ds in SPLIT_IMAGES.values()      for v in ds)
+    ann_max  = max(v for ds in SPLIT_ANNOTATIONS.values() for v in ds)
+
+    for row, data_dict in enumerate([SPLIT_IMAGES, SPLIT_ANNOTATIONS], start=1):
+        for split in SPLITS:
+            values = [data_dict[ds][SPLITS.index(split)] for ds in datasets]
+            show_legend = split not in shown_in_legend
+            if show_legend:
+                shown_in_legend.add(split)
+            fig.add_trace(
+                go.Bar(
+                    name=split,
+                    x=datasets,
+                    y=values,
+                    marker_color=SPLIT_COLORS[split],
+                    marker_line_color="rgba(255,255,255,0.5)",
+                    marker_line_width=0.5,
+                    marker_cornerradius=4,
+                    text=[f"{v:,}" if v > 0 else "" for v in values],
+                    textposition="outside",
+                    textfont=dict(size=8, color=GRAY_HI, family=FONT),
+                    legendgroup=split,
+                    legend="legend2",
+                    showlegend=show_legend,
+                ),
+                row=row, col=1,
+            )
+
+    fig.update_yaxes(**axis_style, title_text="Images",
+                     range=[0, img_max * 1.22], row=1, col=1)
+    fig.update_yaxes(**axis_style, title_text="Annotations",
+                     range=[0, ann_max * 1.22], row=2, col=1)
+    fig.update_xaxes(
+        tickfont=dict(size=11, color=GRAY_HI), showline=True,
+        linecolor="#d0d0d0", linewidth=1, ticklen=0, row=2, col=1,
+    )
+    fig.update_xaxes(showticklabels=False, row=1, col=1)
+
+    # ── Right: class distribution ──────────────────────────────────────────────
+    totals = [
+        sum(DATASETS[ds][i] for ds in DATASETS)
+        for i in range(len(CLASSES))
+    ]
+    y_max_cls = max(totals) * 1.18
+    # Right subplot spans full height: 640px - top/bottom margins - title row ≈ 490px
+    px_per_unit = 490 / y_max_cls
+    min_label_px_cls = 10  # lower threshold so Bus/Truck DroneVehicle segments get labelled
+
+    for ds_name, counts in DATASETS.items():
+        text = [
+            f"{c:,}" if c > 0 and c * px_per_unit >= min_label_px_cls else ""
+            for c in counts
+        ]
+        fig.add_trace(
+            go.Bar(
+                name=ds_name,
+                x=CLASSES,
+                y=counts,
+                text=text,
+                textposition="inside",
+                insidetextanchor="middle",
+                marker_color=COLORS[ds_name],
+                marker_line_color="rgba(255,255,255,0.6)",
+                marker_line_width=0.5,
+                marker_cornerradius=4,
+                textfont=dict(color="white", size=9, family=FONT),
+                legendgroup=ds_name,
+                legend="legend",
+                showlegend=True,
+            ),
+            row=1, col=2,
+        )
+
+    # Totals above class bars
+    class_annotations = []
+    for i, cls in enumerate(CLASSES):
+        total = totals[i]
+        hidden = []
+        for ds_name, counts in reversed(list(DATASETS.items())):
+            count = counts[i]
+            if count > 0 and count * px_per_unit < min_label_px_cls:
+                c = COLORS[ds_name]
+                hidden.append(f"<span style='color:{c}'>{count:,}</span>")
+        if hidden:
+            label = f"<b>{total:,}</b><br>" + "<br>".join(hidden)
+            fsize = 8.5
+        else:
+            label = f"<b>{total:,}</b>"
+            fsize = 10
+        class_annotations.append(dict(
+            x=cls, y=total,
+            xref="x2", yref="y2",
+            text=label,
+            showarrow=False,
+            yanchor="bottom",
+            yshift=5,
+            font=dict(size=fsize, color=GRAY_HI, family=FONT),
+            align="center",
+        ))
+
+    fig.update_yaxes(
+        **axis_style,
+        title_text="Instances",
+        range=[0, y_max_cls],
+        row=1, col=2,
+    )
+    fig.update_xaxes(
+        tickfont=dict(size=11, color=GRAY_HI), showline=True,
+        linecolor="#d0d0d0", linewidth=1, ticklen=0, row=1, col=2,
+    )
+
+    legend_style = dict(
+        bgcolor="rgba(255,255,255,0.92)",
+        bordercolor="#e0e0e0",
+        borderwidth=1,
+        font=dict(size=11),
+    )
+
+    fig.update_layout(
+        barmode="stack",
+        bargap=0.22,
+        bargroupgap=0.05,
+        template="simple_white",
+        font=dict(family=FONT, size=12, color=GRAY_HI),
+        plot_bgcolor="white",
+        paper_bgcolor="white",
+        # Dataset legend — top-right of class distribution panel
+        legend=dict(**legend_style,
+            title=dict(text="Dataset", font=dict(size=11, color=GRAY_HI)),
+            x=1.0, xanchor="right",
+            y=1.0, yanchor="top",
+        ),
+        # Split legend — inside left panel, top-right of images subplot
+        legend2=dict(**legend_style,
+            title=dict(text="Split", font=dict(size=11, color=GRAY_HI)),
+            x=0.49, xanchor="right",
+            y=1.0, yanchor="top",
+        ),
+        width=1280,
+        height=640,
+        margin=dict(l=65, r=30, t=55, b=55),
+    )
+
+    # Add class distribution annotations AFTER update_layout so they are
+    # appended rather than merged into the subplot title annotation slots.
+    for ann in class_annotations:
+        fig.add_annotation(**ann)
+
+    # Override barmode to "group" only for left subplots — not possible directly,
+    # so set the stacked mode globally and patch the left traces to use offsetgroup.
+    for trace in fig.data:
+        if trace.xaxis == "x" or trace.xaxis == "x3":
+            trace.update(offsetgroup=trace.name)
+
+    for ann in fig.layout.annotations:
+        if ann.text in ("Images per Split", "Annotations per Split", "Class Distribution", ""):
+            ann.font = dict(size=13, color=GRAY_HI, family=FONT)
+
+    fig.write_image("images/dataset_combined.pdf")
+    fig.write_image("images/dataset_combined.png", scale=2)
+    print("Saved: images/dataset_combined.{pdf,png}")
+
+
 if __name__ == "__main__":
     plot_class_distribution()
+    plot_split_stats()
+    plot_combined()
