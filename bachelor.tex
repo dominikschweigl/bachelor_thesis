@@ -422,15 +422,14 @@ Figure~\ref{fig:raspberryPiBracket}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.65\textwidth]{images/raspberryPi_mount.jpg}
+    \includegraphics[width=0.65\textwidth]{images/raspberry_bracket_mount.png}
     \caption{
-        The raspberry Pi 5 with Hailo-8 mounted on the 3D-printed 
-        bracket attached to the twinFOLD KAT UAV.
+        3D-printed mounting bracket alone (left), bracket with Raspberry Pi 5 and Hailo-8 module
+        assembled (center), and the unit mounted on the underside of the twinFOLD KAT UAV (right).
     }
     \label{fig:raspberryPiBracket}
 \end{figure}
 
-% TODO: Request 3D model file from Vojtech for potential inclusion or reference.
 
 \section{Sensor System}
 
@@ -1457,129 +1456,6 @@ more information for detection.
 
 
 \newpage
-\chapter{Sensor Fusion}
-\label{chap:sensor_fusion}
-
-sources: 
-A systematic literature review on object detection using near infrared and
-thermal images (Drive) 
-late part of the paper, where they compare early, mid and late fusion approaches
-% Use end of introduction to motivate sensor fusion \cite{bustos2023reviewObjectDetectionIR}
-% Use section 6 for fusion approaches \cite{bustos2023reviewObjectDetectionIR}
-% Use section 7 for challenges \cite{bustos2023reviewObjectDetectionIR}
-
-% Very good paper for fusion approaches:
-% Human Detection in UAV Thermal Imagery: Dataset Extension
-% and Comparative Evaluation on Embedded Platforms
-
-Appearance change. Figure 7 shows several examples of
-pedestrians in the day and night time. The color image in
-daytime shows a distinct human shape due to the strong
-sunlight. On the other hand, the shape in the color image
-at nighttime is not distinguishable due to the dark environment. 
-However, the thermal image shows a distinct shape
-at nighttime, because the temperature difference is greater
-when the air temperature is cooler, so the pedestrians having a 
-fixed temperature, can be clearly captured in the nighttime. In 
-the daytime, the strong sun radiation causes background clutters. 
-For these reasons, we can expect to obtain
-better performance by using the strong points of the color
-and the thermal images throughout the day.
-\cite{hwang2015multispectralPedestrianDetection}
-
-\section{Motivation for Sensor Fusion}
-
-Maybe put in the hardware chapter when we talk about selection
-of sensor modalities, but also here in the sensor fusion 
-chapter, we can talk about the motivation for sensor fusion.
-
-\section{Problems in Sensor Fusion}
-
-Fusion Degradation - Rethinking Multi-modal Object Detection from the Perspective of
-Mono-Modality Feature Learning (Drive)
-
-\section{Sensor Alignment}
-
-Image alignment is one of the issues that should be considered in cross-modal
-image applications. Existing methods [11,16,40,29,6,38,39] usually assume that
-visible-infrared image pairs are perfectly geometrically aligned, and they directly
-perform the multi-modal fusion methods. 
-Actually, after the image registration
-algorithm, the paired images are just weakly aligned (shown in Fig. 1(a)). However, 
-objects differ not only
-in position, but also in scale and angle. These three deviations (position, size and
-angle) of the paired arbitrary oriented objects are closely coupled, changing one
-will affect another one, which makes the alignment operation more complicated.
-As shown in Fig. 1(b), the dashed boxes represent the position of the corresponding 
-bounding-boxes in the infrared images. We find that the same object
-on image pairs differs in location, scale and angle. Therefore, weakly misalignment 
-in cross-modal aerial images is a common issue that needs to be addressed.
-To demonstrate the generality of the misalignment 
-problem in aerial
-imagery, we also obtain the statistics information of DroneVehicle dataset,
-a dataset that provides RGBT data taken from the UAV drone perspective. we
-separately count the number of bounding-boxes with deviations (position and
-size offset by 3 pixels, angle offset by 3 degrees) in the DroneVehicle dataset.
-More than 20\% of the bounding-boxes have the misalignment 
-problem.
-\cite{yuan2022crossModalAlignmentVehicleDetection}
-
-Spatial misalignment: Since RGB and infrared sensors have different coordinate systems,
-fields of view, and sampling frequencies, pairs of RGB and infrared images usually are spatial
-misaligned [21], resulting in low-quality bounding boxes predicted by RGB and infrared fusion
-object detection, as shown in Figure 1a. Figure 1b indicates that the fusion of original RGB
-and infrared images via the image fusion algorithm [22] will take in a significantly misaligned
-ghost, which will also disturb localization. The downsampling may decrease the degree of
-misalignment [8], yet the situation still exists, as shown in Figure 1c. The performance of
-RGB and infrared fusion detection methods that directly fuse misaligned features is not ideal.
-Therefore, achieving spatial alignment between RGB and infrared modalities is crucial. The
-training process of existing RGB and infrared fusion object-detection networks [7,19] relies on
-manually aligned datasets in advance. However, manual alignment is a labor-intensive task
-[13,23], and there will still be subtle misalignments after manual processing, such as the FLIR
-dataset [24]. A more feasible way is to take misaligned RGB and infrared images as input
-directly, and how to adaptively perform spatial alignment at the feature level is the concern of
-our work. Furthermore, RGB and infrared images usually have different resolutions. Existing
-works [22,25] directly resize different modal images to the same size through downscaling or
-upscaling, either dropping beneficial information or introducing redundancy and increasing
-computational overhead.
-\cite{he2023misalignedRGBTadaptiveCalibration}
-
-Explanation in Multi-Perspective RGB and Infrared Dataset
-for UAV Detection IEEE Access 2025 is good
-
-\section{Early Fusion}
-
-\section{Mid (Feature-level) Fusion}
-
-\section{Late Fusion}
-
-
-\newpage
-\chapter{Object Detection}
-\label{chap:object_detection}
-
-Justification for the choice of CNN instead of transformers-based models:
-
-4.1.3. Training Data Limitations
-Our dataset, while extensive at 75,000+ images, combines heterogeneous sources
-with substantial domain shifts (urban vs. mountainous, varying altitudes, different sensor
-characteristics). Transformer-based detectors typically require larger and more consistent
-training datasets to effectively learn their attention mechanisms. The relatively limited size
-and high heterogeneity of thermal datasets compared to RGB benchmarks like COCO may
-J. Imaging 2025, 11, 436 14 of 26
-disproportionately affect RT-DETR’s performance. This appears to be supported by our
-finding that the RT-DETR model achieved lower average precision than the YOLO models
-% from Human Detection in UAV Thermal Imagery: Dataset Extension
-% and Comparative Evaluation on Embedded Platforms
-
-\section{Single Stage Detectors}
-
-\section{Two Stage Detectors}
-
-\section{Tracking-by-Detection}
-
-
-\newpage
 \chapter{Dataset}
 \label{chap:dataset}
 
@@ -2427,7 +2303,9 @@ visualization tool that organizes machine learning datasets by storing
 sample-level annotations, metadata, and file references (URLs) in a 
 structured, queryable format. Maintaining the datasets in a 
 cloud-accessible location is important for the remote training pipeline 
-managed by ClearML, an open-source machine learning operations (MLOps) 
+managed by ClearML as further outlined in Section~\ref{chap:training_pipeline}.
+
+an open-source machine learning operations (MLOps) 
 platform responsible for orchestrating and monitoring machine learning 
 experiments. During training runs, ClearML dispatches workloads to the 
 GPU workers hosted on Bernard's GPU Rack. The workers must retrieve the 
@@ -2454,17 +2332,472 @@ of the RGB annotations.
 % Inspire the evaluation from other dataset papers that I used to create
 % the training dataset
 
+% Include the showcase of the challenging samples of the included public datasets, e.g. the ones shown in RTDOD and M3FD.
+
+
+
+\newpage
+\chapter{Sensor Fusion}
+\label{chap:sensor_fusion}
+
+sources: 
+A systematic literature review on object detection using near infrared and
+thermal images (Drive) 
+late part of the paper, where they compare early, mid and late fusion approaches
+% Use end of introduction to motivate sensor fusion \cite{bustos2023reviewObjectDetectionIR}
+% Use section 6 for fusion approaches \cite{bustos2023reviewObjectDetectionIR}
+% Use section 7 for challenges \cite{bustos2023reviewObjectDetectionIR}
+
+% Very good paper for fusion approaches:
+% Human Detection in UAV Thermal Imagery: Dataset Extension
+% and Comparative Evaluation on Embedded Platforms
+
+Appearance change. Figure 7 shows several examples of
+pedestrians in the day and night time. The color image in
+daytime shows a distinct human shape due to the strong
+sunlight. On the other hand, the shape in the color image
+at nighttime is not distinguishable due to the dark environment. 
+However, the thermal image shows a distinct shape
+at nighttime, because the temperature difference is greater
+when the air temperature is cooler, so the pedestrians having a 
+fixed temperature, can be clearly captured in the nighttime. In 
+the daytime, the strong sun radiation causes background clutters. 
+For these reasons, we can expect to obtain
+better performance by using the strong points of the color
+and the thermal images throughout the day.
+\cite{hwang2015multispectralPedestrianDetection}
+
+\section{Motivation for Sensor Fusion}
+
+Maybe put in the hardware chapter when we talk about selection
+of sensor modalities, but also here in the sensor fusion 
+chapter, we can talk about the motivation for sensor fusion.
+
+\section{Problems in Sensor Fusion}
+
+Fusion Degradation - Rethinking Multi-modal Object Detection from the Perspective of
+Mono-Modality Feature Learning (Drive)
+
+\section{Sensor Alignment}
+
+Image alignment is one of the issues that should be considered in cross-modal
+image applications. Existing methods [11,16,40,29,6,38,39] usually assume that
+visible-infrared image pairs are perfectly geometrically aligned, and they directly
+perform the multi-modal fusion methods. 
+Actually, after the image registration
+algorithm, the paired images are just weakly aligned (shown in Fig. 1(a)). However, 
+objects differ not only
+in position, but also in scale and angle. These three deviations (position, size and
+angle) of the paired arbitrary oriented objects are closely coupled, changing one
+will affect another one, which makes the alignment operation more complicated.
+As shown in Fig. 1(b), the dashed boxes represent the position of the corresponding 
+bounding-boxes in the infrared images. We find that the same object
+on image pairs differs in location, scale and angle. Therefore, weakly misalignment 
+in cross-modal aerial images is a common issue that needs to be addressed.
+To demonstrate the generality of the misalignment 
+problem in aerial
+imagery, we also obtain the statistics information of DroneVehicle dataset,
+a dataset that provides RGBT data taken from the UAV drone perspective. we
+separately count the number of bounding-boxes with deviations (position and
+size offset by 3 pixels, angle offset by 3 degrees) in the DroneVehicle dataset.
+More than 20\% of the bounding-boxes have the misalignment 
+problem.
+\cite{yuan2022crossModalAlignmentVehicleDetection}
+
+Spatial misalignment: Since RGB and infrared sensors have different coordinate systems,
+fields of view, and sampling frequencies, pairs of RGB and infrared images usually are spatial
+misaligned [21], resulting in low-quality bounding boxes predicted by RGB and infrared fusion
+object detection, as shown in Figure 1a. Figure 1b indicates that the fusion of original RGB
+and infrared images via the image fusion algorithm [22] will take in a significantly misaligned
+ghost, which will also disturb localization. The downsampling may decrease the degree of
+misalignment [8], yet the situation still exists, as shown in Figure 1c. The performance of
+RGB and infrared fusion detection methods that directly fuse misaligned features is not ideal.
+Therefore, achieving spatial alignment between RGB and infrared modalities is crucial. The
+training process of existing RGB and infrared fusion object-detection networks [7,19] relies on
+manually aligned datasets in advance. However, manual alignment is a labor-intensive task
+[13,23], and there will still be subtle misalignments after manual processing, such as the FLIR
+dataset [24]. A more feasible way is to take misaligned RGB and infrared images as input
+directly, and how to adaptively perform spatial alignment at the feature level is the concern of
+our work. Furthermore, RGB and infrared images usually have different resolutions. Existing
+works [22,25] directly resize different modal images to the same size through downscaling or
+upscaling, either dropping beneficial information or introducing redundancy and increasing
+computational overhead.
+\cite{he2023misalignedRGBTadaptiveCalibration}
+
+Explanation in Multi-Perspective RGB and Infrared Dataset
+for UAV Detection IEEE Access 2025 is good
+
+\section{Early Fusion}
+
+\section{Mid (Feature-level) Fusion}
+
+\section{Late Fusion}
+
+
+\newpage
+\chapter{Object Detection}
+\label{chap:object_detection}
+
+Justification for the choice of CNN instead of transformers-based models:
+
+4.1.3. Training Data Limitations
+Our dataset, while extensive at 75,000+ images, combines heterogeneous sources
+with substantial domain shifts (urban vs. mountainous, varying altitudes, different sensor
+characteristics). Transformer-based detectors typically require larger and more consistent
+training datasets to effectively learn their attention mechanisms. The relatively limited size
+and high heterogeneity of thermal datasets compared to RGB benchmarks like COCO may
+J. Imaging 2025, 11, 436 14 of 26
+disproportionately affect RT-DETR’s performance. This appears to be supported by our
+finding that the RT-DETR model achieved lower average precision than the YOLO models
+% from Human Detection in UAV Thermal Imagery: Dataset Extension
+% and Comparative Evaluation on Embedded Platforms
+
+\section{Single Stage Detectors}
+
+\section{Two Stage Detectors}
+
+\section{Tracking-by-Detection}
+
+
 \newpage
 \chapter{Detection Implementation}
 \label{chap:implementation}
 
-% TODO:
+\section{Model Training Pipeline}
 
-% Explain ClearML and how it is used for experiment tracking and management.
-% Explain the training pipeline, including data loading, preprocessing, model 
-% architecture, loss functions, and optimization.
+For the model training pipeline, we use the open-source MLOps platform ClearML to orchestrate and
+monitor the training process. ClearML provides experiment tracking, remote task execution, dataset 
+versioning, and a web-based dashboard for visualizing metrics and comparing runs. It wraps existing 
+training code with minimal changes, automatically logging hyperparameters, model artifacts, and 
+performance curves throughout each experiment. The training tasks are dispatched to GPU workers 
+hosted on Bernard's GPU Rack, which retrieve the training dataset from the S3 bucket through FiftyOne 
+at runtime. The workers were using the 10 core Intel Xeon Silver 4210 CPUs and NVIDIA RTX 2080 Ti GPUs 
+with 11 GB of VRAM, which allows us to train the YOLOv11n model with a batch size of 32 and an image size 
+of 640x640.  The experiment logs, training artifacts, metrics, and debugging samples with visualized 
+detections as well as well prepared plots created
+in the training application code and stored in the self-hosted ClearML server after each training run, 
+which allows easy comparison and analysis of different training runs through the ClearML web interface
+with organized storage. Example views of the ClearML web interface for a training run are shown in Figure~\ref{fig:clearml_dashboard}.
+All training code, including dataset loading, model definition, and training 
+loops, is implemented in Python, configuration, and environment files, that are built into docker images
+stored on an Azure container registry, where the ClearML workers execute the corresponding task docker
+container on the GPU Rack.
 
-Lorem ipsum
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/clearml_interface.png}
+    \caption{
+        Example views of the ClearML web interface for a training run, showing the scalar metrics across 
+        training iterations (left), the plot section (center), and the created debugging samples (right).
+    }
+    \label{fig:clearml_dashboard}
+\end{figure}
+
+The training script, which reads the dataset from the S3 bucket through FiftyOne, performs data 
+loading and preprocessing, and trains a YOLOv11n object detection model using the Ultralytics YOLO 
+framework. The training configuration, including hyperparameters and dataset paths, is defined in a 
+separate configuration environment file. After training, the trained model is exported to ONNX format 
+and stored as a ClearML artifact, which is then used as input for the Hailo compilation, which is also
+implemented as a ClearML task as this is a resource intensive long running task that is started 
+subsequently to generate a Hailo binary for deployment on 
+Hailo-8 hardware, as further outlined in the next section.
+
+\section{Hailo Dataflow Compilation}
+
+Deploying the trained network on the Hailo-8 cannot reuse standard
+runtimes such as ONNX Runtime or TensorRT, because the accelerator is a
+domain-specific neural processing unit whose compute fabric is built
+around a set of statically scheduled clusters of multiply-accumulate
+engines backed by a distributed on-chip memory, with no
+general-purpose floating-point arithmetic unit and without a
+connection to external DRAM~\cite{hailo8_m2datasheet2021,hailo8_productBrief2023}.
+Every layer of the network must therefore be lowered into a
+hardware-specific bitstream ahead of time, and every FP32 weight and
+activation value must be translated into an 8-bit fixed-point
+representation (or optionally a mix of 8-bit and 4-bit for weights)
+that the Hailo compute engines process
+natively~\cite{krishnamoorthi2018quantizingWhitepaper,hailo8_productBrief2023}.
+This translation is carried out by Hailo's Dataflow Compiler, which
+produces a \texttt{.hef} (Hailo Executable Format) file that is loaded
+at runtime by the HailoRT library on the Raspberry Pi
+host~\cite{hailoDataflowCompilerUserGuide}. Figure~\ref{fig:hailo_software_suite}
+situates the compiler in Hailo's wider software stack and shows the
+split between the Model Build Environment, which groups the machine
+learning frameworks, the Hailo Model Zoo (a collection of pre-trained
+and retrainable models in TensorFlow and ONNX), and the Dataflow
+Compiler itself, and the Runtime Environment on the host processor,
+which groups the HailoRT runtime that executes compiled models on the
+Hailo-8 device over PCIe, and user applications built on top of 
+it~\cite{hailo8_productBrief2023}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{images/hailo_software_suite.png}
+    \caption{
+        Overview of the Hailo-8 software
+        suite~\cite{hailo8_productBrief2023}.
+    }
+    \label{fig:hailo_software_suite}
+\end{figure}
+
+\subsection{Pipeline Stages}
+
+The Dataflow Compiler structures the conversion as three sequential
+stages, namely Parsing (Translation), Optimization and Compilation as seen in
+Figure~\ref{fig:hailo_software_suite}. Each stage
+consumes a Hailo Archive (\texttt{.har}) and emits a transformed
+\texttt{.har}, and the last stage writes the final \texttt{.hef}
+executable. The stages are kept separate because their inputs and
+their failure modes are different. Parsing only needs the operator
+graph, Optimization additionally needs a calibration dataset, and
+Compilation additionally needs the target hardware architecture, so
+separating them lets the developer re-run the expensive later stages
+without repeating the earlier
+ones~\cite{hailoDataflowCompilerUserGuide}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{images/hailo_software_suite.png}
+    \caption{
+        Overview of the Hailo-8 model build 
+        process.~\cite{hailo8_productBrief2023}.
+    }
+    \label{fig:hailo_build_process}
+\end{figure}
+
+\subsection{Parsing}
+
+Parsing reads the ONNX operator graph produced by exporting the
+trained model, verifies that every operator inside the model has a 
+supported Hailo equivalent (e.g. convolutions, average pooling, concatenation, etc.)
+and converts the graph into the Hailo archive format (HAR) that
+the later stages operate
+on. For YOLO versions up to
+YOLOv5 the dataflow compiler automatically executes non-maximum
+suppression (NMS) on the Hailo-8 TPU core, whereas from YOLOv8
+onwards the core no longer supports NMS directly and the operation
+is instead performed on the host CPU as a post-processing step that
+consumes the raw convolution outputs of the detection
+head~\cite{hailoDataflowCompilerUserGuide}.
+
+This arrangement dictates where the parser must cut the ONNX graph
+of a YOLOv11n model. Each of the three detection scales of the head
+ends in two parallel convolutions, one emitting a bounding-box
+distribution and one emitting the per-class logits, and the ONNX
+export decodes the distribution into actual box coordinates and
+concatenates the boxes before the graph
+output~\cite{hidayatullah2025yolov8toyolo11Review}. The auto-detected
+end nodes therefore sit after this decoding, which conflicts with
+the CPU post-processing step that would decode the distribution a
+second time, and the parsing stage fails with mismatching layer
+outputs. To obtain the correct
+cut, the exported \texttt{.onnx} was opened in
+Netron~\cite{netronViewer}, the detection head at \texttt{/model.23}
+was inspected, and the last \texttt{Conv} node of the \texttt{cv2}
+(box distribution) and \texttt{cv3} (class scores) branches at each
+of the three scales was identified manually, yielding the six
+end-node names that are passed to the
+parser.~\cite{hailoDataflowCompilerUserGuide}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{images/yolov11_onnx_structure.png}
+    \caption{
+        The ONNX graph structure of the exported YOLOv11n model with 
+        marked detection head convolution outputs for bounding-box 
+        distribution (blue) and class scores (red) used for the model cut
+        at three detection scales each. The graph is visualized in 
+        Netron~\cite{netronViewer}.
+    }
+    \label{fig:yolov11n_model_structure_cut}
+\end{figure}
+
+\subsection{Optimization}
+
+The optimization stage decomposes into two phases. A full-precision
+phase applies graph-level modifications to the parsed model in the
+floating-point domain. These modifications express transformations the
+ONNX export does not itself contain, such as input normalization or
+the insertion of hardware post-processing blocks on supported
+detection architectures that shift preprocessing like colour or format
+conversion, input resize, and post-processing work like NMS from the
+host CPU onto the accelerator. They also apply numerical equivalences
+that make the network easier to optimize. A subsequent numerical phase
+then carries out the actual quantization and accuracy recovery
+described in the remainder of this
+subsection.~\cite{hailoDataflowCompilerUserGuide}
+
+A neural network trained in 32-bit floating point represents every
+weight and every intermediate activation as a real number with about
+seven decimal digits of precision. On edge hardware the memory
+bandwidth, the on-chip storage, and the power budget for arithmetic
+units are orders of magnitude more constrained than on a GPU, and
+most of that precision is not actually used by the trained network.
+Quantization replaces high-precision values with compact codes from a
+smaller numerical type, which can be uniform with equally spaced
+levels or non-uniform with levels concentrated where the value
+distribution is denser. The target format ranges from FP16 through
+INT16 and INT8 to INT4, and the transformation can be applied to an
+already-trained network as post-training quantization or folded into
+training as quantization-aware training.
+The Hailo compiler fixes most of these choices to uniform affine
+quantization with signed integers, replacing each floating-point
+value with a compact integer code together with two layer-wide
+parameters that recover the original scale. The default target is 8 bits for both weights and
+activations, with 16 bits available as an opt-in for layers whose
+accuracy is sensitive to precision loss and 4 bits available as an
+opt-in for weights of bandwidth-limited layers. Scales for weights
+are assigned per channel for finer control while activation scales are
+shared across the full tensor, and both are determined statically from
+a calibration run and frozen at inference time. The numerical phase
+can stop after this PTQ step, or it can proceed at higher
+optimization levels to an additional quantization-aware finetuning
+(QFT) step, a form of quantization-aware training applied to an
+already-quantized model. In this work the QFT step is enabled because
+it yields better accuracy at the accepted cost of longer compile
+time.~\cite{hailoQuantizationFineTuning,gholami2021surveyQuantization, hailoDataflowCompilerUserGuide}
+
+Post-training quantization maps every floating-point value to an
+8-bit signed integer through the affine map $x_q =
+\mathrm{round}(x / s) + z$, where $s$ is a per-layer scale factor
+and $z$ is a zero point. The integer tensors are four times smaller
+than their FP32 counterparts, fit into the Hailo on-chip memory
+without spilling to DRAM, and the expensive floating-point
+multiplications inside convolutions collapse into cheap integer
+multiplications that the Hailo compute engines are optimized for.
+The scale $s$ and zero point $z$ cannot be chosen analytically
+because the distribution of activations at each layer depends on the
+input data. The compiler therefore runs the unquantized FP32 network
+on a representative calibration batch drawn from the training set,
+records the minimum, maximum, and percentile statistics of every
+intermediate tensor, and picks a scale that tightly covers the bulk
+of the observed range while clipping extreme outliers that would
+otherwise stretch the scale and waste integer codes on values that
+almost never occur. The official recommendation for the calibration
+set size is at least 1024 images. In this work we use
+2048.~\cite{hailoDataflowCompilerUserGuide,hailoQuantizationFineTuning, gholami2021surveyQuantization}
+
+Even with a well-chosen calibration, naively rounding every weight to
+the nearest integer loses accuracy, typically several mAP points on
+dense-prediction models such as YOLO, because the rounding error in
+one layer feeds into the next and compounds along the
+network~\cite{nagel2020adaround}. The Hailo compiler therefore runs
+two label-free, gradient-free recovery algorithms as part of the PTQ
+step, and the progress bars these algorithms produce are what the
+compiler log reports as training activity. The first is iterative
+bias correction after Finkelstein et al. 2019, which addresses the
+fact that rounding is no longer unbiased once the activation
+distribution of a channel is skewed, so that the mean of every
+quantized channel drifts slightly away from the floating-point mean
+and the drift compounds from layer to layer. The method estimates this
+mean shift per channel by running the quantized network and the FP32
+reference side by side on unlabeled calibration images, and folds the
+estimate back into the layer bias so that the channel means of the
+quantized network match those of the FP32 network, without any
+gradient computation or labels~\cite{finkelstein2019ibc}. The second
+is adaptive rounding (AdaRound) after Nagel et al. 2020, which starts
+from the observation that rounding every weight to its nearest integer
+minimises the per-weight error but not the per-layer output error,
+because neighbouring weights interact through the convolution.
+AdaRound therefore treats the rounding direction of every weight as a
+learned binary variable and searches, per layer, for the combination
+of up and down roundings that minimises the reconstruction error at
+the layer output when the layer is fed calibration
+activations~\cite{nagel2020adaround}.
+
+Quantization-aware finetuning (QFT) after Finkelstein et al. 2022 is
+the additional step that follows PTQ at higher optimization levels.
+Unlike the two recovery algorithms above, QFT requires gradient
+computation. It wraps the already-quantized model in a short training
+loop that jointly tunes all continuous degrees of freedom of the
+quantized network at once, namely the per-layer scales, the activation
+clipping thresholds, and small residual corrections on the weights and
+biases~\cite{finkelstein2022qft}. QFT uses the original FP32 model as
+a teacher through knowledge
+distillation~\cite{hinton2015knowledgeDistillation}, where the
+teacher output serves as the training target for the quantized model.
+Gradients propagate through the non-differentiable rounding step via
+the Straight-Through Estimator, which on the backward pass treats the
+rounding as the identity
+function.~\cite{gholami2021surveyQuantization, hailoQuantizationFineTuning}
+
+\subsection{Compilation}
+
+The final stage maps the quantized graph onto the physical Hailo-8
+fabric, allocates each layer to one of the on-chip compute clusters,
+schedules the flow of activations between clusters, and pre-places
+intermediate tensors in on-chip memory so that inference never has
+to wait on external DRAM.
+The target-architecture flag of the compiler (\texttt{hailo8} or
+\texttt{hailo8l}) must match the physical device, because the two
+chips differ in their number of compute clusters, and using the
+wrong flag produces a binary that will not load on the
+hardware. Unusual network
+topologies can cause the allocator to report an infeasible mapping
+on the target architecture.~\cite{hailoDataflowCompilerUserGuide,hailo8_m2datasheet2021}
+
+\subsection{Model Script}
+
+The default behaviour of each pipeline stage can be overridden
+through an optional plain-text Hailo model script with the extension
+\texttt{.alls}, which is loaded at the Optimization or Compilation
+entry points and dispatches its commands to the phase they apply to,
+namely full-precision graph modifications, numerical quantization
+tuning and compilation-stage allocator
+hints. Two full-precision
+modifications were required for the network trained in this project.
+First, because the detector accepts a four-channel input stacking
+three RGB channels with one thermal channel rather than the
+three-channel input for which the Dataflow Compiler auto-generates a
+normalization statement, the normalization command is rewritten in
+four-element form \texttt{normalization([0.0, 0.0, 0.0, 0.0], [255.0,
+255.0, 255.0, 255.0])}, which lowers the division by 255 into the
+accelerator hardware so that the on-chip engines receive the same
+$[0, 1]$ inputs the network was trained
+on. Second, the three
+class-score output convolutions at the three detection scales are
+wrapped by a \texttt{change\_output\_activation($\ldots$, sigmoid)}
+command, because the ONNX model was cut to end at the convolution layers,
+therefore exporting the class logits instead of the class scores,
+while Hailo's non-maximum-suppression
+block expects the class scores in $[0, 1]$ at its
+input~\cite{hailoDataflowCompilerUserGuide}.
+
+Beyond these two modifications, the full-precision phase can insert
+additional graph modifications such as colour or format conversion,
+input resize and hardware post-processing on supported
+architectures, to shift more work off the host
+CPU. The numerical phase is
+controlled by two main knobs, namely the optimization level, which
+sets how aggressive the post-quantization recovery algorithms run
+and therefore trades compile time against accuracy, and the
+compression level, which sets the fraction of weights that are
+compressed to 4 bits and therefore trades inference throughput
+against the accuracy burden placed on the recovery
+passes. At compilation time, a
+performance mode can be enabled that maximises the utilisation of
+the on-chip compute clusters and therefore the inference throughput
+of the compiled binary at the cost of a substantially longer compile
+time.~\cite{hailoDataflowCompilerUserGuide} All models built in this
+work were compiled with the highest optimization level of 4, no
+weight compression and the highest compilation level of 2, so that
+accuracy is prioritised and the additional compile time is
+accepted.
+
+\subsection{Execution Environment}
+
+The Dataflow Compiler is only released for x86 Linux hosts, which
+rules out running it on the Raspberry Pi itself, and a full run at
+the highest optimization level takes several hours on a GPU worker,
+so the pipeline is wrapped as a ClearML child task downstream of the
+training job described in the previous subsection and produces the
+\texttt{.hef} artifact that is consumed by the on-board HailoRT runtime.
+~\cite{hailoDataflowCompilerUserGuide}
+The compiled model is loaded on the Raspberry Pi host to run the 
+vehicle detection service, which is further outlined in the next chapter.
+
+\section{Vehicle Detection Service}
+
 
 % TODO: explain decision for fine-tuning backbone because was found better
 % First, fully fine-tuning the model when train-
