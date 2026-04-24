@@ -1,0 +1,3 @@
+4 Drohnen aber 1 sensor packet - begründung kosten und für Datenaufnahme genügt 1 Sensorpaket, Twinfold KAT wurde derzeit verwendet um frühzeitig im Projekt Datenkollektion zu betreiben.
+Zukünftig sollen kleinere Drohnen speziell für das Projekt gebaut werden, daher der Strom und Gewichtsminimierung.
+Auf anderen Drohnen werden Koordinierungsaufgaben des Drohnenschwarms, die Verkehrsklassifizierung und Kommunikation mit Verkehrsaktuartoren betrieben.
