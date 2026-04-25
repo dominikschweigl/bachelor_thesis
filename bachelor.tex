@@ -2542,26 +2542,49 @@ manual tuning based on the domain to avoid removing valid detections as duplicat
 
 \section{Grid-based Detectors}
 
-YOLO (You Only Look Once) [67, 79] models are state-of-the-art
-in real-time performance [83] with a design that directly predicts bounding boxes and class
-probabilities from an image. This object detection model uses a grid-based approach to detect objects
-in a single pass, dividing the image into a grid where each cell is responsible for detecting one or more
-objects. The YOLO model was gradually improved over time and has many iterations. The main drawback of the original YOLO, compared to concurrent
-proposal-based methods, was its difficulty in detecting small objects due to the design of its regression loss.
-YOLOv2 [65] introduces a bag of tricks to improve performance in terms of both accuracy (e.g. better
-detection of smaller objects) and speed. Inspired by Fast R-CNN, it introduces anchors into the YOLO
-family, improving localization accuracy while maintaining real-time performance. YOLOv3 [66] enhances
-multi-scale predictions using FPN~\cite{lin2017featurePyramidNetworks} as perviously seen for proposal-based detectors, further improving recognition of small
-objects. YOLOv4 [10] introduces an extended bag of tricks, including CSPDarkNet [84] as a backbone
-and mosaic augmentation, achieving strong performance while being lightweight enough to train on a
-single NVIDIA 2080 Ti GPU—unlike its predecessors. Ultralytics’ YOLOv5, YOLOv8 and YOLOv11 [46],
-further optimize the architecture for speed and accuracy, incorporating advanced techniques such as mosaic
-augmentation, auto-anchor optimization, and better backbone designs. YOLOv5 is the first YOLO model
-implemented in Python, specifically using PyTorch [60]. YOLOX [34] adopts an anchor-free approach with
-decoupled heads for classification and regression. Most recently, YOLOv26 was introduced, which is optimized
-for edge deployment, . YOLO models
-also depend on NMS to remove duplicate detections. Although anchorless versions are less reliant on
-NMS, they still require its use for optimal performance [34, 46].
+YOLO (You Only Look Once)~\cite{redmon2016YOLO} models are state-of-the-art in real-time object 
+detection for speed and parameter efficiency~\cite{wang2024yolov10}, using a unified one-stage design that directly predicts bounding boxes and class 
+probabilities from an image in a single forward pass. 
+ This object detection model uses a grid-based approach to detect objects, dividing the image into a grid where each cell is responsible for detecting one or more
+objects. The general architecture can be seen in Figure~\ref{fig:grid_based_architecture}. The YOLO family has been continuously refined 
+over time through many iterations to improve the trade-off between speed, accuracy, and deployment 
+efficiency. The main drawback of the original YOLO, compared to concurrent proposal-based methods, 
+was weaker small-object detection and less precise localization. YOLOv2~\cite{redmon2017yolo9000} introduced 
+improvements including anchor boxes (predefined bounding box templates that improve localization 
+across object shapes and scales), batch normalization (stabilizing training and accelerating convergence), 
+and multi-scale training (varying input image sizes during training to improve robustness), leading to 
+better accuracy and speed. YOLOv3~\cite{redmon2018yolov3} enhanced multi-scale prediction using FPN~\cite{lin2017featurePyramidNetworks}, 
+further improving recognition of small objects. YOLOv4~\cite{bochkovskiy2020yolov4} introduced an improved  
+CSPDarkNet~\cite{wang2020cspnet} feature extractor as backbone, PANet as an improvement on FPN for improved feature fusion 
+between shallow spatial and deep semantic 
+layers, and Mosaic augmentation. YOLOv5~\cite{khanam2024yolov5} was the first YOLO model implemented in Python using PyTorch~\cite{paszke2019pytorch}, 
+greatly increasing accessibility. Later versions such as YOLOv6~\cite{li2022yolov6} introduced decoupled heads, 
+where separate branches predict classes and bounding boxes independently for better optimization and 
+accuracy, while YOLOv8~\cite{yaseen2024yolov8} adopted a simpler anchor-free design. YOLOv9~\cite{wang2024yolov9} introduced GELAN (Generalized Efficient Layer Aggregation Network), 
+which improves feature reuse and gradient flow for deeper yet efficient networks, together with stronger localization losses such as Distribution Focal Loss (DFL), 
+which predicts bounding box coordinates as probability distributions for more precise localization. 
+YOLOv10~\cite{wang2024yolov10} reduced inference latency through NMS-free end-to-end training using dual assignments with dual detection heads, 
+meaning each ground-truth object is matched to multiple predictions during training (one-to-many head) so the model learns richer 
+object features, but only one final prediction is produced during inference (one-to-one head), removing duplicate boxes without 
+requiring NMS. It adds an enhanced CSPNet backbone and PANet neck for improved 
+efficiency, achieving 25\% fewer parameters than comparable YOLOv9 models at equivalent accuracy. 
+YOLOv11~\cite{khanam2024yolov11} further emphasized faster inference and computational efficiency while improving accuracy, using enhanced 
+backbone and neck modules to achieve better feature extraction with fewer parameters.
+Most recently, YOLOv26~\cite{sapkota2026yolo26} was introduced, optimized for edge deployment and CPU inference. 
+YOLO models also typically depend on Non-Maximum Suppression (NMS) to remove duplicate detections, although 
+newer anchor-free and end-to-end variants reduce this reliance while often still benefiting from NMS in 
+practice~\cite{ge2021yolox}.
+\cite{kotthapalli2025yolov1Toyolov11,advzemovic2025deepLearningMultiObjectTrackingSurvey}
+In this work, YOLOv11n is used, as it achieved the best performance on the COCO dataset after compilation to the Hailo-8 NPU, as provided by the Hailo Model Explorer \cite{hailoModelExplorer2026}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/yolo_architecture.png}
+    \caption{
+        An illustration of the YOLO architecture. Modified after \cite{redmon2016YOLO}.
+    }
+    \label{fig:grid_based_architecture}
+\end{figure}
 
 
 \section{Query-based Detectors}
@@ -2589,7 +2612,8 @@ Real-time optimised variants have since emerged, most notably RT-DETR~\cite{zhao
 which achieves state-of-the-art real-time performance on the COCO dataset. This lead continues to grow with newer
 versions and more training data, as demonstrated by RT-DETRv3~\cite{wang2025RT_DETRv3}.
 This trend is also observed in RGB-thermal pedestrian and vehicle detection, where transformer-based methods
-produce state-of-the-art accuracy~\cite{guo2024damsdet, yuan2024c2former}.
+produce state-of-the-art accuracy, but are still slightly more computationally intensive than 
+single-stage detectors~\cite{guo2024damsdet, yuan2024c2former, kotthapalli2025yolov1Toyolov11}.
 
 \begin{figure}[H]
     \centering
@@ -3139,7 +3163,10 @@ should be employed to handle the noisy object motion due to the unpredictable ca
 \newpage
 \chapter{Evaluation}
 \label{chap:evaluation}
-Lorem ipsum
+
+
+Some drop is expected when quantizing a model from FP32 to INT8, but the goal is to keep this drop as small as possible.
+\cite{hailoModelExplorer2026}
 
 % TODO:
 
