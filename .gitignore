@@ -326,3 +326,7 @@ TSWLatexianTemp*
 #*Notes.bib
 
 *.code-workspace
+
+# Videos
+*.mp4
+*.avi

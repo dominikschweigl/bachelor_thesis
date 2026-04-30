@@ -2651,6 +2651,295 @@ detectors and very competitive accuracy.
 \chapter{Multi-Object Tracking}
 \label{chap:tracking}
 
+Multi-object tracking (MOT) is a computer vision task that involves detecting and tracking objects
+of a given category in a video. It operates without prior knowledge of the objects' appearance or their
+location. Compared to object detection applied to a video, it additionally requires associating detections
+across frames by assigning them unique object IDs. Solving MOT results in a set of tracks, where each
+track consists of all detections belonging to the same object. The main difficulty arises from frequent 
+occlusions, where MOT algorithms,
+i.e. trackers, may switch object IDs or lose track of some objects. Additionally, objects with similar
+appearances make it difficult to distinguish between them, while unpredictable dynamic motion further
+complicates tracking. 
+There are two major paradigms for online MOT, namely tracking-by-detection 
+and end-to-end tracking. 
+
+\section{Tracking-by-Detection}
+\label{sec:tracking_by_detection}
+
+The emergence of deep learning-based
+methods led to introduction of tracking-by-detection frameworks. 
+Tracking-by-detection is a simple and highly efficient paradigm in MOT. The object detection and association 
+are decoupled and performed in independent steps. First, an object
+detection model detects objects in each frame. Then, an association
+method is used to associate objects across frames. This paradigm is widely adopted due to its modularity,
+which enables independent optimization of detection and association modules, its flexibility to integrate
+both traditional algorithms and deep learning models, and its good performance in modern applications.
+Each component, such as object detector, motion model, association, can be replaced independently, 
+making it convenient
+to adapt to different object detectors and the use of different association methods, both with 
+traditional and deep learning approaches. The tracking-by-detection methods evaluated in the tracker 
+evaluation section are introduced in the following paragraphs.
+\cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}
+
+SORT (Simple Online and Real-time Tracking)~\cite{bewley2016SORT} is the foundational tracking-by-detection algorithm 
+and operates in three steps per frame. First, an object detector produces bounding box detections 
+filtered by a confidence threshold. Second, a Kalman Filter predicts each active track's next 
+bounding box position using a linear constant velocity motion model, whose state captures the 
+bounding box center, scale, aspect ratio, and their velocities. These predictions are then matched 
+to the current frame's detections via the Hungarian algorithm, which minimises assignment cost over 
+a matrix of pairwise IoU distances and rejects any pairing whose IoU falls below a minimum gate 
+threshold. Confirmed pairs update the Kalman Filter state via Bayesian inference, blending the 
+motion prior with the detection measurement. Third, unmatched detections are initialised as 
+candidate tracks that must survive a short probationary period of 3 consecutive associations 
+b default before receiving a confirmed identity, while confirmed tracks that remain unmatched for more 
+than $T_{lost}$ consecutive frames are deleted. With the default setting of $T_{lost} = 1$, SORT 
+does not tolerate long occlusions, which is one of its main limitations.
+\cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}
+
+Deep SORT~\cite{wojke2017DeepSORT} targets SORT's tendency to accumulate identity switches during occlusions by augmenting 
+motion-based association with appearance information. A interchangeable convolutional re-identification model extracts 
+a compact embedding vector from each detected bounding box crop, and each track maintains a rolling buffer 
+of such embeddings. Similarity between a detection and a track is measured as the minimum cosine distance 
+between the detection's embedding and any embedding stored in the track's buffer, capturing the most 
+favourable historical match. The final association cost blends this 
+appearance distance with the computed distance from the Kalman Filter prediction, with a gate that 
+requires both motion and appearance conditions to be satisfied before a pairing is considered. 
+Deep SORT also introduces cascaded association ordered by how long a track has been lost, so recently 
+active tracks are matched first and accumulated Kalman Filter uncertainty cannot cause lost tracks to 
+steal detections from visible objects. Confirmed tracks are then prioritised over candidate tracks in 
+their probationary period, reducing false-positive associations.
+\cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}
+
+ByteTrack~\cite{zhang2022bytetrack} builds directly on SORT and addresses its sensitivity to the detection score threshold 
+through a two-stage association strategy called Byte. In the first stage, high-confidence detections are 
+matched to all active and lost tracks using IoU similarity, optionally extended with appearance embeddings 
+from a re-identification model. In the second stage, the low-confidence detections that remain are matched 
+to the still-unmatched active tracks using IoU similarity alone, without appearance features, because 
+occluded objects tend to produce blurry, unreliable crops that would degrade re-identification quality. 
+This design reflects the key insight that low-confidence detections frequently correspond to partially 
+occluded objects rather than detector errors, so discarding them entirely, as SORT does, causes 
+unnecessary identity switches. A third association stage handles candidate tracks in their probationary 
+period by attempting to match them against any high-confidence detections not consumed in the first stage. 
+ByteTrack pairs this association pipeline with the YOLOX detector and has become the de-facto baseline for 
+the MOT benchmarks and serves as the foundation for a large family of subsequent tracking methods.
+\cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}
+
+BoT-SORT~\cite{aharon2022BOTSORT} combines ByteTrack's two-stage association pipeline with several improvements borrowed 
+from or inspired by Deep SORT. The Kalman Filter adopts adaptive, time-dependent process and measurement 
+noise that scale with the tracked object's bounding box dimensions, making predictions more confident 
+for small, distant objects that are assumed to move less between frames. BoT-SORT introduces a camera 
+motion compensation (CMC) method to correct KF predictions between
+frames in non-static camera scenes by estimating the camera motion through global image features. 
+In addition the re-identification backbone is upgraded to a
+stronger appearance model. The association cost is also revised to incorporate appearance similarity 
+only when a track and detection are already in close spatial proximity, falling back to motion alone otherwise.
+
+OC-SORT~\cite{cao2023OCSORT} addresses a fundamental weakness of the Kalman Filter shared by SORT, Deep SORT, and 
+ByteTrack, namely that prediction errors accumulate during occlusions and corrupt the track state 
+even after a lost object reappears. Its central contribution is observation-centric re-update (ORU), 
+which triggers a retrospective correction whenever a lost track is successfully re-associated after 
+$N$ missed frames. Rather than accepting the drifted Kalman Filter state, ORU interpolates the 
+missing bounding boxes across those N frames and replays the filter updates along the reconstructed 
+trajectory, resetting accumulated error. Two additional heuristics complement ORU. Observation-centric 
+momentum (OCM) augments the association cost with a motion consistency term derived from the 
+track's recent detection history, favouring matches that preserve the track's observed movement 
+pattern over those that only satisfy the Kalman Filter prediction. Observation-centric recovery 
+(OCR) adds a final association pass for still-unmatched tracks, using their last confirmed 
+detection position instead of the increasingly uncertain Kalman Filter extrapolation as the 
+reference bounding box. Together these mechanisms make OC-SORT a strong alternative to ByteTrack 
+in scenarios involving long occlusions and erratic motion, where linear constant-velocity assumptions 
+break down.
+
+\section{End-to-End Tracking}
+\label{sec:end_to_end_tracking}
+
+In end-to-end tracking methods, object detection and association are trained jointly rather than as separate stages.
+The most well-known methods of this type~\cite{zeng2022motr, zhang2023motrv2, yu2023motrv3, cai2022memot, gao2023memotr} build on the DETR
+object detection model and its extension to tracking called MOTR
+(Multi-Object Tracking with Transformer)~\cite{zeng2022motr}.
+Since end-to-end methods learn to track directly from data, they offer a generalizable approach that is not domain-specific.
+However, they come with significant computational demands and are slow during inference, which makes tracking-by-detection methods
+generally more suitable for real-time applications. Furthermore, their transformer-based architecture makes them incompatible with
+the Hailo-8 NPU due to hardware limitations, as already discussed in Chapter~\ref{chap:object_detection}.
+\cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}
+
+\section{Tracking evaluation metrics}
+\label{sec:tracking_evaluation_metrics}
+
+Evaluating a multi-object tracker requires comparing predicted tracks against ground truth
+tracks. Errors fall into two broad
+categories. Association errors include false positive tracks (a tracked object does not exist in the
+scene), false negative tracks (an existing object is never recognised throughout the video), and
+identity switches (two tracks swap their detection assignments). Detection errors include false positive
+detections, false negative detections, and localisation errors, where the predicted bounding box does
+not precisely align with the ground truth. Figure~\ref{fig:mot_error_types} illustrates each of these
+outcomes.~\cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/mot_tracking_errors_advzemovic_2025.png}
+    \caption{
+        Six representative tracking outcomes. Case (a) shows a correctly tracked object. Cases (b) and
+        (c) show a false positive track and a false negative track. Cases (d) and (e) show a false
+        negative detection and a false positive detection. Case (f) shows an identity switch. In all
+        cases the predicted and ground truth bounding boxes do not align perfectly, resulting in
+        localisation errors. Modified after \cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}.
+    }
+    \label{fig:mot_error_types}
+\end{figure}
+
+The standard choice similarity measure to match predictions against ground truth for 
+2D bounding box detections is Intersection over Union (IoU). A prediction is matched to
+a ground truth when their IoU exceeds a fixed threshold, typically 0.5. Because multiple predictions
+can overlap a single ground truth and vice versa, all candidate pairs form a bipartite graph that is
+resolved with the Hungarian algorithm to yield the optimal one-to-one assignment.
+\cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}
+
+MOTA (Multi-Object Tracking Accuracy)~\cite{bernardin2006MOTAMOTP} and MOTP (Multi-Object Tracking Precision)\cite{bernardin2006MOTAMOTP} are among the
+earliest and most widely used MOT metrics~\cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}. MOTA is defined as $\text{MOTA} = 1 - \frac{|\text{FP}| + |\text{FN}| + |\text{IDSW}|}{|\text{gtDet}|}$,
+where $|\text{FP}|$, $|\text{FN}|$, and $|\text{IDSW}|$ are the total counts of false positive
+detections, false negative detections, and identity switches, and $|\text{gtDet}|$ is the total number
+of ground truth detections. Its values range from $-\infty$ to 1 with higher values indicating better
+performance. MOTP is the average IoU over all correctly matched detection pairs and captures
+localisation quality independently of the association errors that affect MOTA. Because false positive
+and false negative detections dominate the MOTA sum in most practical scenarios, MOTA is primarily
+sensitive to detection quality rather than association quality.
+
+
+IDF1~\cite{ristani2016IDF1} addresses this imbalance by performing matching at the track level rather than at the detection
+level and is defined as the harmonic mean of ID-Recall and ID-Precision. ID-Recall is the share of
+ground truth identity matches that are correctly recovered relative to all ground truth matches.
+ID-Precision is the share of predicted identity matches that are correct relative to all predicted
+matches. IDF1 therefore complements MOTA by focusing on association accuracy and identity consistency.
+
+HOTA (Higher Order Tracking Accuracy)~\cite{luiten2021HOTA} is the primary metric on current benchmarks because it
+explicitly balances detection and association quality. It is defined as the geometric mean of a
+detection score (DetA) and an association score (AssA). DetA measures how accurately the tracker
+detects objects. It is computed as the intersection over union of the predicted and ground truth sets of
+detections. The intersection is the number of true
+positives and the union is the sum of true positives, false positives, and false negatives.
+To reward both detection accuracy and localisation precision, DetA is averaged across IoU
+thresholds from 0.05 to 0.95. AssA measures how consistently the tracker links those detections into tracks.
+For every correctly matched ground truth and predicted track ID pair, it computes the fraction of
+detections along the corresponding ground truth and predicted tracks that are consistently associated
+with that same pair, and then averages this score over all matched pairs. By separating detection and association errors, 
+HOTA provides a more complete picture of tracker
+performance than MOTA or IDF1 alone. Therefore, it became the primary metric in MOT benchmarks alongside
+AssA, DetA, MOTA, IDF1, and the total number of identity switches~\cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}.
+
+\section{Evaluation}
+
+For this application, we choose the tracking-by-detection paradigm for its modularity, and 
+better performance in real-time applications. To select a specific tracking-by-detection method, 
+the outlined trackers are evaluated on the 3D-Net dataset as outlined in Chapter~\ref{chap:dataset}.
+In addition to the detection bounding boxes, object indices, which identify the objects across frames,
+are added to the 3D-Net dataset, which are used as ground truth for the tracking evaluation.
+Using ground truth detections as tracker input simulates a well-configured object detector and
+ensures that the evaluation metrics reflect only the tracker's association and motion modeling
+capabilities, without being distorted by the prediction behavior of any specific detector.
+The dataset footage was recorded at 20 fps with every second frame skipped, resulting in an
+effective evaluation frame rate of 6 fps. For trackers that expose a frame-rate parameter, this
+was set to 6. The lost-track buffer was set to 30 frames for all trackers and the minimum number
+of consecutive detections required to confirm a new track was set to 2, with all remaining
+parameters left at their defaults.
+Low frame rates are known to reduce tracking accuracy across all methods, with relative performance
+remaining largely consistent across moderate frame rate reductions~\cite{mabrouk2022assessment}.
+
+The evaluation is performed using the MOT evaluation metrics outlined in
+Section~\ref{sec:tracking_evaluation_metrics}. Each tracker is evaluated in two output modes:
+returning the input detection bounding boxes directly, and returning the tracker-predicted
+bounding boxes from the internal Kalman filter. Both modes use the same ground truth detections
+as input, so any accuracy difference reflects the impact of the tracker's motion model on the
+reported boxes. The results are given in Table~\ref{tab:tracker_evaluation_metrics}.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{l cccccccc}
+        \toprule
+        Tracker & HOTA & DetA & AssA & MOTA & MOTP & IDF1 & IDP & IDR \\
+        \midrule
+        \multicolumn{9}{l}{\textit{Detection bounding boxes as output}} \\
+        \midrule
+        SORT         & 0.908 & 0.924 & 0.891 & 0.921 & 1.000 & 0.930 & 0.968 & 0.895 \\
+        ByteTrack    & 0.946 & 0.965 & 0.927 & 0.963 & 1.000 & 0.954 & 0.972 & 0.938 \\
+        OC-SORT      & 0.847 & 0.868 & 0.827 & 0.863 & 1.000 & 0.889 & 0.957 & 0.830 \\
+        DeepSort     & 0.829 & 0.867 & 0.791 & 0.841 & 1.000 & 0.871 & 0.938 & 0.814 \\
+        BoTSort      & 0.895 & 0.907 & 0.883 & 0.894 & 1.000 & 0.928 & 0.976 & 0.885 \\
+        BoTSort+ReID & 0.895 & 0.907 & 0.883 & 0.894 & 1.000 & 0.928 & 0.976 & 0.885 \\
+        \midrule
+        \multicolumn{9}{l}{\textit{Tracker-predicted bounding boxes as output}} \\
+        \midrule
+        SORT         & 0.794 & 0.800 & 0.789 & 0.921 & 0.876 & 0.930 & 0.968 & 0.895 \\
+        ByteTrack    & 0.812 & 0.818 & 0.808 & 0.957 & 0.866 & 0.952 & 0.969 & 0.935 \\
+        OC-SORT      & 0.659 & 0.652 & 0.671 & 0.771 & 0.813 & 0.842 & 0.906 & 0.786 \\
+        DeepSort     & 0.698 & 0.720 & 0.681 & 0.833 & 0.845 & 0.868 & 0.934 & 0.810 \\
+        BoTSort      & 0.764 & 0.763 & 0.769 & 0.894 & 0.856 & 0.928 & 0.976 & 0.885 \\
+        BoTSort+ReID & 0.764 & 0.763 & 0.769 & 0.894 & 0.856 & 0.928 & 0.976 & 0.885 \\
+        \bottomrule
+    \end{tabular}
+    \caption{
+        Tracking accuracy metrics for each evaluated tracker on the 3D-Net dataset using
+        ground truth detections as input. The top section reports metrics when the tracker
+        returns the input detection bounding boxes unchanged. The bottom section reports metrics
+        when the tracker returns its internally predicted bounding boxes.
+    }
+    \label{tab:tracker_evaluation_metrics}
+\end{table}
+
+The trackers are additionally evaluated for their per-frame latency on the Raspberry Pi 5 CPU
+inference, as the Hailo-8 is reserved for the object detection model. Tracker runtime scales with
+the number of tracked objects in a frame. Since a large portion of frames in the dataset contain no
+detections and most frames with detections hold only one to three objects, the latency distributions
+are bimodal. The near-zero runtimes of empty frames distort aggregate statistics over the full
+sequence, so latency is reported separately for all frames and for frames containing at least one
+detection. Both distributions per tracker are shown in
+Figure~\ref{fig:tracker_latency_distributions}. SORT and ByteTrack are the fastest trackers with
+means of 0.40\,ms and 0.36\,ms and p95 values below 0.5\,ms on detection frames. OC-SORT remains
+similarly fast with a mean of 0.54\,ms and a p95 of 0.78\,ms on detection frames. BoTSort without 
+ReID reaches a mean of 7.73\,ms and a p95 of 27.06\,ms on detection frames.
+The latency increase compared to SORT and ByteTrack is caused by the camera motion compensation
+module. DeepSort and BoTSort with ReID reach means of 112.15\,ms and 71.97\,ms on detection
+frames respectively. The substantially higher latency in both cases is caused by the neural
+re-identification module, which runs feature extraction for each detected object.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/tracker_latency_distributions.png}
+    \caption{
+        Per-frame Latency distributions of the evaluated trackers on the 3D-Net dataset.
+        (Left) all frames, (Right) only frames with at least 1 detection.
+    }
+    \label{fig:tracker_latency_distributions}
+\end{figure}
+
+Comparing the two output modes, the Kalman filter predictions consistently reduce detection
+accuracy DetA across all trackers while association accuracy and IDF1 scores remain largely
+unchanged. The motion model therefore introduces positional error relative to the detector output
+without improving identity consistency, therefore the detection bounding box output mode is used for the
+final tracker. While deep learning-based motion model alternatives may yield better predictions in the
+general case~\cite{sun2022dancetrack, xiao2024motiontrack, advzemovic2025beyondKalmanFilters}, they were not explored here as
+the detection model is expected to deliver accurate localization in the target environment where occlusion is infrequent,
+and they would add further computational load to the application.
+
+The ReID modules of DeepSort and BoTSort with ReID show no measurable benefit in tracking accuracy
+over the purely motion-based trackers on this dataset. ReID features are most effective in scenarios
+involving long occlusions, frequent object crossings, or heavily overlapping trajectories, where
+appearance cues are needed to re-establish identity after a track is lost\cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}.
+In the target use case of vehicle tracking, objects follow relatively predictable trajectories
+with little spatial overlap and few sustained occlusions, so motion-based association in
+combination with a high-quality object detector is sufficient.
+Neither ReID model was fine-tuned on the 3D-Net dataset, and domain-adapted appearance features
+may improve the association accuracy of the respective trackers. Similarly, the camera motion compensation
+module of BoT-SORT yields no measurable improvement.
+Although the drone does move during some sequences, the object count during those periods is low
+enough that motion-based association can still resolve matches without requiring camera motion
+correction.
+
+ByteTrack is selected as the tracker for this application. It achieves the lowest per-frame latency
+while also achieving the best tracking accuracy across both evaluated output modes. Each tracker
+encodes domain-specific heuristics targeting particular challenges such as long occlusions,
+non-linear motion, or tracking distant objects, and ByteTrack's design best matches the
+characteristics of this application with small relatively fast moving objects~\cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}.
 
 \newpage
 \chapter{Detection Implementation}
@@ -3007,7 +3296,7 @@ per stream also avoid corruption of the RGB and thermal frames due to a single p
 able to keep up with the incoming frame rate of both streams, which was a problem during the 
 first data collection session and led to a number of corrupted frames, which had to be filtered out 
 during the dataset curation process. The stream capture classes provide a single latest frame property
-that allows to access the most recent frame without blocking. The Stream captures keep a double-ended queue
+that allows to access the most recent frame without blocking through a thread-safe interface. The Stream captures keep a double-ended queue
 of the latest frames, which allows to match the latest frames of both streams by timestamp, which is
 important for the inference service to run inference on timely aligned RGB and thermal frames, which is 
 important for the performance of the fused model.
@@ -3035,7 +3324,11 @@ service from downstream applications.
 
 The service also includes a performance monitor and continuously monitors the performance of the service by 
 collecting per-frame diagnostics from the inference service and hardware resource usage metrics from the 
-Raspberry Pi host.
+Raspberry Pi host and Hailo-8 NPU.
+To read Hailo-8 performance metrics, a parser reads binary data written by the HailoRT scheduler 
+to \texttt{/tmp/hmon\_files}, which is mounted as a Docker volume to allow monitoring of the containerized 
+inference service. The binary files are decoded using Protocol Buffers with the schema defined 
+in \texttt{scheduler\_mon.proto}, sourced from the open-source HailoRT repository \cite{hailort_github}.
 The inference service sends per-frame monitoring information such as frame pair timestamp drift,
 the execution time of frame alignment, preprocessing, inference, post-processing, tracking, and the list of detected objects 
 with their class labels, confidence scores, and bounding box coordinates to the performance monitor, which stores this per-frame diagnostics
@@ -3081,63 +3374,6 @@ can be defined, which was set to every 30 frames to avoid performance degradatio
 
 
 \subsection{Tracker}
-
-There are two major paradigms for multi-object tracking (MOT), namely tracking-by-detection 
-and end-to-end tracking. 
-Tracking-by-detection is a simple and highly efficient paradigm in MOT, excelling in both accuracy and
-speed. The detection and association are decoupled and performed in independent steps. First, an object
-detection model detects objects in each frame. Then, an association
-method is used to associate objects across frames. This paradigm is widely adopted due to its modularity,
-which enables independent optimization of detection and association modules, its flexibility to integrate
-both traditional algorithms and deep learning models, and its good performance in modern applications.
-The main benefit of the tracking-by-detection paradigm is its modularity. Each component (e.g., object
-detector, motion model, association, etc.) can be replaced independently, making it very convenient
-to adapt to different object detectors and the use of different association methods, both with traditional and deep learning approaches.
-\cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}
-In end-to-end tracking methods object detection and association are trained jointly. Currently, most well 
-known end-to-end multi-object tracking methods are extensions of the DETR [16] end-to-end object detection
-model [99, 104, 97, 14, 31, 32, 57], which was detailed in Section 4 and its extension to tracking called MOTR 
-(Multi-Object Tracking with Transformer).
-These models are based on the transformer architecture and therefore
-unsuitable as discussed in the object detection chapter. The tracking-by-detection paradigm, on the other hand, is more flexible and
-can integrate a wide range of object detectors, including CNN-based models, which are more suitable for our dataset 
-and computational constraints as discussed in the object detection chapter.
-Since these solutions learn to track directly from data, they are not
-domain-specific and provide a generalizable approach. However, they come with significant computational
-demands. They are slow during
-inference, which prevents their use in real-time applications. Currently, tracking-by-detection methods are
-generally more suitable for real-time object tracking. Lastly, they generally perform poorly compared to
-tracking-by-detection methods on heavily crowded scenes [99, 14, 104, 97, 31, 32].
-\cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}
-
-
-
-
-
-
-If objects’ motion is noisy due to unpredictable camera movement, a camera motion compensation (CMC)
-module should be employed [3, 89, 26]. In domains where objects exhibit dynamic and nonlinear motion,
-deep learning-based motion models combined with a strong re-ID model are crucial [56, 1]. Last but not
-least, association accuracy can be improved with a set of heuristics based on domain knowledge.
-
-The Kalman Filter (KF) is a staple in tracking-by-detection algorithms [8, 89, 103, 3, 15, 56] due to its efficiency in
-modeling object dynamics and handling noisy observations, delivering satisfactory results on datasets
-where object motion is predominantly linear [8, 89, 103, 3, 15], such as MOT17 and MOT20 datasets [22].
-However, this does not hold in the general case, where the performance of the KF declines compared to
-deep learning-based motion model alternatives [78, 91, 2, 1].
-\cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}
-
-As the camera is mounted on a drone, the motion of the objects in the scene is influenced by the drone's movement.
-If objects' motion is noisy due to unpredictable camera movement, a camera motion compensation (CMC)
-module should be employed [3, 89, 26] \cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}.
-However, currently the drone currently in the beginning states planned to be stationary
-at a fixed position or to move along a predefined trajectory, following the road, which leads to 
-predictable and linear camera movement and as a result, the object motion, which is well handled by the KF.
-
-Limitations:
-For future work, if the drone is planned to move freely not following a road and have 
-more unpredictable movement trajectories, a camera motion compensation (CMC) module 
-should be employed to handle the noisy object motion due to the unpredictable camera movement.
 
 % TODO: explain decision for fine-tuning backbone because was found better
 % First, fully fine-tuning the model when train-

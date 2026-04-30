@@ -1,3 +1,18 @@
 4 Drohnen aber 1 sensor packet - begründung kosten und für Datenaufnahme genügt 1 Sensorpaket, Twinfold KAT wurde derzeit verwendet um frühzeitig im Projekt Datenkollektion zu betreiben.
 Zukünftig sollen kleinere Drohnen speziell für das Projekt gebaut werden, daher der Strom und Gewichtsminimierung.
 Auf anderen Drohnen werden Koordinierungsaufgaben des Drohnenschwarms, die Verkehrsklassifizierung und Kommunikation mit Verkehrsaktuartoren betrieben.
+
+
+Context Feature Fusion experiments
+The current yolov11n.py trains on 4-channel RGBT data using an early-fusion approach: the custom dataloader pre-combines RGB + thermal into a single 4-channel TIFF, and standard ultralytics (8.3.180) auto-adapts its first Conv layer to accept ch=4. This works but is architecturally equivalent to treating the thermal as a 4th colour channel — no modality-aware processing.
+
+The goal is a new yolov11nrgbt.py script that uses the dedicated wandahangFY/YOLOv11-RGBT framework, which provides proper RGBT fusion architectures (mid-fusion, early-fusion, late-fusion) with separate backbone streams for RGB and thermal. Three fusion variants are needed so they can be compared.
+
+
+If fusion models run slower on hailo reason is probably that they are not fitting in a single context on the hailo
+(
+[info] Single context flow failed: Recoverable single context error
+[info] Using Multi-context flow
+)
+
+
