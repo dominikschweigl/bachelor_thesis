@@ -2648,6 +2648,157 @@ suitable for our application. Grid-based detectors are chosen for their better s
 detectors and very competitive accuracy.
 
 
+\section{Multispectral Feature Fusion}
+
+The core problem in multispectral object detection is combining
+the features from two different modalities, which can be described as
+\begin{equation}
+    F_{\text{Fused}} = F(F_R, F_T) = F(\phi_R(I_R), \phi_T(I_T)).
+    \label{eq:fusion}
+\end{equation}
+$I_R$ and $I_T$ represent the input RGB and thermal images.
+$F_R$ and $F_T$ denote the extracted feature maps for each modality,
+obtained by applying the modality-specific feature extraction functions
+$\phi_R(\cdot)$ and $\phi_T(\cdot)$. $F_{\text{Fused}}$ denotes the resulting
+fused feature maps produced by the fusion function $F(\cdot)$.
+Based on Eq.~(\ref{eq:fusion}), multi-modality fusion can be characterised
+along two dimensions, namely the input features and the fusion function.
+Accordingly, multi-modality fusion can be split into two levels, 
+selecting input features at the macro level, and constructing
+the fusion function at the micro level.~\cite{qingyun2021CFT}
+
+
+\subsection{Macro level feature fusion}
+
+Macro-level fusion addresses the question of where in the network the
+two modalities are combined, that is, at which feature stage fusion
+is applied. The first study of
+this kind~\cite{wagner2016multispectralDetectionDeepFusion} investigates
+early fusion and late fusion and analyzes their
+performance on multispectral data. Liu et al.~\cite{liu2016multispectralDeepNeuralNetworks}
+extended this to mid fusion and score fusion to explore the
+potential of deep models for multispectral pedestrian detection further.
+
+The macro level fusion architectures are two-branch CNN models that perform
+fusions at different feature stages. Early, mid and late fusion implement
+feature fusions, as shown in
+Figure~\ref{fig:macro_fusion_architecture}, while score fusion
+combines confidence scores from almost entirely separate color and
+thermal models at the decision stage using NMS or averaging of the
+respective detected bounding boxes.
+\cite{liu2016multispectralDeepNeuralNetworks,li2019illuminationAwareFasterRCNN, wan2025yolov11rgbt}
+Early Fusion concatenates the feature maps from color and thermal branches
+immediately after the first convolutional layers, or concatenates the raw
+modalities before the network, a variant known as input fusion. Input fusion
+is the early fusion architecture used in this work.
+Since these layers capture low-level visual features such as corners
+and line segments, Early Fusion operates at a low semantic level.
+Mid Fusion places the fusion module at the end of the feature extraction
+backbone at the last convolutional layers. The features at this stage
+carry more semantic meaning than in early fusion while retaining some
+spatial detail.
+Late Fusion fuses high-level features. In earlier CNN architectures
+this occurred at the fully connected layers, whereas in modern detection
+models it typically happens at the neck, after each modality has
+independently completed its feature extraction at a stage that yields
+robust object representations.
+Score Fusion can be regarded as an ensemble of two CNNs that combines
+detection scores from each modality through weighted averaging or
+maximum selection to produce the final results.
+\cite{liu2016multispectralDeepNeuralNetworks, li2019illuminationAwareFasterRCNN}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/macro_fusion_architecture.png}
+    \caption{
+        An illustration of the macro-level fusion architectures for multispectral object detection.
+        Adapted from \cite{wan2025yolov11rgbt}.
+    }
+    \label{fig:macro_fusion_architecture}
+\end{figure}
+
+Liu et al.~\cite{liu2016multispectralDeepNeuralNetworks} demonstrated that the mid fusion model
+achieved the best detection performance. Subsequent
+works~\cite{li2019illuminationAwareFasterRCNN, zhang2019crossModalityInteractiveAttentionNetwork}
+validated that mid-level fusion outperforms the other fusion architectures,
+and it has since been widely adopted and accepted as the best fusion stage for
+multispectral object detection in modern
+work~\cite{zhang2021GAFF,qingyun2021CFT, gallagher2025surveyMultispectralYOLO, wan2025yolov11rgbt}.
+However, these works focus only on full-precision models, and the performance
+of the different fusion architectures for quantized models has not been explored.
+While previous work investigates RGB-thermal fusion for quantized models targeting
+real-time edge deployment, it neglects comparing the performance of different macro
+fusion architectures and relies exclusively on early
+fusion~\cite{kafka2025EarlyFusionQuantizedModels}.
+This work therefore evaluates all four fusion architectures and compares their
+performance on a vehicle and pedestrian detection dataset for both full-precision
+and quantized models in a real-time edge deployment scenario.
+
+\subsection{Micro level feature fusion}
+
+Besides the position of fusion defined in macro network architectures, the
+construction of the fusion function $F(\cdot)$ is another key factor for 
+complementary learning of modality interaction. 
+The objective is to design $F(\cdot)$ such that complementary information 
+from both modalities is maximized, spatial misalignment and 
+modality-specific noise are mitigated, and the features most relevant 
+to the downstream task are retained for each modality. 
+
+Many strategies for the instantiation of the fusion function
+$F(F_R, F_T)$ from Eq.~(\ref{eq:fusion}) have been explored, distinguished by the complexity of the learned operator $F(\cdot)$.
+The simplest operators apply a fixed combination at every spatial location, including element-wise addition ($F_{\text{Fused}} = F_R + F_T$), 
+element-wise average ($F_{\text{Fused}} = \frac{1}{2}(F_R + F_T)$), element-wise maximum ($F_{\text{Fused}} = \max(F_R, F_T)$), 
+and element-wise multiplication ($F_{\text{Fused}} = F_R \odot F_T$).
+Commonly, concatenation followed by a $1{\times}1$ convolution extends this to a learned linear mixing across 
+all input channels~\cite{liu2016multispectralDeepNeuralNetworks}.
+The Network-in-Network (NIN)~\cite{lin2013networkInNetwork} concept replaces this single linear layer with a
+small sub-network capable of modeling non-linear cross-modal interactions,
+making it a widely adopted building block in multispectral fusion
+modules~\cite{zhang2019crossModalityInteractiveAttentionNetwork, zhang2021GAFF, liang2023explicitAttentionEnhancedFusion, qingyun2021CFT}.
+These operators are fast and parameter-efficient but treat both modalities equally regardless 
+of conditions, making them vulnerable when one modality is degraded by poor lighting or sensor noise.
+
+Gating approaches replace fixed weights with learned, input-dependent masks.
+A typical gating unit produces a weight map $g = \sigma\!\left(\mathrm{Conv}([F_R, F_T])\right)$
+and blends the modalities as $g \odot F_R + (1 - g) \odot F_T$, where each pixel or channel is
+weighted independently without any notion of spatial competition.\cite{zheng2019GFD_SSD, kim2018DeepGatedFusionNetwork}
+Illumination-aware fusion is a prominent specialization of conditioned gating in which a dedicated deep network
+estimates an illumination value from the color image and uses it to derive the gate.
+Because the thermal modality is largely insensitive to lighting changes, the gate suppresses the
+RGB branch under low-light conditions and places more weight on the thermal branch, as implemented
+in the Illumination-Aware Network of Li et al.\ \cite{li2019illuminationAwareFasterRCNN}.
+Illumination-aware gating outperforms fixed operators and linear mixing, with multispectral pedestrian
+benchmarks such as KAIST showing gains from suppressing the RGB branch at night.
+However, it is limited to a single weight per modality, with no spatial or channel granularity.
+
+Pre-transformer attention mechanisms refine gating by computing input-dependent weights
+along either the channel or the spatial dimension, but remain local in scope.
+The receptive field of the underlying convolution bounds the region over which each weight is
+influenced, so distant features have no direct effect on one another.
+Channel attention collapses the spatial dimensions of a feature map via global average or max
+pooling to obtain a compact channel descriptor, which an MLP then maps to per-channel
+scaling weights.
+In the multispectral setting these mechanisms can be applied within a single modality
+(intra-modal attention) or across modalities, where the channel or spatial statistics of
+$F_T$ inform the weighting applied to $F_R$ and vice versa (inter-modal attention),
+enabling selective emphasis of features that are complementary across the two input streams.
+Attention-based methods outperform gating on KAIST and FLIR.
+\cite{wang2020ECANet, zhang2019crossModalityInteractiveAttentionNetwork, zhang2021GAFF, liang2023explicitAttentionEnhancedFusion}
+Transformer-based fusion \cite{qingyun2021CFT} removes the locality constraint entirely through
+query-key-value cross-attention, which computes pairwise similarities between all spatial tokens
+of $F_R$ and $F_T$ simultaneously, enabling long-range interactions that are beyond the reach of
+convolutional attention.
+Transformer cross-attention achieves the highest benchmark accuracy~\cite{qingyun2021CFT} but 
+its quadratic token complexity makes it considerably more expensive than convolutional designs.
+
+Regardless of the chosen object detection strategy, the detection pipeline described in this chapter 
+delivers a set of bounding boxes per frame together with their class and confidence scores.
+For the downstream task of traffic congestion detection, this per-frame view alone is insufficient.
+Determining whether a vehicle is stationary or slow-moving requires observing the same vehicle
+across consecutive frames and associating detections over time.
+This temporal association problem is the subject of the following chapter.
+
 \chapter{Multi-Object Tracking}
 \label{chap:tracking}
 
@@ -3403,6 +3554,96 @@ can be defined, which was set to every 30 frames to avoid performance degradatio
 
 Some drop is expected when quantizing a model from FP32 to INT8, but the goal is to keep this drop as small as possible.
 \cite{hailoModelExplorer2026}
+
+The proposed midCMA3 fusion architecture cannot be compiled for execution on the
+Hailo-8 neural processing unit due to three categories of fundamental hardware
+incompatibilities. First, the CrossMLCAv2 cross-modal attention module implements
+an ECA (Efficient Channel Attention) mechanism that internally reshapes feature
+tensors from four dimensions to three in order to feed a one-dimensional
+convolution, then reshapes back. The Hailo-8 hardware exclusively operates on
+four-dimensional (NHWC) tensors, and any change in tensor rank is rejected by the
+Dataflow Compiler with an \texttt{UnsupportedShuffleLayerError}
+\cite{hailo_shuffle_reshape_3228, hailo_shuffle_reshape_5850,
+hailo_reshape_bchw_14560}. Second, the channel-wise max-pooling operation
+(\texttt{ReduceMax} on the channel axis) used within the spatial attention
+sub-module is not correctly handled during the compiler's internal
+NCHW-to-NHWC axis remapping, yielding an
+\texttt{UnsupportedReduceMaxLayerError} even when the operation formally
+satisfies the stated requirement of reducing along the features axis with
+\texttt{keepdim=True} \cite{hailo_transformer_decoder_11480}. Third, the C2PSA
+module at the top of the backbone uses a multi-head self-attention block whose
+tensor splitting occurs along the sequence axis rather than the channel axis ---
+which Hailo-8 does not support --- and whose attention scores are normalised with
+a Softmax operation that the compiler only accepts in the specific context of a
+rank-two output following a fully-connected layer
+\cite{hailo_multihead_attention_968, hailo_softmax_7222}. All three limitations
+are confirmed as unresolved hardware constraints in the official Hailo community
+forums, where Hailo engineers have acknowledged that transformer-style and
+ECA-style attention blocks are not robustly supported on Hailo-8
+\cite{hailo_yolov12_12130}. As a result, the midCMA3 model in its current form
+cannot be quantised or compiled to a HEF (Hailo Executable Format) binary without
+fundamentally redesigning the fusion and backbone attention modules to use
+exclusively four-dimensional convolution-based operations such as
+Squeeze-and-Excitation attention.
+
+% @misc{hailo_shuffle_reshape_3228,
+%   title        = {{UnsupportedShuffleLayerError} when using {Reshape} node in {ONNX}},
+%   howpublished = {Hailo Community Forum.
+%                   \url{https://community.hailo.ai/t/unsupportedshufflelayererror-when-using-reshape-node-in-onnx/3228}},
+%   note         = {Accessed: 2026-05-04}
+% }
+
+% @misc{hailo_shuffle_reshape_5850,
+%   title        = {{UnsupportedShuffleLayerError} while parsing {ONNX} model},
+%   howpublished = {Hailo Community Forum.
+%                   \url{https://community.hailo.ai/t/unsupportedshufflelayererror-while-parsing-onnx-model/5850}},
+%   note         = {Accessed: 2026-05-04}
+% }
+
+% @misc{hailo_reshape_bchw_14560,
+%   title        = {{BCHW} to {BCP} simple reshape model error},
+%   howpublished = {Hailo Community Forum.
+%                   \url{https://community.hailo.ai/t/bchw-bcp-simple-reshape-model-error/14560}},
+%   note         = {Accessed: 2026-05-04}
+% }
+
+% @misc{hailo_multihead_attention_968,
+%   title        = {Error while parsing {ONNX} file created from
+%                   \texttt{torch.nn.MultiHeadAttention}},
+%   howpublished = {Hailo Community Forum.
+%                   \url{https://community.hailo.ai/t/error-while-parsing-onnx-file-created-from-torch-nn-multiheadattention/968}},
+%   note         = {Accessed: 2026-05-04}
+% }
+
+% @misc{hailo_yolov12_12130,
+%   title        = {{YOLOv12} support},
+%   howpublished = {Hailo Community Forum.
+%                   \url{https://community.hailo.ai/t/yolov12-support/12130}},
+%   note         = {Accessed: 2026-05-04}
+% }
+
+% @misc{hailo_transformer_decoder_11480,
+%   title        = {Parse transformer decoder},
+%   howpublished = {Hailo Community Forum.
+%                   \url{https://community.hailo.ai/t/parse-transformer-decoder/11480}},
+%   note         = {Accessed: 2026-05-04}
+% }
+
+% @misc{hailo_softmax_7222,
+%   title        = {Parser {ONNX} model failed ({UnsupportedSoftmaxLayerError})},
+%   howpublished = {Hailo Community Forum.
+%                   \url{https://community.hailo.ai/t/paser-onnx-model-failed/7222}},
+%   note         = {Accessed: 2026-05-04}
+% }
+
+% @misc{hailo_onnxruntime_17956,
+%   title        = {Handling unsupported operations with {ONNXRuntime}},
+%   howpublished = {Hailo Community Forum.
+%                   \url{https://community.hailo.ai/t/handling-unsupported-operations-with-onnxruntime/17956}},
+%   note         = {Accessed: 2026-05-04}
+% }
+
+
 
 % TODO:
 

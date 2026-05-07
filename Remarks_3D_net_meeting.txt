@@ -15,4 +15,4 @@ If fusion models run slower on hailo reason is probably that they are not fittin
 [info] Using Multi-context flow
 )
 
-
+Maybe have day only and night only metrics as per Tri-Modal Fusion Transformers for UAV based Object Detection
