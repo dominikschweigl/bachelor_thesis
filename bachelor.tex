@@ -1559,7 +1559,7 @@ Figure~\ref{fig:bounding_box_degradation_misalignment}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.45\textwidth]{images/misalignment_degrading_bounding_box_he_2023.png}
+    \includegraphics[width=0.9\textwidth]{images/misalignment_degrading_bounding_box_he_2023.png}
     \vspace{-1em}
     \caption{
         Illustration of low-quality bounding boxes caused by spatial misalignment.
@@ -2588,7 +2588,7 @@ detectors and very competitive accuracy.
 
 \section{Multispectral Feature Fusion}
 
-As outlined in Section~\ref{sec:sensor_system}, visible light and thermal 
+As outlined in Section~\ref{sec:sensor_system}, visible light and thermal
 infrared are used to exploit their complementary strengths. The fusion of these modalities
 is the critical component for improved performance of the detection model.
 The core problem in multispectral object detection is combining
@@ -3499,7 +3499,7 @@ Fusion methods that combine features in later stages of the network, such as mid
 achieve better performance in the presence of residual misalignment, as they have
 more operations to align the features before fusion.
 \cite{he2023misalignedRGBTadaptiveCalibration}
-And even after sensor alignment, there is residual alignment both in all the training datasets 
+And even after sensor alignment, there is residual alignment both in all the training datasets
 used as well as during operation.
 
 Some drop is expected when quantizing a model from FP32 to INT8, but the goal is to keep this drop as small as possible.
