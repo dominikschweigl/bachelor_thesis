@@ -2776,9 +2776,9 @@ Illumination-aware gating outperforms fixed operators and linear mixing, with mu
 benchmarks such as KAIST showing gains from suppressing the RGB branch at night.
 However, it is limited to a single weight per modality, with no spatial or channel granularity.
 
-Pre-transformer attention mechanisms refine gating by computing input-dependent weights
+Pre-transformer spatial attention mechanisms refine gating by computing input-dependent element-wise weights
 along either the channel or the spatial dimension, but remain local in scope.
-The receptive field of the underlying convolution bounds the region over which each weight is
+The receptive field of the underlying convolution operator bounds the region over which each weight is
 influenced, so distant features have no direct effect on one another.
 Channel attention collapses the spatial dimensions of a feature map via global average or max
 pooling to obtain a compact channel descriptor, which an MLP then maps to per-channel
