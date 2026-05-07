@@ -1354,6 +1354,7 @@ modalities for UAV-based vehicle detection.
 
 
 \subsection{Sensor System}
+\label{sec:sensor_system}
 
 % TODO: refine the wording of this section
 
@@ -1548,9 +1549,39 @@ The object distance was set to 25\,m to match the typical operating altitude of 
 \subsection{Sensor Alignment}
 \label{chap:sensor_alignment}
 
-The sensor data exhibited two main issues that needed to be addressed:
-temporal misalignment and spatial misalignment between the RGB and thermal
-video streams.
+The collected RGB and thermal video streams are spatially and temporally unaligned,
+which requires correction before the data can be used for training or inference.
+Existing RGB-thermal object detection methods~\cite{zhang2021GAFF,qingyun2021CFT,wan2025yolov11rgbt,li2019illuminationAwareFasterRCNN,zhang2019crossModalityInteractiveAttentionNetwork}
+assume that input image pairs are at least weakly geometrically aligned.
+Providing unaligned input degrades detection quality because spatially inconsistent
+feature fusion produces imprecise bounding boxes, as illustrated in
+Figure~\ref{fig:bounding_box_degradation_misalignment}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{images/misalignment_degrading_bounding_box_he_2023.png}
+    \vspace{-1em}
+    \caption{
+        Illustration of low-quality bounding boxes caused by spatial misalignment.
+        Adapted from \cite{he2023misalignedRGBTadaptiveCalibration}.
+    }
+    \label{fig:bounding_box_degradation_misalignment}
+\end{figure}
+
+Physical sensor calibration through mechanical co-boresighting and manual per-frame
+alignment by annotators are both labor-intensive approaches that are considered impractical for this
+project~\cite{valverde2021selfSupervisedMultiObjectDetection, hwang2015multispectralPedestrianDetection}.
+A more practical approach is to compute the geometric mapping between the two sensor views
+and to match frames by timestamp.
+This yields weakly aligned image pairs, which is consistent with the alignment quality
+present in established RGB-thermal datasets~\cite{he2023misalignedRGBTadaptiveCalibration, yuan2022crossModalAlignmentVehicleDetection}.
+The same transformations are applied at inference time to ensure that the model
+receives consistently processed input.
+
+Two distinct sources of misalignment were present in the collected data and are corrected
+in the following procedure.
+Temporal misalignment arose from differing frame rates between the two cameras, and spatial
+misalignment arose from physical differences in sensor placement and field of view.
 
 \paragraph{Temporal Misalignment}
 The temporal misalignment was primarily caused by differences in the sampling
@@ -2375,6 +2406,7 @@ of the RGB annotations.
     \label{fig:dataset_class_distribution}
 \end{figure}
 
+
 % TODO:
 % Evaluation of the dataset, including statistics on the number of images, distribution of classes, and examples of challenging scenarios (e.g., low-light, occlusions, weather conditions).
 % Inspire the evaluation from other dataset papers that I used to create
@@ -2382,104 +2414,6 @@ of the RGB annotations.
 
 % Include the showcase of the challenging samples of the included public datasets, e.g. the ones shown in RTDOD and M3FD.
 
-
-
-\newpage
-\chapter{Sensor Fusion}
-\label{chap:sensor_fusion}
-
-sources:
-A systematic literature review on object detection using near infrared and
-thermal images (Drive)
-late part of the paper, where they compare early, mid and late fusion approaches
-% Use end of introduction to motivate sensor fusion \cite{bustos2023reviewObjectDetectionIR}
-% Use section 6 for fusion approaches \cite{bustos2023reviewObjectDetectionIR}
-% Use section 7 for challenges \cite{bustos2023reviewObjectDetectionIR}
-
-% Very good paper for fusion approaches:
-% Human Detection in UAV Thermal Imagery: Dataset Extension
-% and Comparative Evaluation on Embedded Platforms
-
-Appearance change. Figure 7 shows several examples of
-pedestrians in the day and night time. The color image in
-daytime shows a distinct human shape due to the strong
-sunlight. On the other hand, the shape in the color image
-at nighttime is not distinguishable due to the dark environment.
-However, the thermal image shows a distinct shape
-at nighttime, because the temperature difference is greater
-when the air temperature is cooler, so the pedestrians having a
-fixed temperature, can be clearly captured in the nighttime. In
-the daytime, the strong sun radiation causes background clutters.
-For these reasons, we can expect to obtain
-better performance by using the strong points of the color
-and the thermal images throughout the day.
-\cite{hwang2015multispectralPedestrianDetection}
-
-\section{Motivation for Sensor Fusion}
-
-Maybe put in the hardware chapter when we talk about selection
-of sensor modalities, but also here in the sensor fusion
-chapter, we can talk about the motivation for sensor fusion.
-
-\section{Problems in Sensor Fusion}
-
-Fusion Degradation - Rethinking Multi-modal Object Detection from the Perspective of
-Mono-Modality Feature Learning (Drive)
-
-\section{Sensor Alignment}
-
-Image alignment is one of the issues that should be considered in cross-modal
-image applications. Existing methods [11,16,40,29,6,38,39] usually assume that
-visible-infrared image pairs are perfectly geometrically aligned, and they directly
-perform the multi-modal fusion methods.
-Actually, after the image registration
-algorithm, the paired images are just weakly aligned (shown in Fig. 1(a)). However,
-objects differ not only
-in position, but also in scale and angle. These three deviations (position, size and
-angle) of the paired arbitrary oriented objects are closely coupled, changing one
-will affect another one, which makes the alignment operation more complicated.
-As shown in Fig. 1(b), the dashed boxes represent the position of the corresponding
-bounding-boxes in the infrared images. We find that the same object
-on image pairs differs in location, scale and angle. Therefore, weakly misalignment
-in cross-modal aerial images is a common issue that needs to be addressed.
-To demonstrate the generality of the misalignment
-problem in aerial
-imagery, we also obtain the statistics information of DroneVehicle dataset,
-a dataset that provides RGBT data taken from the UAV drone perspective. we
-separately count the number of bounding-boxes with deviations (position and
-size offset by 3 pixels, angle offset by 3 degrees) in the DroneVehicle dataset.
-More than 20\% of the bounding-boxes have the misalignment
-problem.
-\cite{yuan2022crossModalAlignmentVehicleDetection}
-
-Spatial misalignment: Since RGB and infrared sensors have different coordinate systems,
-fields of view, and sampling frequencies, pairs of RGB and infrared images usually are spatial
-misaligned [21], resulting in low-quality bounding boxes predicted by RGB and infrared fusion
-object detection, as shown in Figure 1a. Figure 1b indicates that the fusion of original RGB
-and infrared images via the image fusion algorithm [22] will take in a significantly misaligned
-ghost, which will also disturb localization. The downsampling may decrease the degree of
-misalignment [8], yet the situation still exists, as shown in Figure 1c. The performance of
-RGB and infrared fusion detection methods that directly fuse misaligned features is not ideal.
-Therefore, achieving spatial alignment between RGB and infrared modalities is crucial. The
-training process of existing RGB and infrared fusion object-detection networks [7,19] relies on
-manually aligned datasets in advance. However, manual alignment is a labor-intensive task
-    [13,23], and there will still be subtle misalignments after manual processing, such as the FLIR
-dataset [24]. A more feasible way is to take misaligned RGB and infrared images as input
-directly, and how to adaptively perform spatial alignment at the feature level is the concern of
-our work. Furthermore, RGB and infrared images usually have different resolutions. Existing
-works [22,25] directly resize different modal images to the same size through downscaling or
-upscaling, either dropping beneficial information or introducing redundancy and increasing
-computational overhead.
-\cite{he2023misalignedRGBTadaptiveCalibration}
-
-Explanation in Multi-Perspective RGB and Infrared Dataset
-for UAV Detection IEEE Access 2025 is good
-
-\section{Early Fusion}
-
-\section{Mid (Feature-level) Fusion}
-
-\section{Late Fusion}
 
 
 \newpage
@@ -2654,6 +2588,9 @@ detectors and very competitive accuracy.
 
 \section{Multispectral Feature Fusion}
 
+As outlined in Section~\ref{sec:sensor_system}, visible light and thermal 
+infrared are used to exploit their complementary strengths. The fusion of these modalities
+is the critical component for improved performance of the detection model.
 The core problem in multispectral object detection is combining
 the features from two different modalities, which can be described as
 \begin{equation}
@@ -2670,6 +2607,17 @@ along two dimensions, namely the input features and the fusion function.
 Accordingly, multi-modality fusion can be split into two levels,
 selecting input features at the macro level, and constructing
 the fusion function at the micro level.~\cite{qingyun2021CFT}
+
+% TODO: Maybe investigate these:
+% Very good paper for fusion approaches:
+% Human Detection in UAV Thermal Imagery: Dataset Extension
+% and Comparative Evaluation on Embedded Platforms
+
+% TODO: Maybe use this as citation to write that fusion can degrade performance as
+% the fused features can get worse if one modality detects something and the other does not
+% then the missing modality can degrade the one with good visibility
+% Fusion Degradation - Rethinking Multi-modal Object Detection from the Perspective of
+% Mono-Modality Feature Learning (Drive)
 
 
 \subsection{Macro level feature fusion}
@@ -3527,23 +3475,6 @@ or to disable the capturing.
 Lastly the service configuration file allows to define monitoring settings, where for example the hardware resource usage poll rate
 can be defined, which was set to every 30 frames to avoid performance degradation due to too frequent polling and I/O wait times.
 
-
-\subsection{Tracker}
-
-% TODO: explain decision for fine-tuning backbone because was found better
-% First, fully fine-tuning the model when train-
-% ing on combined infrared datasets will likely result in bet-
-% ter generalization across datasets compared to freezing the
-% pre-trained backbone of a detection model.
-\cite{becker2025fusionOrConfusionDatasetPooling}
-
-% TODO: maybe use different preprocessing techniques for data augmentation during training
-% Although previous work demonstrated that
-% combining multiple preprocessing techniques as part of data augmentation
-% can improve detection performance \cite{herrmann2018cnnInfraredPersonDetectionDomainAdaptation}, applying a single unified
-% preprocessing method across datasets showed no measurable benefit.
-% \cite{becker2025fusionOrConfusionDatasetPooling}
-
 \section{Edge Server Optimization}
 
 % Good paper showing quantization and optimization for edge devices:
@@ -3555,6 +3486,21 @@ can be defined, which was set to every 30 frames to avoid performance degradatio
 \chapter{Evaluation}
 \label{chap:evaluation}
 
+
+Multi-Perspective RGB and Infrared Dataset
+for UAV Detection IEEE Access 2025 is good
+as source for expected lower performance of the early fusion model
+due to residual spatial misalignment
+
+The performance of
+RGB and infrared fusion detection methods that directly fuse misaligned features is not ideal.
+Therefore, achieving spatial alignment between RGB and infrared modalities is crucial.
+Fusion methods that combine features in later stages of the network, such as mid-level fusion, are more robust to misalignment and can
+achieve better performance in the presence of residual misalignment, as they have
+more operations to align the features before fusion.
+\cite{he2023misalignedRGBTadaptiveCalibration}
+And even after sensor alignment, there is residual alignment both in all the training datasets 
+used as well as during operation.
 
 Some drop is expected when quantizing a model from FP32 to INT8, but the goal is to keep this drop as small as possible.
 \cite{hailoModelExplorer2026}
