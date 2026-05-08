@@ -2632,6 +2632,11 @@ modalities before the network, a variant known as input fusion. Input fusion
 is the early fusion architecture used in this work.
 Since these layers capture low-level visual features such as corners
 and line segments, Early Fusion operates at a low semantic level.
+Early fusion is therefore particularly susceptible to spatial
+misalignment between the modalities, as misregistration in
+image-level fused inputs is more difficult to correct than in
+dual-branch architectures that process each modality
+separately first~\cite{he2023misalignedRGBTadaptiveCalibration}.
 Mid Fusion places the fusion module at the end of the feature extraction
 backbone at the last convolutional layers. The features at this stage
 carry more semantic meaning than in early fusion while retaining some
