@@ -1578,8 +1578,8 @@ present in established RGB-thermal datasets~\cite{he2023misalignedRGBTadaptiveCa
 The same transformations are applied at inference time to ensure that the model
 receives consistently processed input.
 
-Two distinct sources of misalignment were present in the collected data and are corrected
-in the following procedure.
+Two distinct sources of misalignment were present in the recordings from the initial
+data collection flight and are corrected in the following procedure.
 Temporal misalignment arose from differing frame rates between the two cameras, and spatial
 misalignment arose from physical differences in sensor placement and field of view.
 
@@ -1876,6 +1876,22 @@ near the image edges visible for the vehicle near the top.
     }
     \label{fig:camera_alignment_result}
 \end{figure}
+
+The alignment procedure described above was first developed and applied in
+postprocessing to the recordings from the initial data collection flight.
+Both the spatial transformation matrix and the temporal synchronization approach
+were subsequently integrated into the object detection service described in
+Chapter~\ref{chap:implementation}, which runs on a Raspberry Pi mounted on the drone.
+A dedicated recording mode was added to the service that applies the spatial
+transformation to each incoming thermal frame in real time.
+For temporal alignment, the service maintains rolling buffers of 30 frames per
+modality and selects the temporally closest thermal frame for each incoming
+visible-spectrum frame by comparing presentation timestamps.
+This integration ensured that all subsequent data collection flights produced
+spatially and temporally aligned recordings without postprocessing.
+As a result, the training data and the model input during production are
+processed by the same system.
+This guarantees consistent input representations across data collection and deployment.
 
 \subsection{Annotation}
 
