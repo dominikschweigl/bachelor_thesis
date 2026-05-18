@@ -19,7 +19,7 @@ DATASETS = {
     "DroneVehicle": [440_163,   16_535, 43119,  0,      0,      0],  # car includes van; truck includes freight car
     "RTDOD":        [78_063,    2_336,  7_580,  26_378, 2_693,  57_515],
     "M3FD":         [18_296,    700,    1_008,  521,    0,      11_477],
-    "Ours":         [  450,     120,    230,    0,      0,      0],  # placeholder — update when collection is complete
+    "Ours":         [  4502,     101,    2872,    20,      205,      1360],
 }
 
 COLORS = {

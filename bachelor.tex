@@ -202,95 +202,90 @@
 
 \chapter{Introduction}
 
-% TODO: Research questions?
-% Research questions:
-% Overall 3d-net: Is it possible improve traffic flow monitoring and traffic congestion prevention using a UAV swarm equipped with RGB and thermal sensors
-% Is it possible to reliably detect vehicles in aerial imagery using a UAV swarm equipped with RGB and thermal sensors in realtime on an edge device?
-% What is the impact of different sensor fusion strategies on detection performance in this context?
+Urban traffic systems face growing pressure from increasing vehicle volumes
+and rising congestion frequency. Fixed ground-level sensors, including 
+induction loops, roadside cameras, and
+radar detectors, provide the foundation of most current monitoring
+infrastructures, but their spatial coverage is constrained by installation
+density and their deployment costs are high. As a result, these systems
+struggle to adapt to dynamic or spatially extended congestion events. Probe
+vehicle data from GPS-equipped vehicles extends coverage to unmonitored
+segments at lower deployment cost, but only captures connected vehicles,
+provides no vehicle-level classification, and offers no visual information for
+incident detection. Neither approach is therefore suited to fine-grained,
+real-time traffic analysis, particularly in rural or mountain areas where
+fixed infrastructure is impractical.
 
-3D-NET
+Unmanned aerial vehicle (UAV) swarms offer a practical path toward
+flexible, real-time aerial traffic monitoring. A coordinated group of aerial
+platforms can cover large road segments continuously without the spatial
+constraints of fixed installations. In this project, one swarm configuration 
+employs four UAVs with distinct operational roles and is planned to perform 
+automated battery-based replacement to maintain uninterrupted coverage.
 
-UAV-swarms and future 6G communication technologies for traffic flow monitoring supporting the mobility transition
+The central perception task in this system is the detection of vehicles in 
+aerial imagery under variable illumination and adverse weather. Visible-spectrum 
+cameras perform well under clear daytime conditions but degrade in low light or 
+and adverse weather conditions. Thermal infrared cameras record heat emitted 
+by vehicles independently of ambient light and therefore retain detection 
+capability when visible imaging fails. In this project, a combined RGB and 
+thermal sensor system is used to increase detection robustness in uncontrolled 
+outdoor environments.
 
-This project is funded by the granting organisation Bundesministerium für Innovation, Mobilität
-und Infrastruktur (BMIMI) and the Österreichische Forschungsförderungsgesellschaft (FFG).
-The FFG is the central national funding agency and strengthens Austria's innovative capacity.
+The combined sensor data is processed onboard the UAV, rather than transmitting
+raw image streams to a ground station, to reduce end-to-end latency, relax
+demands on the communication link and comply with the General Data Protection 
+Regulation (GDPR). However, UAV payload and power budgets
+impose strict constraints on the onboard hardware. Fusing two modalities
+through a deep neural network introduces additional computational requirements,
+and certain fusion mechanisms are incompatible with resource-constrained 
+AI accelerators.
 
-Motivation
+This thesis is conducted within the 3D-Net research project, which investigates
+UAV swarms and next-generation communication technologies for traffic flow
+monitoring in support of the mobility transition.
+The 3D-Net project is funded by the granting organisation Bundesministerium
+für Innovation, Mobilität und Infrastruktur (BMIMI) and the
+Österreichische Forschungsförderungsgesellschaft (FFG).
+The FFG is the central national funding agency and strengthens
+Austria's innovative capacity.
+Project partners include Twins GmbH, which contributes UAV hardware and test
+flight operations, and Lakeside Labs, which develops drone swarm coordination.
+Bernard Gruppe GmbH is responsible for online traffic data analysis and object
+detection. This thesis is conducted in cooperation with Bernard Gruppe GmbH
+and addresses the vehicle detection component of the project.
 
-• Zunehmende Verkehrsbelastung führt zu häufigeren und schwer vorhersehbaren Staus
-• Begrenzte Echtzeit-Informationen des Verkehrsgeschehen durch stationäre Sensoren und GPS-Fahrzeugdaten
-• Hoher Aufwand und geringe Flexibilität klassischer Verkehrsmonitoringsysteme
-• Bedarf an skalierbaren und anpassungsfähigen Ansätzen zur Verkehrsanalyse
-
-Projektziele
-
-• Entwicklung eines UAV-Schwarms zur flexiblen Erfassung von Verkehrsdaten in Echtzeit
-• Integration von terrestrischen (TN) und nicht-terrestrischen (NTN) Netzen für die zuverlässige Kommunikation
-• Entwicklung von KI-basierten Methoden zur Analyse des Verkehrsgeschehens
-• Demonstration des Systems durch einen Proof-of-Concept
-
-Highlights
-
-Left image labels (device / drone hardware)
-(No additional text shown in image)
-
-Right illustration labels
-
-• Schwarmkoordination
-• Daten-Offloading
-• On-board Prozessierung
-• Sensordatenerfassung
-
-• Integrierte TN/NTN Netzwerkarchitektur
-
-• Schwarmsteuerung
-
-• Edge/Cloud
-
-• Verkehrsdatenanalyse
-
-Forschungsförderungsgesellschaft (FFG)
-
-Projektpartner
-
-Projektlaufzeit: 01.09.2023 - 31.08.2026
-
-Goes here...
-\cite{karle2017semantify}
-
-In this work, the term “uncontrolled environment” is
-employed to refer to outdoor scenes where illumination
-and temperature changes occur frequently, and where
-various atmospheric conditions can be observed.
+Two research questions guide this thesis. The first asks whether reliable
+vehicle detection from aerial imagery is achievable in real-time on a UAV edge
+device equipped with RGB and thermal sensors. The second asks what impact
+different sensor fusion strategies have on detection performance in this
+operational context.
 
 The remainder of this thesis is structured as follows.
-Chapter~\ref{chap:literature_review} provides a review of related
-literature on UAV-based traffic monitoring, sensor fusion, and aerial
-object detection. Chapter~\ref{chap:hardware} describes the hardware
-components employed in this work, including the UAV platform, the
-onboard processing unit, and the multi-sensor system, concluding with
-an overview of the overall system integration.
-Chapter~\ref{chap:sensor_fusion} discusses the theoretical foundations
-of sensor fusion, covering early, mid-level, and late fusion approaches
-as well as common challenges. Chapter~\ref{chap:object_detection}
-discusses object detection methods, including single-stage and
-two-stage detectors as well as tracking-by-detection paradigms.
-Chapter~\ref{chap:dataset} presents the dataset collected for this
-work. Chapter~\ref{chap:implementation} details the implementation
-of the detection system, encompassing RGB-thermal fusion, distance
-sensor integration, and edge optimization.
-Chapter~\ref{chap:evaluation} evaluates the proposed approach,
-followed by Chapter~\ref{chap:limitations}, which discusses its
-limitations. Finally, Chapter~\ref{chap:conclusion} summarizes the
-findings and outlines directions for future work.
+Chapter~\ref{chap:literature_review} reviews related work on UAV-based
+traffic monitoring, sensor fusion, and aerial object detection.
+Chapter~\ref{chap:hardware} describes and justifies the hardware components used in this
+work, including the UAV platform, the onboard processing unit, and the
+multi-sensor system.
+Chapter~\ref{chap:dataset} presents the dataset collected for this work and
+the public datasets incorporated alongside it.
+Chapter~\ref{chap:object_detection} introduces machine learning object
+detection methods and deep multi-sensor fusion techniques.
+Chapter~\ref{chap:tracking} introduces multi-object tracking methods and
+reports their evaluation for this application.
+Chapter~\ref{chap:implementation} details the development and implementation
+of the detection model, including the training pipeline, the compilation to
+the edge device, and the final vehicle detection service running on the UAV.
+Chapter~\ref{chap:evaluation} evaluates the proposed approach, followed by
+Chapter~\ref{chap:limitations}, which discusses its limitations.
+Finally, Chapter~\ref{chap:conclusion} summarizes the findings and outlines
+directions for future work.
 
 \chapter{Literature Review}
 \label{chap:literature_review}
 
 % Literatur recherche
 
-% Include graph of the number of papers per year over timespan
 
 \chapter{Hardware}
 \label{chap:hardware}
@@ -1495,41 +1490,43 @@ video streams instead of a single overlayed stream, we gain access to
 more information for detection.
 
 
-% \section{System Integration Overview}
-
-% Table for weight
-
-% Table for power consumption
-
-% Figure for single-drone system architecture
-
-
 \newpage
 \chapter{Dataset}
 \label{chap:dataset}
 
-There are several existing large scale datasets that
-contain RGB and thermal data for object detection. However,
-none of them to the best of our knowledge fully match the ideal
-large scale RGB and LWIR low altitude side view UAV perspective
-with a focus on vehicle detection under diverse conditions
-including adverse weather and nighttime. Many existing datasets
-focus on pedestrian detection rely on vehicle mounted cameras or
-use high altitude aerial imagery that targets small object
-detection. The following section provides an overview of the
-most relevant datasets and afterwards explains how the dataset
-for this project is constructed.
+To the best of our knowledge, no existing large-scale dataset fully satisfies the
+requirements identified in for this the 3D-Net research project.
+Specifically, no publicly available dataset combines a low-altitude side-view UAV
+perspective with LWIR imagery and covers vehicle detection under adverse weather
+and nighttime conditions.
+For this reason, this project collects a new dataset for this project referred to as 3D-Net.
+This chapter first describes the data collection process, then outlines existing
+public UAV datasets and justifies the inclusion of public datasets for
+this project.
 
 \section{Data Collection}
 
 As previously described in Chapter~\ref{chap:hardware}, the data collection is performed using the
 Workswell WIRIS Enterprise multi-sensor system, which provides unaligned RGB and thermal
-video streams. The data collection process involves flying the drone equipped
-with the WIRIS camera next to road segments. The primary location for
-data collection is the IG-Modellflugplatz Häusern in Ampass, a model airfield in the
-Austrian Alps that features a road with regular traffic and flight permission
-without drone flight prohibition or the need for special permits in contrast to many other locations
-in the Innsbruck area due to the Innsbruck airport.
+video streams. The collection process involves flying the drone equipped with the WIRIS camera
+alongside road segments. Data was collected at the IG-Modellflugplatz Häusern in Ampass,
+a model airfield in the Austrian Alps. The site features a road with regular traffic.
+Unlike many locations in the Innsbruck area near the Innsbruck airport, it does not require
+special permits or impose drone flight prohibitions. The data collection was conducted over
+three separate sessions on different days. In total, eight scenes were recorded, each at a
+different distance and viewing angle to the road. The drone was repositioned at a different
+location along the airfield for each scene, which introduces additional variation in backgrounds
+and vehicle appearances.
+Samples of the recorded scenes are shown in Figure~\ref{fig:recorded_scenes}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/3d_net_dataset_samples.png}
+    \caption{
+        Aligned sample frames from the recorded scenes. The top row shows RGB frames, while the bottom row shows the corresponding thermal frames.
+    }
+    \label{fig:recorded_scenes}
+\end{figure}
 
 The WIRIS camera was configured to capture optimal thermal data.
 Material emissivity was set to 0.95, the standard value for rubber tires and
@@ -1606,15 +1603,12 @@ selected, resulting in two videos with equal numbers of synchronized frames.
 While this step eliminated the progressive temporal drift, a constant offset
 between the videos remained due to different recording start times. This
 offset was estimated by identifying a distinct and easily recognizable event
-in both videos (e.g., two cars crossing, as shown in
-Figure~\ref{fig:event}). The difference between the corresponding timestamps
-yielded an offset of 2.6\,seconds.
+in both videos (e.g., two cars crossing). The difference between the 
+corresponding timestamps yielded an offset of 2.6\,seconds.
 The final synchronization was achieved by shifting one video by this offset
 and repeating the frame-matching procedure. This resulted in temporally
 aligned video streams with a maximum frame pairing error of 55\,ms over
 15-minute recordings.
-
-% TODO: add figure of event used for temporal offset estimation
 
 The first problem that needed to be addressed for the sensor data
 was temporal misalignment in the collected video samples during data
@@ -1640,7 +1634,7 @@ them together, creating two videos with the same number of synchronized frames.
 After this process, the videos were no longer drifting apart temporally over time, yet
 there was still a constant temporal offset between the two videos due to the differing
 start times. This offset was estimated by selecting a well suited and easily identifiable
-event in both videos, such as two cars crossing each other as seen in Figure~\ref{fig:event}.
+event in both videos, such as two cars crossing each other.
 From this event, the timestamp
 of the event in both videos was found and the difference between them was calculated
 to obtain the temporal offset of 2.6 seconds. After this step, the videos were synchronized by shifting
@@ -1896,7 +1890,7 @@ This guarantees consistent input representations across data collection and depl
 \subsection{Annotation}
 
 The aligned RGB and thermal video streams were sampled to extract individual frames for annotation.
-Every third frame was selected from each video, yielding a total of \{N\_frames\} image pairs.
+Every third frame was selected from each video.
 Sampling at this rate reduces the redundancy inherent in high-frame-rate recordings, where consecutive
 frames differ very little in content.
 At a camera rate of 20\,fps, every third frame corresponds to an inter-sample interval of 0.15\,s.
@@ -1910,19 +1904,11 @@ this corresponds to a pixel shift of
     \Delta\mathrm{px} = \frac{2.92}{30} \times 1030 \approx 100\,\mathrm{px},
 \end{equation}
 %
-which is sufficient to ensure that adjacent samples show the vehicle in substantially
+which is sufficient to ensure that adjacent samples show the vehicle in
 different positions, thereby avoiding dataset redundancy.
-In practice, this value represents an upper bound, as the drone was often oriented with a forward
+In practice, this value represents an upper bound, as the drone was also oriented with a forward
 component relative to the road. This reduced the lateral displacement
 and consequently increased the number of consecutive samples in which vehicles remain within the field of view.
-
-Because the recordings consist of continuous roadside footage, the sampled frames include long
-sequences showing only the static road background with no vehicles present.
-These \{N\_background\} background-only frames are largely redundant, as hundreds of near-identical
-images represent the same empty scene.
-To reduce this imbalance, 90\,\% of all frames containing no annotated objects were removed at
-random, retaining a representative fraction of background context.
-
 
 Annotations were produced using a combination of the FiftyOne dataset management
 library~\cite{moore2020fiftyone} and the Computer Vision Annotation Tool
@@ -1950,7 +1936,7 @@ Figure~\ref{fig:annotation_tools} shows the interfaces of both tools.
 \end{figure}
 
 The six annotation classes are car, truck, bus, motorcycle, bicycle, and person, chosen to align
-with the public datasets used for training as described in Section~\ref{chap:public_datasets}.
+with the public datasets used for training as described in Section~\ref{sec:public_datasets}.
 To reduce inter-annotator ambiguity, vehicles were classified using the Bernard Gruppe 12+1
 taxonomy~\cite{bernardGruppe12plus1Classification}, which extends the BASt 8+1
 system~\cite{bastVehicleClassification} and is already familiar to all annotators in the team.
@@ -2026,48 +2012,73 @@ for the original, simply mapped and interpolated versions are shown in Figure~\r
 
 \subsection{Dataset Statistics}
 
-After background reduction and annotation, the self-collected dataset comprises \{N\_total\} annotated
-image pairs containing a total of \{N\_annotations\} bounding boxes.
-Figure~\ref{fig:self_collected_stats} shows the class distribution and the day and night sample split.
-The dataset is dominated by the car class, reflecting the traffic composition at the collection site.
-No adverse weather conditions occurred during the data collection flights, so the dataset does
-not cover rain, fog, or snow scenarios.
-This is a limitation of the self-collected data that motivates the inclusion of the public
-adverse-weather datasets described in Section~\ref{chap:public_datasets}.
+After annotation, the self-collected dataset comprises $12263$ pixel-aligned image pairs of dimension
+$852 \times 672$ containing a total of $9060$ bounding boxes across six classes.
+Cars ($49.7\%$) and trucks ($31.7\%$) together constitute $81.4\%$ of all labels.
+The remaining $18.6\%$ is distributed across persons ($15.0\%$), bicycles ($2.3\%$), buses ($1.1\%$),
+and motorcycles ($0.2\%$).
+The dataset was split by assigning the first $70\,\%$ of frames from each recorded scene to the training set,
+the next $15\,\%$ to validation, and the final $15\,\%$ to the test set.
+To ensure that the underrepresented bus, bicycle, and motorcycle classes appear in all splits,
+their instances were explicitly distributed across the three partitions in the same manner.
+Figure~\ref{fig:self_collected_stats} (left) shows the class distribution across the train, validation, and test splits.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/dataset_split_stats.png}
+    \includegraphics[width=\textwidth]{images/3d_net_dataset_statistics.png}
     \vspace{-1em}
     \caption{
         Statistics of the self-collected dataset after background reduction and annotation.
         Left: annotated frame and bounding box counts per train, validation, and test split.
-        Center: bounding box counts per class across all splits.
-        Right: day and night sample distribution.
-        \textit{(Adjust subfigure layout to match the actual content of dataset\_split\_stats.png.
-            If day/night split is not included, add it as a separate bar chart here.)}
+        Center: normalized bounding box area distribution per class.
+        Right: normalized bounding box size scatter plot showing the relationship between bounding box width and height across all classes.
     }
     \label{fig:self_collected_stats}
 \end{figure}
 
+All classes occupy approximately $0.1\%$ to $1\%$ of the normalized image area, which is in accordance with
+other UAV vehicle object detection datasets\cite{feng2023rtdodDataset,sun2022droneVehicleRGBThermalUAVDataset}.
+Truck bounding boxes form a narrow peak in the area distribution.
+This concentration reflects a single stationary truck that was present in the background of 2 scenes during the collection flights.
+Generally, the classes show a peak around $0.1\%$ with a long tail towards larger sizes as the vehicles move closer
+to the camera in the recording scenes that are angled with a forward component relative to the road.
 
+The shape scatter reveals the relationship between object height and width.
+Persons appear as tall, narrow boxes because their vertical body silhouette dominates from an aerial viewpoint.
+Bicycles share a similar aspect ratio but shift toward slightly greater width.
+Cars and buses form a compact diagonal band with low aspect-ratio variance.
+Trucks occupy the largest bounding box sizes and show the widest spread in both width and height, but the distribution 
+goes towards wide horizontal bounding boxes with increasing size.
+
+
+
+All recordings were captured during daytime because operational restrictions at Bernard Gruppe
+prohibited night flights.
+No adverse weather conditions occurred during the collection flights, so the dataset does not cover
+rain or fog scenarios.
+The first collection flight took place in February 2026 and therefore includes snow conditions.
+In addition, motorcycle and bus instances are underrepresented, with at most $12$ and $86$
+samples in the training split respectively.
+These limitations motivate the inclusion of the public datasets described in Section~\ref{sec:public_datasets}.
 
 \section{Public Visible-Thermal Datasets}
-\label{chap:public_datasets}
+\label{sec:public_datasets}
 
+UAV datasets typically distinguish between nadir views, where the camera points 
+straight downward, and oblique views, where the camera is tilted at an angle to the ground.
 Among UAV-based RGB-thermal datasets, the DroneVehicle dataset
 \cite{sun2022droneVehicleRGBThermalUAVDataset} is one of the largest,
 comprising 28,439 aligned RGB and thermal image pairs with 953,087
 oriented bounding boxes across five vehicle classes including car,
 truck, bus, van, and freight car. The data were captured from UAVs
-flying at altitudes between 80 and 120 meters with viewing angles
-from 15 degrees to 45 degrees, and include daytime, nighttime, and
+flying at altitudes between 80 and 120 meters with oblique viewing angles
+from 15 to 45 degrees, and include daytime, nighttime, and
 dark-night conditions. Similarly, the RTDOD dataset
 \cite{feng2023rtdodDataset} provides 16,192 aligned RGB-thermal
 image pairs. It includes ten object classes such as car,
 truck, bus, motorcycle, and person, and covers diverse environments
 including suburbs, highways, and bridges under sunny, rainy, foggy,
-and nighttime scenarios with varying altitudes and viewing angles. The VTUAV dataset
+and nighttime scenarios with varying altitudes and nadir to oblique viewing angles. The VTUAV dataset
 \cite{zhang2022VTUAVDataset} contains around 500 RGB-thermal
 sequences totaling about 1.7 million frame pairs captured at
 low to moderate altitudes between 5 and 20 meters with nadir and
@@ -2086,12 +2097,12 @@ in low-light and nighttime traffic scenarios.
 
 Other UAV datasets provide only one of the two modalities. Thermal-only
 datasets include HIT-UAV \cite{suo2023hitUAVDataset}, which contains 2,898
-thermal images captured at altitudes between 60 and 130 meters with viewing
+thermal images captured at altitudes between 60 and 130 meters with oblique to nadir viewing
 angles from 30 to 90 degrees, covering day and night scenarios but including
 only one true vehicle class. The MONET thermal dataset
 \cite{riz2023monetDataset} expands UAV-based thermal data with approximately
 53,000 thermal frames captured at altitudes between 20 and 130 meters with
-angled forward-looking views. RGB data was also collected but not released
+oblique forward-looking views. RGB data was also collected but not released
 due to privacy concerns. MONET contains day and night recordings and provides
 rich drone metadata such as GPS, altitude, and gimbal orientation, but
 includes only two primary object classes, person and vehicle.
@@ -2105,9 +2116,9 @@ provides 32,823 RGB frames from low altitudes between 5 and 30 meters with
 viewing angles from 45 to 90 degrees and eight vehicle classes but only daytime
 conditions. The VAID dataset \cite{li2020aerialVehicleDetectionVAIDDataset}
 includes 5,937 RGB aerial images with seven vehicle classes captured at
-approximately 90 meters from overhead perspectives, without nighttime or
+approximately 90 meters from a nadir perspective, without nighttime or
 adverse weather data. The VEDAI dataset \cite{razakarivony2016VEDAIdataset}
-contains 1,210 aerial RGB and infrared images from overhead perspectives
+contains 1,210 aerial RGB and infrared images from a nadir perspective
 with six vehicle categories including car, pick-up, truck, camping car,
 tractor, and van, but does not focus on nighttime or adverse weather conditions.
 
@@ -2145,7 +2156,7 @@ lighting and weather, but does not cover nighttime. The ACDC dataset
 semantic segmentation with the same relevant classes and pixel-level annotations.
 From this set, 4,006 images are taken in adverse conditions including nighttime.
 Both datasets lack thermal modality. Finally, the LLVIP dataset \cite{jia2021llvip}
-provides 16,836 aligned RGB-thermal pairs from fixed overhead surveillance cameras
+provides 16,836 aligned RGB-thermal pairs from fixed oblique surveillance cameras
 for pedestrian detection in low-light conditions. Table \ref{tab:rgb_thermal_datasets}
 summarizes the characteristics of all discussed datasets.
 
@@ -2159,56 +2170,56 @@ summarizes the characteristics of all discussed datasets.
     \centering
     \small
     \caption{Comparison of RGB/Thermal vehicle datasets. The symbol “–” indicates not mentioned in the
-        original paper.}
+        original paper or not present in the dataset.}
     \label{tab:rgb_thermal_datasets}
 
     \setlength{\tabcolsep}{2pt}
     \begin{adjustbox}{center, scale=0.8}
-        \begin{tabular}{|C{2.5cm}|C{2cm}|C{1.8cm}|C{2.5cm}|C{1.6cm}|C{1.8cm}|C{1.8cm}|C{1.5cm}|C{1.2cm}|C{1.8cm}|C{1.6cm}|}
+        \begin{tabular}{|C{2.5cm}|C{2cm}|C{1.8cm}|C{2.5cm}|C{1.6cm}|C{1.8cm}|C{1.5cm}|C{1.2cm}|C{1.8cm}|C{1.6cm}|}
             \hline
-            \textbf{Dataset}                                                      & \textbf{Modality} & \textbf{Capture Setup} & \textbf{Perspective}     & \textbf{Altitude (m)} & \textbf{Viewing Angle} & \textbf{Vehicle Classes} & \textbf{Person} & \textbf{Night} & \textbf{Adverse Weather} & \textbf{Images} \\
+            \textbf{Dataset}                                                      & \textbf{Modality} & \textbf{Capture Setup} & \textbf{Perspective}     & \textbf{Altitude (m)} & \textbf{Vehicle Classes} & \textbf{Person} & \textbf{Night} & \textbf{Adverse Weather} & \textbf{Images} \\
             \hline
-            DroneVehicle \cite{sun2022droneVehicleRGBThermalUAVDataset}           & RGB+T             & UAV                    & Overhead / Angled        & 80\textemdash120      & 15°\textemdash45°      & 5                        & \textemdash     & \checkmark     & \textemdash              & 28,439          \\
+            DroneVehicle \cite{sun2022droneVehicleRGBThermalUAVDataset}           & RGB+T             & UAV                    & Nadir / Oblique          & 80\textemdash120      & 5                        & \textemdash     & \checkmark     & \textemdash              & 28,439          \\
             \hline
-            VTUAV \cite{zhang2022VTUAVDataset}                                    & RGB+T             & UAV                    & Nadir/Oblique / Tracking & 5\textemdash20        & Varies                 & 9                        & \checkmark      & \checkmark     & \textemdash              & 1,700,000       \\
+            VTUAV \cite{zhang2022VTUAVDataset}                                    & RGB+T             & UAV                    & Nadir / Oblique          & 5\textemdash20        & 9                        & \checkmark      & \checkmark     & \textemdash              & 1,700,000       \\
             \hline
-            VAID \cite{li2020aerialVehicleDetectionVAIDDataset}                   & RGB               & UAV                    & Overhead / Birds-eye     & 90                    & 45\textemdash90°       & 7                        & \textemdash     & \textemdash    & \textemdash              & 5,937           \\
+            VAID \cite{li2020aerialVehicleDetectionVAIDDataset}                   & RGB               & UAV                    & Nadir / Oblique          & 90                    & 7                        & \textemdash     & \textemdash    & \textemdash              & 5,937           \\
             \hline
-            VEDAI \cite{razakarivony2016VEDAIdataset}                             & RGB+T             & UAV                    & Overhead / Birds-eye     & \textemdash           & \textemdash            & 6                        & \textemdash     & \textemdash    & \textemdash              & 1,210           \\
+            VEDAI \cite{razakarivony2016VEDAIdataset}                             & RGB+T             & UAV                    & Nadir                    & \textemdash           & 6                        & \textemdash     & \textemdash    & \textemdash              & 1,210           \\
             \hline
-            M3OT \cite{nie2025m3ot}                                               & RGB+T             & UAV                    & Overhead / Angled        & 100\textemdash200     & \textemdash            & 1                        & \textemdash     & \checkmark     & \textemdash              & 21,580          \\
+            M3OT \cite{nie2025m3ot}                                               & RGB+T             & UAV                    & Nadir / Oblique          & 100\textemdash200     & 1                        & \textemdash     & \checkmark     & \textemdash              & 21,580          \\
             \hline
-            RTDOD \cite{feng2023rtdodDataset}                                     & RGB+T             & UAV                    & Forward / Angled         & \textemdash           & \textemdash            & 5                        & \checkmark      & \checkmark     & \checkmark               & 16,192          \\
+            RTDOD \cite{feng2023rtdodDataset}                                     & RGB+T             & UAV                    & Nadir / Oblique          & \textemdash           & 5                        & \checkmark      & \checkmark     & \checkmark               & 16,192          \\
             \hline
-            TrafficNight \cite{zhang2024trafficNightDataset}                      & RGB+T+D           & UAV                    & Overhead / Birds-eye     & \textemdash           & 90°                    & 6                        & \textemdash     & \checkmark     & \textemdash              & 2,200           \\
+            TrafficNight \cite{zhang2024trafficNightDataset}                      & RGB+T+D           & UAV                    & Nadir                    & \textemdash           & 6                        & \textemdash     & \checkmark     & \textemdash              & 2,200           \\
             \hline
-            HIT-UAV \cite{suo2023hitUAVDataset}                                   & T                 & UAV                    & Overhead / Angled        & 60\textemdash130      & 30°\textemdash90°      & 1                        & \checkmark      & \checkmark     & \textemdash              & 2,898           \\
+            HIT-UAV \cite{suo2023hitUAVDataset}                                   & T                 & UAV                    & Nadir / Oblique          & 60\textemdash130      & 1                        & \checkmark      & \checkmark     & \textemdash              & 2,898           \\
             \hline
-            MONET \cite{riz2023monetDataset}                                      & T                 & UAV                    & Angled / Forward         & 20\textemdash130      & Angled                 & 1                        & \checkmark      & \checkmark     & \textemdash              & 53,000          \\
+            MONET \cite{riz2023monetDataset}                                      & T                 & UAV                    & Forward / Oblique         & 20\textemdash130     & 1                        & \checkmark      & \checkmark     & \textemdash              & 53,000          \\
             \hline
-            UAVDT \cite{du2018UAVDTDataset}                                       & RGB               & UAV                    & Forward / Side           & 10\textemdash70       & Varies                 & 3                        & \textemdash     & \checkmark     & \checkmark               & 80,000          \\
+            UAVDT \cite{du2018UAVDTDataset}                                       & RGB               & UAV                    & Forward / Side           & 10\textemdash70       & 3                        & \textemdash     & \checkmark     & \checkmark               & 80,000          \\
             \hline
-            AU-AIR \cite{bozcan2020auAirDataset}                                  & RGB               & UAV                    & Forward / Angled         & 5\textemdash30        & 45°\textemdash90°      & 8                        & \textemdash     & \textemdash    & \textemdash              & 32,823          \\
+            AU-AIR \cite{bozcan2020auAirDataset}                                  & RGB               & UAV                    & Forward / Oblique        & 5\textemdash30        & 8                        & \textemdash     & \textemdash    & \textemdash              & 32,823          \\
             \hline
-            FLIR ADAS v2 \cite{teledyne_2022_flirAdasV2Dataset}                   & RGB+T             & Vehicle                & Forward                  & \textemdash           & \textemdash            & 9                        & \checkmark      & \checkmark     & \checkmark               & 26,442          \\
+            FLIR ADAS v2 \cite{teledyne_2022_flirAdasV2Dataset}                   & RGB+T             & Vehicle                & Forward                  & \textemdash           & 9                        & \checkmark      & \checkmark     & \checkmark               & 26,442          \\
             \hline
-            KAIST ADAS \cite{choi2018kaist}                                       & RGB+T+Depth       & Vehicle                & Forward                  & \textemdash           & \textemdash            & 1                        & \checkmark      & \checkmark     & \textemdash              & 95,000          \\
+            KAIST ADAS \cite{choi2018kaist}                                       & RGB+T+Depth       & Vehicle                & Forward                  & \textemdash           & 1                        & \checkmark      & \checkmark     & \textemdash              & 95,000          \\
             \hline
-            M3FD \cite{liu2022m3fdDataset}                                        & RGB+T             & Vehicle                & Forward                  & \textemdash           & \textemdash            & 5                        & \checkmark      & \checkmark     & \checkmark               & 4,200           \\
+            M3FD \cite{liu2022m3fdDataset}                                        & RGB+T             & Vehicle                & Forward                  & \textemdash           & 5                        & \checkmark      & \checkmark     & \checkmark               & 4,200           \\
             \hline
-            MSRS \cite{tang2022piafusionMSRSDataset}                              & RGB+T             & Vehicle                & Forward                  & \textemdash           & \textemdash            & 1                        & \checkmark      & \checkmark     & \textemdash              & 1,444           \\
+            MSRS \cite{tang2022piafusionMSRSDataset}                              & RGB+T             & Vehicle                & Forward                  & \textemdash           & 1                        & \checkmark      & \checkmark     & \textemdash              & 1,444           \\
             \hline
-            Infraparis \cite{franchi2024infraparisRGBDepthThermalDataset}         & RGB+T+Depth       & Vehicle                & Forward                  & \textemdash           & \textemdash            & 6                        & \checkmark      & \checkmark     & \textemdash              & 12,084          \\
+            Infraparis \cite{franchi2024infraparisRGBDepthThermalDataset}         & RGB+T+Depth       & Vehicle                & Forward                  & \textemdash           & 6                        & \checkmark      & \checkmark     & \textemdash              & 12,084          \\
             \hline
-            Multispectral \cite{takumi2017multispectralDatasetAutonomousVehicles} & RGB+T+NIR+MIR     & Vehicle                & Forward                  & \textemdash           & \textemdash            & 3                        & \checkmark      & \textemdash    & \textemdash              & 7,512           \\
+            Multispectral \cite{takumi2017multispectralDatasetAutonomousVehicles} & RGB+T+NIR+MIR     & Vehicle                & Forward                  & \textemdash           & 3                        & \checkmark      & \textemdash    & \textemdash              & 7,512           \\
             \hline
-            RASMD \cite{youngwan2026rasmd}                                        & RGB+SWIR          & Vehicle                & Forward                  & \textemdash           & \textemdash            & 5                        & \checkmark      & \textemdash    & \checkmark               & 100,000         \\
+            RASMD \cite{youngwan2026rasmd}                                        & RGB+SWIR          & Vehicle                & Forward                  & \textemdash           & 5                        & \checkmark      & \textemdash    & \checkmark               & 100,000         \\
             \hline
-            DAWN \cite{kenk2020dawn}                                              & RGB               & Vehicle                & Forward                  & \textemdash           & \textemdash            & 4                        & \checkmark      & \textemdash    & \checkmark               & 1,000           \\
+            DAWN \cite{kenk2020dawn}                                              & RGB               & Vehicle                & Forward                  & \textemdash           & 4                        & \checkmark      & \textemdash    & \checkmark               & 1,000           \\
             \hline
-            ACDC \cite{sakaridis2025acdcDatasetAdverseConditions}                 & RGB               & Vehicle                & Forward                  & \textemdash           & \textemdash            & 5                        & \checkmark      & \checkmark     & \checkmark               & 5,509           \\
+            ACDC \cite{sakaridis2025acdcDatasetAdverseConditions}                 & RGB               & Vehicle                & Forward                  & \textemdash           & 5                        & \checkmark      & \checkmark     & \checkmark               & 5,509           \\
             \hline
-            LLVIP \cite{jia2021llvip}                                             & RGB+T             & CCTV                   & Overhead / Fixed         & \textemdash           & \textemdash            & \textemdash              & \checkmark      & \checkmark     & \textemdash              & 16,836          \\
+            LLVIP \cite{jia2021llvip}                                             & RGB+T             & CCTV                   & Oblique           & \textemdash                  & \textemdash              & \checkmark      & \checkmark     & \textemdash              & 16,836          \\
             \hline
         \end{tabular}
     \end{adjustbox}
@@ -3483,16 +3494,13 @@ or to disable the capturing.
 Lastly the service configuration file allows to define monitoring settings, where for example the hardware resource usage poll rate
 can be defined, which was set to every 30 frames to avoid performance degradation due to too frequent polling and I/O wait times.
 
-\section{Edge Server Optimization}
-
-% Good paper showing quantization and optimization for edge devices:
-% Human Detection in UAV Thermal Imagery: Dataset Extension
-% and Comparative Evaluation on Embedded Platforms
-
-
 \newpage
 \chapter{Evaluation}
 \label{chap:evaluation}
+
+% Good paper showing quantization and optimization for edge devices evaluation:
+% Human Detection in UAV Thermal Imagery: Dataset Extension
+% and Comparative Evaluation on Embedded Platforms
 
 
 Multi-Perspective RGB and Infrared Dataset
