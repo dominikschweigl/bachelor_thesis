@@ -201,59 +201,56 @@
 
 
 \chapter{Introduction}
+\label{chap:introduction}
 
-Urban traffic systems face growing pressure from increasing vehicle volumes
-and rising congestion frequency. Fixed ground-level sensors, including 
-induction loops, roadside cameras, and
+Traffic systems face growing pressure from increasing vehicle volumes
+and rising congestion frequency. Fixed ground-level sensors, including induction loops, roadside cameras, and
 radar detectors, provide the foundation of most current monitoring
-infrastructures, but their spatial coverage is constrained by installation
-density and their deployment costs are high. As a result, these systems
-struggle to adapt to dynamic or spatially extended congestion events. Probe
-vehicle data from GPS-equipped vehicles extends coverage to unmonitored
-segments at lower deployment cost, but only captures connected vehicles,
-provides no vehicle-level classification, and offers no visual information for
-incident detection. Neither approach is therefore suited to fine-grained,
+infrastructures. Their spatial coverage is constrained by installation density,
+and their deployment costs are high. As a result, these systems struggle to
+adapt to dynamic or spatially extended congestion events. Probe vehicle data
+from GPS-equipped vehicles extends coverage to unmonitored segments at lower
+deployment cost. However, it only captures connected vehicles, provides no
+vehicle-level classification, and offers no visual information for incident
+detection. Neither approach is therefore suited to fine-grained,
 real-time traffic analysis, particularly in rural or mountain areas where
 fixed infrastructure is impractical.
 
-Unmanned aerial vehicle (UAV) swarms offer a practical path toward
-flexible, real-time aerial traffic monitoring. A coordinated group of aerial
-platforms can cover large road segments continuously without the spatial
-constraints of fixed installations. In this project, one swarm configuration 
-employs four UAVs with distinct operational roles and is planned to perform 
-automated battery-based replacement to maintain uninterrupted coverage.
+Unmanned aerial vehicles (UAVs) offer a practical path toward
+flexible, real-time aerial traffic monitoring. Compared to traditional
+fixed-ground sensors, UAV technologies provide greater mobility, higher
+spatial and temporal resolution, more flexible deployment, and richer
+data~\cite{liu2025skysEyePerspectiveUAVHighwayReview}. A coordinated group of aerial
+platforms can therefore cover large road segments continuously without the spatial
+constraints of fixed installations. Outdoor aerial operation, however, exposes
+the perception system to variable illumination and adverse weather conditions
+that visible-spectrum cameras alone cannot reliably handle.
 
-The central perception task in this system is the detection of vehicles in 
-aerial imagery under variable illumination and adverse weather. Visible-spectrum 
-cameras perform well under clear daytime conditions but degrade in low light or 
-and adverse weather conditions. Thermal infrared cameras record heat emitted 
-by vehicles independently of ambient light and therefore retain detection 
-capability when visible imaging fails. In this project, a combined RGB and 
-thermal sensor system is used to increase detection robustness in uncontrolled 
-outdoor environments.
+This thesis addresses the perception task in this UAV monitoring system of reliable vehicle
+tracking across the full range of outdoor operating conditions.
+Visible-spectrum perception performs well under clear daytime conditions but
+degrades in low light or adverse weather. The thermal infrared modality records heat
+emitted by vehicles independently of ambient light and can therefore retain
+tracking capability when visible imaging fails. A combined RGB and thermal
+sensor system is therefore used to increase tracking robustness in uncontrolled
+outdoor environments. Top-down operation above active roadways is restricted
+in Austria and several other jurisdictions, so the UAV flies alongside rural
+road segments rather than hovering above them. The combined sensor data is
+processed onboard the UAV rather than being streamed to a ground station.
+This reduces end-to-end latency, relaxes demands on the communication link,
+and complies with the General Data Protection Regulation (GDPR). UAV payload
+and power budgets, however, impose strict constraints on the onboard hardware.
+Fusing two modalities through a deep neural network places additional demands
+on the inference pipeline within these constraints.
 
-The combined sensor data is processed onboard the UAV, rather than transmitting
-raw image streams to a ground station, to reduce end-to-end latency, relax
-demands on the communication link and comply with the General Data Protection 
-Regulation (GDPR). However, UAV payload and power budgets
-impose strict constraints on the onboard hardware. Fusing two modalities
-through a deep neural network introduces additional computational requirements,
-and certain fusion mechanisms are incompatible with resource-constrained 
-AI accelerators.
-
-This thesis is conducted within the 3D-Net research project, which investigates
-UAV swarms and next-generation communication technologies for traffic flow
-monitoring in support of the mobility transition toward sustainable transportation.
-The 3D-Net project is funded by the granting organisation Bundesministerium
-für Innovation, Mobilität und Infrastruktur (BMIMI) and the
-Österreichische Forschungsförderungsgesellschaft (FFG).
-The FFG is the central national funding agency and strengthens
-Austria's innovative capacity.
-Project partners include Twins GmbH, which contributes UAV hardware and test
-flight operations, and Lakeside Labs, which develops drone swarm coordination.
-Bernard Gruppe GmbH is responsible for online traffic data analysis and object
-detection. This thesis is conducted in cooperation with Bernard Gruppe GmbH
-and addresses the vehicle detection component of the project.
+The thesis introduces a low-altitude oblique paired RGB-LWIR dataset and
+evaluates seven fusion architectures spanning early, mid, late,
+and score fusion strategies on the self-collected and public datasets. 
+The best-performing architecture
+is deployed on a Hailo-8 accelerator under INT8 quantization. To the best of
+our knowledge, no prior work reports a multi-architecture RGB-LWIR fusion
+comparison on a dedicated edge accelerator under a low-altitude oblique
+viewpoint for vehicle traffic monitoring.
 
 Two research questions guide this thesis. The first asks whether reliable
 vehicle detection from aerial imagery is achievable in real-time on a UAV edge
@@ -281,10 +278,103 @@ Chapter~\ref{chap:limitations}, which discusses its limitations.
 Finally, Chapter~\ref{chap:conclusion} summarizes the findings and outlines
 directions for future work.
 
+This thesis is conducted within the 3D-Net research project. The project
+investigates UAV swarms and next-generation communication technologies for
+traffic flow monitoring in support of the mobility transition toward sustainable
+transportation. It is funded by the Bundesministerium für Innovation,
+Mobilität und Infrastruktur (BMIMI) and the Österreichische
+Forschungsförderungsgesellschaft (FFG). Project partners include Twins GmbH,
+which contributes UAV hardware and test flight operations, and Lakeside Labs,
+which develops drone swarm coordination. Bernard Gruppe GmbH is responsible
+for online traffic data analysis and object detection. The present thesis
+addresses the vehicle detection component of this project.
+
 \chapter{Literature Review}
 \label{chap:literature_review}
 
-% Literatur recherche
+UAV-based traffic monitoring has matured into a recognised research area
+over the past decade
+\cite{barmpounakis2016UAVtransportEngineeringSurvey,outay2020UAVroadSafetyTrafficReview,liu2025skysEyePerspectiveUAVHighwayReview}.
+One of the most influential large-scale field deployment to date is the pNEUMA
+experiment of
+\citet{barmpounakis2020pNEUMAdroneFieldExperiment}, in which ten drones
+hovered in coordinated formation over a 1.3\,km$^2$ urban area in central
+Athens and recorded the trajectories of half a million vehicles
+across 100 intersections. Follow-on work has extended the same
+dataset to visual swarm-level anomaly detection
+\cite{kim2023visualExtensionsAnomalyDetectionSwarmDrones}. Despite its scale, pNEUMA exhibits imprecise bounding boxes and trajectory
+anomalies attributed to suboptimal computer-vision tools.
+\citet{fonod2025advancedComputerVisionVehicleTrajectoriesDroneImagery} develop
+Geo-trax, a computer vision framework for high-accuracy trajectory extraction
+from drone imagery. They also release the Songdo Traffic and Songdo Vision
+datasets to address these gaps. The framework extracts georeferenced vehicle
+trajectories from high-resolution drone imagery captured in Songdo at roughly
+150\,m altitude with a top-down view. It stabilises the resulting tracks
+through orthophoto-based image registration in post-flight processing.
+\citet{espadaler2025accurateSafetyCongestionMonitoringFrameworkSwarmDrones}
+employs this framework to obtain vehicle trajectories at signalised intersections
+and applies surrogate safety measures such as Time-To-Collision to relate observed speeds to the spatial
+pattern of unsafe events. Both works rely on visible-spectrum video alone and process the
+captured footage offline after flight. One layer above perception,
+\citet{maljkovic2025learningBasedTrafficMonitoringSwarmDrones} propose an
+online semi-decentralised reinforcement-learning framework that schedules
+monitoring trajectories for a swarm of low-cost drones. However, the method assumes a city-wide real-time congestion signal is
+already available.
+
+Beyond these comprehensive systems, separate deployed work
+follows the same stationary, predominantly top-down pattern
+for individual road segments and intersections. Signalised and unsignalised
+intersections as well as roundabouts have been monitored from a hovering
+drone for traffic flow estimation
+\cite{khan2018UAVTrafficSignalisedIntersections, khan2018UAVtrafficUrbanRoundabouts} and
+safety analysis
+\cite{yang2021functionalSafetyRiskSignalisedIntersections,
+vuong2021intersectionMixedTrafficSafetyCloudModel}.
+In addition, lane-change risk has been examined from drone footage of interchange
+merging areas and freeway segments
+\cite{gu2019UAVcrashRiskInterchangeMerging,park2018laneChangeRiskTrajectoryData}.
+The DARTS system of \citet{li2025DARTSdroneTrafficIncidentDetection} explored
+incident detection on an interstate highway with real-time inference through onboard 
+thermal imaging. They report 99\,\% accuracy for incident detection on their self-collected dataset
+with a successful incident detection during an interstate field test.
+
+Four limitations recur across the deployed systems that target vehicles.
+First, perception relies on a single modality, either RGB or thermal,
+which leaves operational gaps under low-light or adverse weather
+conditions. Second, the viewpoint is predominantly top-down. This
+operating mode is restricted in several jurisdictions including Austria,
+where UAV flights directly above active road segments are not generally
+permitted. Third, the platform typically hovers in place above an
+intersection or short segment. Such configurations suit microscopic
+intersection studies but do not extend to sparse rural or
+alpine corridors where UAV flights enable more ground coverage than fixed
+ground sensors. Fourth, the processing pipeline either streams raw
+video to a ground server or analyses footage after flight.
+Streaming requires a stable high-bandwidth radio link that is unreliable
+in mountainous terrain, and it also raises GDPR concerns because
+identifiable imagery leaves the platform. Post-flight processing in turn
+rules out real-time response. Together these constraints define the
+design space that the present work targets.
+
+The single-modality limitation of the deployed systems surveyed above
+motivates paired RGB-thermal sensing as the natural next step.
+Paired RGB-thermal benchmarks now span vehicle
+detection~\cite{suo2023hitUAVDataset,sun2022droneVehicleRGBThermalUAVDataset},
+multi-object tracking~\cite{zhang2022VTUAVDataset,nie2025m3ot}, and nighttime
+conditions~\cite{zhang2024trafficNightDataset,feng2023rtdodDataset}. These
+benchmarks have stimulated a parallel line of fusion-method research. Modern
+RGB-thermal detectors report substantial detection gains over single-modality
+baselines~\cite{qingyun2021CFT,yuan2024c2former,guo2024damsdet,wan2025yolov11rgbt,li2025DEPFusionUAVMultispectralObjectDetection}.
+Real-time paired RGB-thermal inference has been demonstrated onboard flying
+platforms outside the traffic
+domain~\cite{speth2022deepLearningRGBThermalOnboardDrone,bultmann2021realTimeMultiModalSemanticFusion},
+but no prior work demonstrates this capability for vehicle traffic monitoring.
+The fusion approaches explored in those systems have mostly been limited to separate
+per-modality detectors combined as an ensemble. Quantization-aware RGB-thermal fusion remains largely
+unexplored. To the best of our knowledge,
+\citet{kafka2025EarlyFusionQuantizedModels} is the only published study on
+quantized RGB-thermal fusion for UAV edge deployment, and it only addresses a
+single fusion architecture.
 
 
 \chapter{Hardware}
@@ -301,6 +391,13 @@ overview of the overall system integration is provided.
 
 \section{UAV Platform}
 
+The 3D-Net project envisions a coordinated fleet of four UAVs with distinct operational roles
+and automated battery-based replacement to sustain continuous road coverage.
+All test flights for object tracking and data collection reported in this thesis
+were conducted with a single unit under manual control.
+Future project stages will introduce smaller, purpose-built platforms with extended flight times
+and autonomous coordination, but these developments lie outside the scope of this work.
+
 The aerial platform used in this work is the
 \textit{twinFOLD KAT}, a heavy-payload hexacopter developed
 and provided by
@@ -309,7 +406,7 @@ document \cite{twinsKATspec2021}, the system has a maximum takeoff
 weight of 12\,kg and supports a payload of up to 5.5\,kg
 including batteries and sensors.
 
-The UAV achieves a typical flight endurance of approximately 35
+The UAV achieves a typical flight endurance of approximately 30
 minutes, with maximum flight times of up to 45 minutes under
 favorable conditions. The maximum horizontal flight speed is
 specified as 7\,m/s. Furthermore, the system is certified for

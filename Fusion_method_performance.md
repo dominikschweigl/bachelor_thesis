@@ -19,6 +19,23 @@ val: Scanning /root/.clearml/venvs-builds/3.10/task_repository/3d-net-clearml.gi
                  truck        109        140      0.916      0.542      0.679      0.479
 Speed: 0.4ms preprocess, 3.9ms inference, 0.0ms loss, 1.0ms postprocess per image
 
+### Thermal
+300 epochs completed in 1.208 hours.
+Ultralytics 8.3.75 🚀 Python-3.10.12 torch-2.1.0a0+32f93b1 CUDA:0 (NVIDIA RTX A5000, 24248MiB)
+YOLO11n summary (fused): 238 layers, 2,583,127 parameters, 0 gradients, 6.32 GFLOPs
+val: Scanning /root/.clearml/venvs-builds/3.10/task_repository/3d-net-clearml.git/workspace/dataset_thermal/labels/val.cache... 628 images, 0 backgrounds, 0 corrupt: 100% 628/628 [00:00
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95):   5% 2/40 [00:00<00:08,  4.58it/s]
+2026-05-12 17:41:04
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% 40/40 [00:04<00:00,  9.72it/s]
+                   all        628       4555      0.849      0.607      0.705      0.462
+                person        446       1708      0.912      0.686      0.833      0.481
+                   car        443       2588      0.871      0.759      0.828      0.577
+                   bus         53         61      0.723      0.541      0.616      0.425
+            motorcycle         55         58       0.84      0.414      0.506      0.292
+                 truck        109        140      0.898      0.636      0.742      0.538
+2026-05-12 17:41:09
+Speed: 0.3ms preprocess, 2.7ms inference, 0.0ms loss, 0.5ms postprocess per image
+
 ### Early Fusion
 300 epochs completed in 1.895 hours.
 onnx model exported to workspace/dataset_rgbt/Results/yolo11n-RGBT-earlyfusion_8b1e2932/weights/best.onnx
@@ -175,6 +192,26 @@ val: Scanning /root/.clearml/venvs-builds/3.10/task_repository/3d-net-clearml.gi
 2026-05-12 20:53:44
 Speed: 0.2ms preprocess, 1.4ms inference, 0.0ms loss, 1.8ms postprocess per image
 
+### Thermal
+300 epochs completed in 5.462 hours.
+Ultralytics 8.3.75 🚀 Python-3.10.12 torch-2.1.0a0+32f93b1 CUDA:0 (NVIDIA GeForce RTX 2080 Ti, 11012MiB)
+YOLO11n summary (fused): 238 layers, 2,583,322 parameters, 0 gradients, 6.32 GFLOPs
+val: Scanning /root/.clearml/venvs-builds/3.10/task_repository/3d-net-clearml.git/workspace/dataset_thermal/labels/val.cache... 1221 images, 201 backgrounds, 0 corrupt: 100% 1221/1221 [00:00
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95):   4% 3/77 [00:02<01:07,  1.10it/s]
+2026-05-19 12:28:27
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95):  47% 36/77 [00:08<00:02, 18.69it/s]
+2026-05-19 12:28:33
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% 77/77 [00:12<00:00,  6.40it/s]
+                   all       1221      13737      0.748      0.592      0.638      0.303
+                person        518       4741      0.728      0.585      0.645      0.288
+                   car        676       6231      0.827      0.757      0.789      0.437
+            motorcycle        615       1610      0.799      0.596      0.662      0.334
+               bicycle        226        281       0.55      0.274      0.323     0.0856
+                   bus        118        241      0.804      0.697      0.775      0.403
+                 truck        211        633      0.778      0.643       0.63      0.269
+2026-05-19 12:28:38
+Speed: 0.2ms preprocess, 1.7ms inference, 0.0ms loss, 1.0ms postprocess per image
+
 ### Early Fusion
 300 epochs completed in 6.944 hours.
 onnx model exported to workspace/dataset_rgbt/Results/yolo11n-RGBT-earlyfusion_db5ee497/weights/best.onnx
@@ -321,6 +358,36 @@ Speed: 0.2ms preprocess, 2.3ms inference, 0.0ms loss, 0.7ms postprocess per imag
 
 ## Visdrone Dronevehicle
 
+### RGB
+300 epochs completed in 11.488 hours.
+Ultralytics 8.3.75 🚀 Python-3.10.12 torch-2.1.0a0+32f93b1 CUDA:0 (NVIDIA GeForce RTX 2080 Ti, 11012MiB)
+YOLO11n summary (fused): 238 layers, 2,582,737 parameters, 0 gradients, 6.32 GFLOPs
+val: Scanning /root/.clearml/venvs-builds/3.10/task_repository/3d-net-clearml.git/workspace/dataset_rgb/labels/val.cache... 1469 images, 2 backgrounds, 0 corrupt: 100% 1469/1469 [00:00
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95):   0% 0/92 [00:00<?, ?it/s]
+2026-05-19 02:51:18
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% 92/92 [00:21<00:00,  4.26it/s]
+2026-05-19 02:51:40
+                   all       1469      24490      0.868       0.77       0.85      0.525
+                   car       1401      21313      0.914      0.847      0.918      0.533
+                 truck        588       2388      0.805      0.609      0.718      0.411
+                   bus        291        789      0.886      0.854      0.913      0.631
+Speed: 0.3ms preprocess, 1.9ms inference, 0.0ms loss, 2.2ms postprocess per image
+
+### Thermal
+300 epochs completed in 9.355 hours.
+Ultralytics 8.3.75 🚀 Python-3.10.12 torch-2.1.0a0+32f93b1 CUDA:0 (NVIDIA GeForce RTX 2080 Ti, 11012MiB)
+YOLO11n summary (fused): 238 layers, 2,582,737 parameters, 0 gradients, 6.32 GFLOPs
+val: Scanning /root/.clearml/venvs-builds/3.10/task_repository/3d-net-clearml.git/workspace/dataset_thermal/labels/val.cache... 1469 images, 2 backgrounds, 0 corrupt: 100% 1469/1469 [00:00
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95):   2% 2/92 [00:00<00:34,  2.57it/s]
+2026-05-19 22:18:22
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% 92/92 [00:23<00:00,  3.99it/s]
+                   all       1469      24490      0.918      0.894      0.945      0.696
+                   car       1401      21313      0.954      0.962      0.983      0.707
+                 truck        588       2388      0.867      0.792      0.884      0.618
+                   bus        291        789      0.935      0.928      0.966      0.762
+2026-05-19 22:18:38
+Speed: 0.3ms preprocess, 1.9ms inference, 0.0ms loss, 1.3ms postprocess per image
+
 ### Early Fusion
 300 epochs completed in 7.850 hours.
 onnx model exported to workspace/dataset_rgbt/Results/yolo11n-RGBT-earlyfusion_2386ffa3/weights/best.onnx
@@ -370,7 +437,19 @@ val: Scanning /root/.clearml/venvs-builds/3.10/task_repository/3d-net-clearml.gi
 Speed: 0.4ms preprocess, 4.6ms inference, 0.0ms loss, 2.9ms postprocess per image
 
 ### Mid CMA3 Fusion
-
+300 epochs completed in 12.643 hours.
+Ultralytics 8.3.75 🚀 Python-3.10.12 torch-2.1.0a0+32f93b1 CUDA:0 (NVIDIA RTX A5000, 24248MiB)
+YOLO11n-RGBT-midCMA3fusion summary (fused): 355 layers, 3,731,656 parameters, 0 gradients
+val: Scanning /root/.clearml/venvs-builds/3.10/task_repository/3d-net-clearml.git/workspace/dataset_rgbt/visible/val.cache... 1469 images, 2 backgrounds, 0 corrupt: 100% 1469/1469 [00:00
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95):   0% 0/92 [00:00<?, ?it/s]
+2026-05-18 21:26:02
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% 92/92 [00:26<00:00,  3.53it/s]
+2026-05-18 21:26:07
+                   all       1469      24490      0.922      0.912       0.95      0.701
+                   car       1401      21313      0.954      0.965      0.986      0.722
+                 truck        588       2388      0.869      0.826      0.896      0.631
+                   bus        291        789      0.944      0.944      0.968       0.75
+Speed: 0.3ms preprocess, 5.8ms inference, 0.0ms loss, 2.9ms postprocess per image
 
 ### Mid CFT3 Fusion
 300 epochs completed in 31.108 hours.
@@ -446,6 +525,25 @@ val: Scanning /root/.clearml/venvs-builds/3.10/task_repository/3d-net-clearml.gi
                  truck        357        373      0.963        0.7      0.874      0.721
 2026-05-18 14:42:35
 Speed: 0.2ms preprocess, 1.7ms inference, 0.0ms loss, 0.5ms postprocess per image
+
+### Thermal
+300 epochs completed in 3.202 hours.
+Ultralytics 8.3.75 🚀 Python-3.10.12 torch-2.1.0a0+32f93b1 CUDA:0 (NVIDIA RTX A5000, 24248MiB)
+YOLO11n summary (fused): 238 layers, 2,583,322 parameters, 0 gradients, 6.32 GFLOPs
+val: Scanning /root/.clearml/venvs-builds/3.10/task_repository/3d-net-clearml.git/workspace/dataset_thermal/labels/val.cache... 1889 images, 907 backgrounds, 0 corrupt: 100% 1889/1889 [00:00
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95):   0% 0/119 [00:00<?, ?it/s]
+2026-05-19 12:20:48
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95):  82% 98/119 [00:05<00:00, 24.57it/s]
+2026-05-19 12:20:54
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% 119/119 [00:06<00:00, 18.86it/s]
+                   all       1889       1404      0.713      0.632      0.643      0.345
+                person         85        191      0.212      0.089      0.079     0.0302
+                   car        625        798      0.793      0.855       0.81      0.476
+            motorcycle          4          4      0.579       0.75      0.624      0.146
+               bicycle         31         31      0.812      0.699      0.732       0.29
+                   bus          7          7          1      0.795      0.995      0.692
+                 truck        357        373      0.881      0.606      0.617      0.433
+Speed: 0.2ms preprocess, 1.3ms inference, 0.0ms loss, 0.6ms postprocess per image
 
 ### Early Fusion
 300 epochs completed in 3.398 hours.
@@ -586,6 +684,42 @@ Speed: 0.3ms preprocess, 2.3ms inference, 0.0ms loss, 0.4ms postprocess per imag
 
 ## 3D-Net Data Pool
 
+### RGB
+300 epochs completed in 15.100 hours.
+Ultralytics 8.3.75 🚀 Python-3.10.12 torch-2.1.0a0+32f93b1 CUDA:0 (NVIDIA RTX A5000, 24248MiB)
+YOLO11n summary (fused): 238 layers, 2,583,322 parameters, 0 gradients, 6.32 GFLOPs
+val: Scanning /root/.clearml/venvs-builds/3.10/task_repository/3d-net-clearml.git/workspace/dataset_rgb/labels/val.cache... 4989 images, 1111 backgrounds, 0 corrupt: 100% 4989/4989 [00:00
+2026-05-19 22:30:05
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% 312/312 [00:19<00:00, 15.76it/s]
+2026-05-19 22:30:26
+                   all       4989      42718      0.781      0.651       0.72      0.448
+                person        843       5820      0.846      0.629      0.724      0.447
+                   car       3040      30304      0.876      0.828      0.881      0.531
+            motorcycle        659       1655      0.799      0.722       0.79      0.543
+               bicycle        257        312      0.522      0.353      0.406      0.222
+                   bus        465       1094      0.879      0.758      0.827      0.542
+                 truck       1264       3533      0.764      0.616      0.691      0.405
+Speed: 0.1ms preprocess, 1.1ms inference, 0.0ms loss, 0.5ms postprocess per image
+
+### Thermal
+300 epochs completed in 15.552 hours.
+Ultralytics 8.3.75 🚀 Python-3.10.12 torch-2.1.0a0+32f93b1 CUDA:0 (NVIDIA RTX A5000, 24248MiB)
+YOLO11n summary (fused): 238 layers, 2,583,322 parameters, 0 gradients, 6.32 GFLOPs
+2026-05-19 22:57:19
+val: Scanning /root/.clearml/venvs-builds/3.10/task_repository/3d-net-clearml.git/workspace/dataset_thermal/labels/val.cache... 4989 images, 1111 backgrounds, 0 corrupt: 100% 4989/4989 [00:00
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95):  16% 49/312 [00:03<00:17, 15.41it/s]
+2026-05-19 22:57:24
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% 312/312 [00:19<00:00, 16.10it/s]
+2026-05-19 22:57:40
+                   all       4989      42718      0.776      0.604      0.655      0.392
+                person        843       5820      0.726      0.424      0.513      0.221
+                   car       3040      30304      0.904      0.865      0.905      0.611
+            motorcycle        659       1655      0.756      0.545      0.604      0.308
+               bicycle        257        312      0.554       0.26      0.264     0.0842
+                   bus        465       1094      0.899      0.821      0.873      0.635
+                 truck       1264       3533      0.818       0.71      0.768      0.492
+Speed: 0.1ms preprocess, 1.0ms inference, 0.0ms loss, 0.5ms postprocess per image
+
 ### Early Fusion
 300 epochs completed in 19.767 hours.
 Ultralytics 8.3.75 🚀 Python-3.10.12 torch-2.1.0a0+32f93b1 CUDA:0 (NVIDIA GeForce RTX 2080 Ti, 11012MiB)
@@ -661,6 +795,22 @@ val: Scanning /root/.clearml/venvs-builds/3.10/task_repository/3d-net-clearml.gi
 Speed: 0.1ms preprocess, 1.9ms inference, 0.0ms loss, 0.5ms postprocess per image
 
 ### Mid CFT3 Fusion
+300 epochs completed in 67.611 hours.
+Ultralytics 8.3.75 🚀 Python-3.10.12 torch-2.1.0a0+32f93b1 CUDA:0 (NVIDIA GeForce RTX 2080 Ti, 11012MiB)
+YOLO11n-RGBT-midCFT3fusion summary: 705 layers, 13,088,770 parameters, 0 gradients, 978.96 GFLOPs
+val: Scanning /root/.clearml/venvs-builds/3.10/task_repository/3d-net-clearml.git/workspace/dataset_rgbt/visible/val.cache... 4989 images, 1111 backgrounds, 0 corrupt: 100% 4989/4989 [00:00
+2026-05-20 04:06:06
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95):   9% 28/312 [00:05<00:31,  8.99it/s]
+2026-05-20 04:06:37
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% 312/312 [00:33<00:00,  9.24it/s]
+                   all       4989      42718      0.825      0.732      0.785      0.531
+                person        843       5820      0.864      0.672      0.766      0.496
+                   car       3040      30304      0.923      0.889      0.933      0.669
+            motorcycle        659       1655       0.83      0.715      0.802      0.548
+               bicycle        257        312      0.608      0.488      0.486      0.271
+                   bus        465       1094      0.905      0.846      0.898      0.649
+                 truck       1264       3533      0.818      0.783      0.826      0.555
+Speed: 0.2ms preprocess, 3.4ms inference, 0.0ms loss, 0.5ms postprocess per image
 
 ### Late Fusion
 300 epochs completed in 34.823 hours.
