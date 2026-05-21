@@ -3195,6 +3195,73 @@ can be defined, which was set to every 30 frames to avoid performance degradatio
 \chapter{Evaluation}
 \label{chap:evaluation}
 
+\section{Detection Accuracy}
+
+
+% model size with parameters and FLOPS
+
+\section{Embedded Inference Performance}
+
+The inference performance of the compiled models is evaluated by running the detection service
+on the Raspberry Pi 5 with the Hailo-8 accelerator and recording the per-frame inference time
+and frames per second (fps). Power draw is measured simultaneously using an external power supply
+and a custom USB-C cable, as shown in Figure~\ref{fig:power_measurement_setup}.
+The measurements are collected on the train and validation sets of the 3D-Net dataset,
+preceded by a one-minute warm-up period and followed by a two-minute measurement window
+with current and voltage sampled at one-second intervals.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.35\textwidth]{images/power_measurement_setup.jpeg}
+    \caption{
+        Power draw measurement setup for the Raspberry Pi 5.
+    }
+    \label{fig:power_measurement_setup}
+\end{figure}
+
+Figure~\ref{fig:embedded_inference_performance} shows the results, where bar heights represent
+the mean and candlestick error bars indicate the minimum, maximum, 25th percentile, 75th percentile,
+and median. All quantized models achieve real-time performance above the 20\,fps threshold of the 
+camera setup.
+A consistent trend is observable across model sizes. Inference time increases and fps decreases as
+the number of model parameters grows from the single-modality models to the late fusion model.
+The power draw at the 20\,fps cap increases slightly with model size but remains approximately 5\,W
+across all models.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/power_draw.png}\\
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/inference_stats.png}
+    \end{minipage}
+    \caption{
+        Power draw and inference time on the Raspberry Pi 5 running the tracking 
+        service with the compiled detection models.
+    }
+    \label{fig:embedded_inference_performance}
+\end{figure}
+
+The KAT drone is equipped with two 6S LiPo (lithium polymer) batteries with a capacity of 
+12{,}000\,mAh each, where 6S denotes six lithium polymer cells connected in series, with a 
+single cell having a nominal voltage of 3.7\,V, yielding a nominal pack voltage of 
+$6 \times 3.7\,\text{V} = 22.2\,\text{V}$. Connected in parallel, the two packs provide a 
+combined energy of $2 \times 12\,\text{Ah} \times 22.2\,\text{V} \approx 533\,\text{Wh}$. 
+With a measured in-flight power draw of 1{,}600\,W, the theoretical maximum flight time is 
+$533\,\text{Wh} / 1{,}600\,\text{W} \approx 20\,\text{min}$, reducing to roughly 
+$0.75 \times 20\,\text{min} \approx 15\,\text{min}$ when accounting for the recommended 
+75\,\% usable capacity limit of LiPo cells. The 5\,W power draw of the Raspberry~Pi~5 running the detection service 
+represents $5\,\text{W} / 1{,}600\,\text{W} \approx 0.3\,\%$ of the total system power 
+consumption, corresponding to a flight time reduction of under 3 seconds and is therefore 
+negligible.
+
+
+
+
 % Good paper showing quantization and optimization for edge devices evaluation:
 % Human Detection in UAV Thermal Imagery: Dataset Extension
 % and Comparative Evaluation on Embedded Platforms
