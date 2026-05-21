@@ -631,44 +631,15 @@ radar and LiDAR transmit their own energy and record the return signal
     \label{fig:electromagnetic_remote_sensing}
 \end{figure}
 
-Electromagnetic energy encompasses a broad range of radiation, all
-propagating as sinusoidal waves at the constant speed of light
-$c = 3 \times 10^8$~m/s. Each form of radiation is characterized by
-its wavelength $\lambda$, the distance between successive wave peaks,
-and frequency $f$, the number of wave cycles per second,
-which are inversely related through
-\begin{equation}
-    c = \lambda f.
-\end{equation}
-In remote sensing, radiation is typically categorized by wavelength,
-with the micrometer \si{\micro\meter} being the most common unit.
-The resulting electromagnetic spectrum and its named divisions, as
-shown in Figure~\ref{fig:electromagnetic_spectrum}, are organized
-largely by convenience rather than any inherent differences in energy
-characteristics --- the divisions have grown from the different methods
-developed for sensing each type of radiation rather than from
-clear-cut physical boundaries \cite[pp.~4]{lillesand2015remoteSensing}.
-
-
-The spectral sensitivity of the human eye spans only the narrow visible
-portion of the spectrum, from approximately \SI{0.4}{\micro\meter} to
-\SI{0.7}{\micro\meter}, divided into blue (0.4--\SI{0.5}{\micro\meter}),
-green (0.5--\SI{0.6}{\micro\meter}),
-and red (0.6--\SI{0.7}{\micro\meter}). Ultraviolet
-(UV) energy adjoins the blue end of the visible range. Beyond the red
-end lies the infrared (IR) region, subdivided into near-IR
-(0.7--\SI{1.3}{\micro\meter}), mid-IR or shortwave IR
-(1.3--\SI{3}{\micro\meter}), and thermal or longwave IR
-(3--\SI{14}{\micro\meter}), where only the longwave portion is directly
-related to heat sensation, giving it's name.
-At much longer wavelengths, from \SI{1}{\milli\meter} to \SI{1}{\meter},
-lies the microwave region. Most remote sensing systems operate in one
-or several of these regions: optical cameras in the visible, LiDAR
-typically at \SI{1.064}{\micro\meter} in the near-IR
-to avoid interference with
-the atmosphere and other sensors, thermal sensors in the thermal IR,
-and radar in the microwave region.
-\cite[p.~6]{lillesand2015remoteSensing}.
+As illustrated in Figure~\ref{fig:electromagnetic_spectrum},
+the electromagnetic spectrum spans a wide range of radiation bands
+characterized by wavelength. The regions most relevant to remote sensing
+are the visible band (\SIrange{0.4}{0.7}{\micro\meter}), where optical
+cameras operate; the near-infrared, where LiDAR typically operates at
+\SI{1.064}{\micro\meter}; the longwave infrared (LWIR,
+8--\SI{14}{\micro\meter}), used by thermal sensors; and the microwave
+region (\SI{1}{\milli\meter} to \SI{1}{\meter}), where radar operates.
+\cite[pp.~4]{lillesand2015remoteSensing}
 
 \begin{figure}[H]
     \centering
@@ -681,167 +652,31 @@ and radar in the microwave region.
     \label{fig:electromagnetic_spectrum}
 \end{figure}
 
-Figure~\ref{fig:electromagnetic_atmospheric_windows} illustrates the
-interrelationship between energy sources and atmospheric absorption
-characteristics. Figure~\ref{fig:electromagnetic_atmospheric_windows}a
-shows the spectral distribution of energy emitted by the sun and by earth
-features, the two most common natural energy sources in remote sensing. The
-energy of a wave is inversely proportional to its wavelength, meaning
-longer wavelengths carry lower energy content. This has important
-implications for remote sensing. Naturally emitted long-wavelength
-radiation, such as thermal infrared energy,
-is more difficult to sense than shorter-wavelength radiation, such as
-visible light. Consequently, systems
-operating at long wavelengths must view larger areas of the earth at any
-given time to obtain a detectable signal. Conversely, shorter wavelengths
-are easier to detect and provide more detailed information about the
-environment, such as material texture, but are also more susceptible to
-atmospheric absorption and scattering in suboptimal atmospheric conditions.
-\cite[pp.~6, 9, 11]{lillesand2015remoteSensing}
 
-The atmosphere does not transmit all wavelengths equally --- certain
-ranges, known as atmospheric windows, exhibit high transmittance and
-form the basis for remote sensing systems. In
-Figure~\ref{fig:electromagnetic_atmospheric_windows}b, spectral
-regions where the atmosphere blocks energy are shaded, and remote sensing
-data acquisition is restricted to the unshaded windows. Each sensing
-modality exploits a different window. Optical cameras operate in the
-visible range (\SIrange{0.4}{0.7}{\micro\meter}), which coincides with
-both an atmospheric window and the peak of solar energy output
-(Figure~\ref{fig:electromagnetic_atmospheric_windows}c), resulting in
-high-detail imagery under good atmospheric conditions. Thermal sensors
-detect emitted heat energy from the earth, shown by the small curve
-in (a), through windows at \SIrange{3}{5}{\micro\meter} and
-\SIrange{8}{14}{\micro\meter}. Its much lower intensity than solar
-radiation limits spatial detail, but the independence from solar
-illumination is a key advantage for detection in low-light conditions.
-LiDAR operates at
-\SI{1.064}{\micro\meter} in the near-infrared to minimise atmospheric
-interference, overlap with other sensors, and optimise detector material
-efficiency, though its proximity to the visible spectrum makes it more
-susceptible to scattering by fog and aerosols than radar.
-% TODO: needs source (https://www.yellowscan.com/knowledge/why-does-lidar-have-a-specific-wavelength/)
-Radar and passive microwave systems operate through a window spanning
-\SI{1}{\milli\meter} to \SI{1}{\meter}, where they can penetrate clouds
-and function entirely independently of solar illumination.
+Shorter wavelengths provide higher spatial detail and fine-grained information like texture and color, but are more
+susceptible to atmospheric absorption and scattering by fog, rain, and aerosols.
+In contrast, longer wavelengths penetrate adverse weather more effectively but
+provide lower spatial resolution due to their lower energy content 
+and the larger areas they must view in consequence to obtain a detectable signal.
 \cite[pp.~6, 10, 386, 481]{lillesand2015remoteSensing}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{images/electromagnetic_atmospheric_windows.png}
-    \caption{
-        Spectral characteristics of (a) energy sources,
-        (b) atmospheric transmittance, and
-        (c) common remote sensing systems on
-        logarithmic wavelength scale.
-        Modified after
-        \cite[p.~11]{lillesand2015remoteSensing}
-    }
-    \label{fig:electromagnetic_atmospheric_windows}
-\end{figure}
+In the following, the available electromagnetic remote sensing modalities
+are evaluated against the specific requirements of UAV-based vehicle
+detection. The evaluation covers how each modality captures different
+aspects of the environment and how its performance varies under
+different environmental conditions.
 
+\paragraph{Optical Imaging}
 
-An ideal sensor would be highly sensitive to all wavelengths, yielding
-spatially detailed radiance data across the entire electromagnetic
-spectrum and wide areas on the ground. It would be simple and reliable,
-require virtually no power or space, and be accurate and economical to
-operate. Unsurprisingly, no such sensor exists: no single sensor is
-sensitive to all wavelengths or energy levels, and all real sensors have
-fixed limits of spatial, spectral, radiometric, and temporal resolution.
-\cite[p.~46]{lillesand2015remoteSensing}
-Therefore, in the following the available electromagnetic remote sensing modalities are
-evaluated against the specific requirements of UAV-based vehicle
-detection to identify the most suitable option, comparing how each
-captures different aspects of the environment and how their performance
-varies under different environmental conditions.
-
-\paragraph{Visible-band Imaging}
-
-Optical remote sensing is the oldest electromagnetic remote sensing method,
-originating with the invention of photography. We will refer to optical
-remote sensors as cameras. Cameras are passive sensors that capture light
-emitted by one or more sources, possibly reflected from object surfaces
-multiple times, and directed towards the camera through the lens onto the
-image sensor to form an image of the scene
-as illustrated in Figure~\ref{fig:photometric_image_formation}b.
-\cite[p.~66]{szeliski2022computerVision}
+RGB cameras are passive sensors that capture visible light reflected
+from scene objects. A lens projects this light onto a two-dimensional
+array of photosensitive detectors, where each detector is sensitive to
+one of three spectral bands (red, green, or blue). The recorded
+brightness values across all three bands are combined to produce a
+color image.
+\cite[pp.~66, 81, 93]{szeliski2022computerVision}
+\cite[pp.~89, 115]{lillesand2015remoteSensing}
 \cite{agrawal2019comparativeRemoteSensing}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{images/photometric_image_formation_szeliski_2021_lillesand_2015.png}
-    \caption{
-        (a) Spectral characteristics of  Simple lens camera,
-        \cite[p.~89]{lillesand2015remoteSensing}
-        (b) A simplified model of photometric image formation.
-        \cite[p.~66]{szeliski2022computerVision}
-    }
-    \label{fig:photometric_image_formation}
-\end{figure}
-
-The simple lens camera, shown in Figure~\ref{fig:photometric_image_formation}a,
-was developed to increase the amount of light reaching the image sensor within
-a given time, referred to as exposure. It achieves this by using a lens to
-gather light originating from a scene object over a larger area and converge it
-onto a single point on the sensor, provided the camera is properly focused on
-the object. The design and function of modern adjustable
-cameras is conceptually identical to the simple lens camera.
-\cite[pp.~89]{lillesand2015remoteSensing}
-
-To obtain sharp, properly exposed images, the camera must be focused and the
-correct exposure settings must be applied. In modern cameras, focus is achieved
-automatically by adjusting the position of the lens element. Beyond the lens
-itself, modern cameras introduce two additional controls: an adjustable diaphragm
-and an adjustable shutter. The diaphragm controls the diameter of the lens
-opening during exposure, while the shutter controls the duration of exposure.
-\cite[pp.~89]{lillesand2015remoteSensing}
-
-For a given camera and scene, exposure can be varied by changing the shutter
-speed $t$ and/or the lens opening diameter $d$, with various combinations of
-the two yielding equivalent exposures. Short exposure times allow one to freeze
-motion and prevent blurring when photographing moving objects, or when the camera
-itself is moving, as in the case of a UAV-mounted system. However, a shorter
-exposure time requires more light to reach the sensor per unit time, necessitating
-more illumination or a larger lens opening diameter. The largest available lens opening diameter is
-referred to as the lens speed, and determines the minimum exposure time achievable
-under a given lighting condition. A large lens opening diameter allows more light
-to reach the image sensor, making it beneficial under low-light conditions. A small
-lens opening diameter, on the other hand, limits overexposure and yields a larger range of distances over
-which objects appear sharp in the image, known as the depth of field. This is
-because the narrower diaphragm limits the angle of incoming light rays, forcing
-them to converge more directly onto the sensor.
-\cite[pp.~89]{lillesand2015remoteSensing}
-\cite[p.~81]{szeliski2022computerVision}
-
-After light passes through the camera's lens, it reaches the imaging sensor, a
-two-dimensional array of photosensitive semiconductors. When light energy strikes each
-individual detector in this array, it produces a small electrical charge proportional
-to the brightness of the scene at that point. This charge is then converted into a
-voltage, and ultimately into a digital brightness value. However, these sensors are
-inherently monochromatic, so to capture color, each detector is covered by a colored
-filter most commonly arranged in a Bayer pattern (Figure~\ref{fig:bayer_filter}a).
-In this color filter array, half of the filters
-are green, with the remaining half split equally between red and blue. The overrepresentation
-of green takes advantage of both the green peak of solar radiation
-(Figure~\ref{fig:electromagnetic_atmospheric_windows}) and the human visual
-system's greater sensitivity to detail in brightness, which is largely determined by green,
-than in color. Since each detector only records
-one color, the two missing color values at every pixel must be interpolated from neighboring
-detectors of the same color — a process called demosaicing — to produce the final RGB
-image we see (Figure~\ref{fig:bayer_filter}b).
-\cite[pp.~93]{szeliski2022computerVision}
-\cite[pp.~115]{lillesand2015remoteSensing}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\textwidth]{images/bayer_filter_szeliski_2021_computer_vision.png}
-    \caption{
-        Bayer RGB pattern: (a) color filter array layout; (b) Pixel values,
-        with interpolated values shown as lower case
-        \cite[p.~94]{szeliski2022computerVision}
-    }
-    \label{fig:bayer_filter}
-\end{figure}
 
 Cameras are the most widely used remote sensing modality in autonomous
 traffic applications for good reason. RGB cameras offer exceptionally
@@ -896,47 +731,30 @@ of the visible spectrum are explored in the following.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/camera_lighting_defects_collection.png}
+    \vspace{-1em}
     \caption{
         Collection of lighting conditions and environmental factors that
-        negatively impact vehicle detection in camera images, including
-        reflections, sand, rain, snow, and fog \cite{kenk2020dawn},
-        sun glare \cite{yahiaoui2020sunGlareDetection}, backlighting
-        \cite{youngwan2026rasmd}, and low-light night conditions
-        \cite{jia2021llvip}.
-        % TODO: Potentially get better examples from DAWN Dataset as in this
-        % paper showcased in the end: Assessment of Efficient and Cost-Effective Vehicle
-        % Detection in Foggy Weather
+        negatively impact vehicle detection in camera images.
+        ~\cite{kenk2020dawn, yahiaoui2020sunGlareDetection, youngwan2026rasmd, jia2021llvip}
     }
     \label{fig:camera_lighting_defects}
 \end{figure}
 
 
-
-
 \paragraph{Infrared Imaging}
 
-Infrared imaging is a passive remote sensing modality that captures electromagnetic
-radiation in the infrared spectrum, which lies just beyond the visible range. Unlike
-visible-band imaging, which relies on reflected sunlight or artificial illumination,
-infrared sensors detect radiation emitted or reflected by objects themselves. This
-independence from external light sources enables detection both during daylight and
-at night, without reliance on solar illumination. While the optical design principles
-of infrared sensors closely resembles that of optical cameras, the detector array is
-engineered to respond to the longer wavelengths characteristic of infrared radiation.
-The infrared spectrum spans several distinct subregions, each with different physical
-properties and sensing applications, as illustrated in Figure~\ref{fig:IR_spectrum}.
+Infrared imaging is a passive remote sensing modality that captures
+electromagnetic radiation in the infrared spectrum, which lies just
+beyond the visible range. Unlike optical imaging, which relies
+on reflected sunlight or artificial illumination, infrared sensors
+detect radiation emitted by objects themselves. This
+independence from external light sources enables detection both
+during daylight and at night without reliance on solar illumination.
+While the optical design principles of infrared sensors closely
+resemble those of optical cameras, the detector array is engineered
+to respond to the longer wavelengths characteristic of infrared
+radiation.
 \cite[pp.~243]{lillesand2015remoteSensing}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.65\textwidth]{images/IR_radiation_classification_modified.png}
-    \caption{
-        A visualization of the electromagnetic spectrum showcasing
-        different sections attributed to IR wavelengths. Modified after
-        \cite{rizk2025humandDetectionThermalIR}
-    }
-    \label{fig:IR_spectrum}
-\end{figure}
 
 Of particular relevance to infrared imaging is the concept of blackbody radiation.
 All objects emit thermal radiation as a function of their temperature, and the
@@ -956,7 +774,7 @@ temperature relative to, their surroundings such as vehicles and personnel.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{images/spectral_distribution_temperatures_lillesand_2015_remote_sensing.png}
+    \includegraphics[width=0.55\textwidth]{images/spectral_distribution_temperatures_lillesand_2015_remote_sensing.png}
     \caption{
         Spectral distribution of energy radiated from blackbodies
         of various temperatures.
@@ -965,104 +783,58 @@ temperature relative to, their surroundings such as vehicles and personnel.
     \label{fig:black_body_radiation}
 \end{figure}
 
-% TODO: maybe explain graybody radiation and emissivity here, and how it affects the thermal contrast of objects in the scene
-%       lillesand2015remoteSensing page 246 onwards
-% TODO: maybe also explain that the lenses in thermal sensors are made of different materials 
-%       than those in optical cameras, such as germanium or chalcogenide glass, which are 
-%       transparent to infrared radiation but opaque to visible light
-%       because thermal radiation cannot penetrate glass
-% TODO: maybe also explain that thermal sensors typically have lower spatial resolution than 
-%       optical cameras due to the longer wavelengths and the need for larger detector 
-%       elements (microbolometers), which can limit the level of detail in the captured images
-
-To demonstrate the applicability of long-wave infrared sensing to vehicles under realistic
-conditions, outdoor thermal measurements were conducted on two structurally identical models,
-the Volkswagen e-Golf and the Volkswagen Golf 1.5 TSI. Thermographic images were acquired
-after 30 minutes of city driving at low ambient temperatures of 5~$^\circ$C and $-1~^\circ$C.
-The resulting thermograms, shown in Figure~\ref{fig:vehicle_thermal_radiation}, include views
-of the front hood and mask area as well as the side regions, and capture spatial
-temperature variations across the vehicle body and its surroundings. In particular, the hood
-area of the combustion engine vehicle exhibits a more pronounced temperature increase,
-whereas the electric vehicle's front surface remains closer to ambient temperature. In both
-cases, additional heat signatures such as warmed tires, wheel arches, fenders, headlights,
-tail lights, and windows are visible. The windows appear warmer because the vehicle interior
-is heated, allowing more thermal radiation to be transmitted through the glass. Together,
-these characteristic regions provide stable and detectable thermal patterns in operating
-vehicles for infrared-based detection.
+As shown in Figure~\ref{fig:vehicle_thermal_radiation}, thermographic measurements 
+of the Volkswagen e-Golf and Golf 1.5TSI after 30 minutes of city driving 
+at 5$^\circ$C and $-1~^\circ$C reveal characteristic heat patterns across 
+both vehicles. The combustion engine's hood exhibits a pronounced temperature 
+increase, while the electric vehicle's front surface remains near ambient 
+temperature. Additional signatures from tires, wheel arches, headlights, and 
+windows provide stable and detectable thermal patterns for infrared-based vehicle detection.
 \cite{svorc2020detectionElectricVehicleThermal}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/vehicle_thermal_radiation_tichy_2021_thermal_vehicle_feature_detection.png}
+    \vspace{-1em}
     \caption{
-        Example of outdoor thermal measurements of the \textit{Volkswagen e-Golf} and
-        the \textit{Volkswagen Golf 1.5 TSI}. Thermograms
-        show front and side views of (a) the electric vehicle and (b) the combustion
-        engine vehicle after 30 minutes of city driving. Modified after
+        Example of thermal measurements of the \textit{Volkswagen e-Golf} and
+        \textit{Volkswagen Golf 1.5 TSI} after 30 minutes of city driving. Modified after
         \cite{svorc2020detectionElectricVehicleThermal}
     }
     \label{fig:vehicle_thermal_radiation}
 \end{figure}
 
 
-Thermal imaging in the long-wave infrared spectrum overcomes
-many of the limitations of visible-band imaging previously illustrated
-in Figure~\ref{fig:camera_lighting_defects}. Unlike RGB sensors, LWIR
-cameras are unaffected by changes in visible illumination, enabling
-reliable detection of vehicles and pedestrians in low-light and
-nighttime conditions. In full darkness, LWIR is the only passive
-sensor capable of pedestrian detection. In foggy conditions, LWIR
-similarly maintains reliable detection where visible-band cameras
-fail, as illustrated in Figure~\ref{fig:comparison_recognition_vis_lwir}.
-Since LWIR cameras are inherently insensitive to visible light, they
-are equally immune to glare from direct sunlight, vehicle headlights,
-reflections, and high-contrast backlighting, all of which can cause
-overexposure and loss of detail in visible-band
-imagery.
+LWIR imaging overcomes many of the limitations of optical imaging
+previously illustrated in Figure~\ref{fig:camera_lighting_defects}.
+Unlike RGB sensors, LWIR cameras are unaffected by visible illumination,
+enabling reliable detection of vehicles and pedestrians in low-light,
+nighttime, and foggy conditions. In full darkness, LWIR is the only
+passive sensor capable of pedestrian detection. LWIR cameras are
+equally immune to glare from direct sunlight, vehicle headlights,
+reflections, and high-contrast backlighting, all of which cause
+overexposure and loss of detail in optical imagery, as illustrated
+in Figure~\ref{fig:comparison_recognition_vis_nir_swir_lwir}.
 \cite{pinchon2018allWeatherVision}
 
+Compared to NIR and SWIR, LWIR performs better in adverse weather.
+In fog combined with oncoming headlights, VIS, NIR, and SWIR sensors
+experience glare that renders vehicle recognition impossible, while
+LWIR maintains consistent detection regardless of headlight state.
+Due to its longer wavelength, LWIR is less susceptible to
+atmospheric scattering from fog, snow, and
+sand~\cite{pinchon2018allWeatherVision}. Nevertheless, water vapor
+in fog and rain absorbs and scatters infrared radiation, which reduces
+thermal contrast and detection range in very dense
+fog~\cite{rivera2022analysisThermalExtremeFog}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/comparison_recognition_vis_lwir_rivera2022_iwasaki2013.png}
+    \includegraphics[width=0.9\textwidth]{images/comparison_recognition_vis_nir_swir_lwir_pinchon2018allWeatherVision.png}
     \caption{
-        Comparison of visible and thermal imagery under challenging
-        conditions. Left: foggy conditions, where a vehicle is clearly
-        visible in the thermal image but almost entirely obscured in
-        the visible image~\cite{iwasaki2013robustVehicleDetection}.
-        Right: nighttime conditions, where a pedestrian and a distant
-        vehicle are visible in the thermal image but hidden in the
-        visible image~\cite{rivera2022analysisThermalExtremeFog}.
-    }
-    \label{fig:comparison_recognition_vis_lwir}
-\end{figure}
-
-Compared to NIR and SWIR, LWIR also performs better in adverse
-weather. In fog combined with oncoming headlights, VIS, NIR, and SWIR
-sensors are susceptible to glare severe enough to render vehicle
-recognition impossible. LWIR delivers more consistent recognition
-results regardless of whether a vehicle's headlights are on or off.
-Due to its longer wavelength, LWIR is less affected by atmospheric
-scattering from fog, snow, and sand than NIR, SWIR, and visible-band
-cameras~\cite{pinchon2018allWeatherVision}. However, LWIR is not
-entirely immune to atmospheric degradation. Water vapor in fog and
-rain absorbs and scatters infrared radiation, reducing thermal
-contrast and detection range in very dense
-fog~\cite{rivera2022analysisThermalExtremeFog}. LWIR should therefore
-be regarded as more robust than visible, NIR, and SWIR imaging under
-adverse conditions, rather than completely unaffected by them. These
-properties are illustrated in
-Figure~\ref{fig:comparison_recognition_vis_nir_swir_lwir}.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{images/comparison_recognition_vis_nir_swir_lwir_pinchon2018allWeatherVision.png}
-    \caption{
-        Comparison of VIS, NIR, SWIR, and LWIR imagery under adverse
-        conditions. Top: glare effects from oncoming headlights across
-        all four spectral bands. Bottom: images recorded in a fog
-        tunnel with the four different cameras. Modified
-        after~\cite{pinchon2018allWeatherVision}.
+        VIS, NIR, SWIR, and LWIR imagery under adverse conditions: glare
+        from oncoming headlights (top) and fog tunnel recordings
+        (bottom). Modified after~\cite{pinchon2018allWeatherVision}.
     }
     \label{fig:comparison_recognition_vis_nir_swir_lwir}
 \end{figure}
@@ -1087,21 +859,6 @@ little \cite{stlaurent2007combinationColorThermal, choi2018kaist}. In summer, th
 reduce the temperature contrast between vehicles and background as the entire scene heats up,
 lowering thermal
 performance precisely when optical cameras perform very well under clear-sky conditions.
-An illustrative example is shown in Fig.~\ref{fig:thermal_contrast_sunny_rainy}, where the reduction
-in thermal contrast during rain and sunny days is clearly visible \cite{bustos2023reviewObjectDetectionIR}.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{images/thermal_showcase_modified.png}
-    \caption{
-        Example of Thermal and Thermal MSX (multispectral with embedded
-        visual spectrum edges) images. All the images are from the
-        same scene taken on a sunny morning, sunny afternoon , and
-        rainy morning.
-        \cite{bustos2023reviewObjectDetectionIR}
-    }
-    \label{fig:thermal_contrast_sunny_rainy}
-\end{figure}
 
 
 \paragraph{LiDAR}
@@ -1129,47 +886,6 @@ safety consideration \cite{royo2019overviewLiDARAutonomousVehicles}.
     \label{fig:lidar_point_cloud}
 \end{figure}
 
-Three main measurement approaches exist: pulsed time-of-flight (TOF),
-amplitude-modulated continuous wave (AMCW), and frequency-modulated
-continuous wave (FMCW). Pulsed TOF is currently the most widely used
-technology in automotive LiDAR systems and is therefore the focus of this
-section.
-\cite{royo2019overviewLiDARAutonomousVehicles}
-In pulsed TOF LiDAR, a short laser pulse is emitted toward a target. The
-system records the elapsed time until the reflected echo returns to the
-detector. Since the speed of light $c$ is a known constant, the range $R$ to
-the target is computed as:
-
-\begin{equation}
-    R = \frac{1}{2} \cdot c \cdot t_{\mathrm{TOF}}
-    \label{eq:lidar_range}
-\end{equation}
-
-where $t_{\mathrm{TOF}}$ is the round-trip travel time of the pulse. The
-factor of two accounts for the pulse travelling the distance to the target
-twice: once on the outward path and once on the return path. This principle
-is illustrated in Figure~\ref{fig:lidar_tof}.
-The ambiguity distance arises when a second pulse is
-emitted before the echo of the first has returned. In this case, the system
-cannot reliably assign the echo to the correct pulse. To avoid this, each
-new pulse must be transmitted only after the return of the previous one has
-been received. The ambiguity
-distance is therefore inversely related to the pulse repetition rate, which
-can be seen in Equation~\ref{eq:lidar_range}.
-\cite[pp.~25]{wang2024introductionLiDARRemoteSensing}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{images/lidar_tof_wang_2024_introduction_lidar.png}
-    \caption{
-        Pulsed time-of-flight measurement principle. A laser pulse is
-        emitted toward the target and the round-trip travel time
-        $t$ of the reflected echo is measured to determine
-        the range $R$.
-        \cite{royo2019overviewLiDARAutonomousVehicles}
-    }
-    \label{fig:lidar_tof}
-\end{figure}
 
 
 Two factors constrain the maximum measurable object recognition range in LiDAR systems.
@@ -1205,107 +921,42 @@ under adverse weather conditions.
     \label{fig:fog_chamber_rgb_lidar_radar}
 \end{figure}
 
-The second factor limiting the maximum object recognition range is the sparsity
-and limited information content of point clouds. Unlike RGB images, point clouds
-lack rich semantic cues such as texture and color information, which limits
-object recognition capabilities compared to camera-based methods.
-Beyond this, the structure of point cloud data itself
-poses difficulties. Unlike the regular 2D pixel grid of a camera image, 3D
-points are unordered and lack fixed neighborhoods, making local feature
-extraction sensitive to small perturbations, especially at larger distances.
-This is further compounded by sparsity, which is severely imbalanced
-across objects and worsens with distance, as illustrated in
-Figure~\ref{fig:sparse_point_cloud}. At greater distances,
-fewer points are captured and spatial shapes become increasingly
-incomplete, causing small or thin objects like pedestrians to be
-potentially missed entirely.
+The second factor limiting object recognition range is the limited
+information content of point clouds. Unlike RGB images, point clouds
+lack texture and color information, and their sparsity worsens with
+distance, making it difficult to recognize objects at longer ranges.
 \cite{wang2023lidarOnly3DObjectDetection}
 \cite{qi2020imvotenet}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{images/sparse_point_cloud_wang_2023_3d_only_detection.png}
-    \caption{
-        Sparse point cloud distribution of vehicles at increasing distances.
-        \cite{wang2023lidarOnly3DObjectDetection}
-    }
-    \label{fig:sparse_point_cloud}
-\end{figure}
-
 \paragraph{Radar}
 
-The basic operating principle of imaging radar (Radio Detection and Ranging) is
-largely similar to that of LiDAR systems. While LiDAR emits laser pulses in the
-near-infrared spectrum and detects the reflected light using photodetectors, radar
-systems transmit radio waves in the microwave range and detect the reflected signals
-using antennas.
-Imaging radar emits short microwave pulses in a narrow beam from its antennas. These
-waves propagate through space, reflect off objects, and return as echoes, as illustrated
-in Figure~\ref{fig:radar_principle}. The received signals are then processed by the
-radar receiver, where the signal processing chain is largely based on the Fourier
-transform, which converts the raw wave signals measured by antenna arrays
-into spatial and motion-related information. From this processing, the range of
-objects is estimated from the time delay of the returned signal, while the signal
-strength provides information about the reflectivity of targets, which depends on
-properties such as size, shape, and material. In addition, the relative radial velocity of
-objects can be estimated using the Doppler shift of the returned signal.
-To localize objects in the environment, angular
-information is obtained from the antenna array geometry using phase differences
-across antennas, which allows estimation of the
-vertical angle (elevation) along the vertical antenna dimension and the horizontal
-angle (azimuth) along the horizontal antenna dimension.
+The basic operating principle of imaging radar (Radio Detection and
+Ranging) is largely similar to that of LiDAR systems. While LiDAR
+emits laser pulses in the near-infrared spectrum, radar transmits
+short microwave pulses and detects the reflected signals using
+antennas. The range of objects is estimated from the time delay of
+the returned signal, their radial velocity from the Doppler shift,
+and their angular position from phase differences across the antenna
+array, which allows estimation of both azimuth (horizontal) and 
+elevation (vertical) angles.
 \cite[pp.~389, 400]{lillesand2015remoteSensing}
 \cite{kurniawan2023clusterfusionRadarCamera3DObjectDetection}
 \cite{srivastav2023radarsAutonomousDriving}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{images/radar_principle_lillesand_2015_remote_sensing.png}
-    \caption{
-        Operating principle of imaging radar: (a) propagation of one radar
-        pulse wavefront location at multiple time intervals; (b) resulting
-        antenna return.
-        Modified after \cite[p.~390]{lillesand2015remoteSensing}.
-    }
-    \label{fig:radar_principle}
-\end{figure}
-
-Radar data can be represented in several formats extracted at different
-stages of the Fourier-transform-based signal processing chain, including
-the range-azimuth-Doppler (RAD) tensor, range-azimuth heatmap, point cloud,
-and micro-Doppler spectrogram (rarely used for object detection because it
-does not provide spatial information), as illustrated in Fig.~\ref{fig:radar_formats}.
-Modern 4D radars capture observations across range, Doppler, azimuth, and elevation,
-producing a four-dimensional radar tensor. Earlier 3D radar systems commonly
-store observations in a three-dimensional range-azimuth-Doppler tensor,
-where measurements are averaged over the elevation dimension if present.
-This representation allows object position, speed, and coarse 2D shape to
-be inferred directly from the tensor, because the azimuth and elevation
-resolution are typically low.
-Due to their large size, RAD tensors are impractical for deep learning and
-are often compressed. A common example is
-the range-azimuth heatmap, which forms a 2D radar image (top-down view) by
-collapsing the Doppler dimension. Each bin contains the amplitude of the
-observations as seen in Figure~\ref{fig:range_azimuth_heatmap},
-occasionally including collapsed Doppler information. This
-representation still enables localization of objects in the top-down view,
-but loses the ability to represent multiple velocities at the same spatial
-location, retaining only an average Doppler estimate per location.
+Radar data can be represented in several formats, including the
+range-azimuth-Doppler (RAD) tensor, the range-azimuth heatmap, and
+point clouds. The RAD tensor captures observations across range,
+Doppler, azimuth, and elevation, and allows object position, speed,
+and coarse 2D shape to be inferred directly. Due to their large size,
+RAD tensors are often compressed into a range-azimuth heatmap, which
+forms a 2D radar image in a top-down view by collapsing the Doppler
+dimension, as seen in Figure~\ref{fig:range_azimuth_heatmap}. Radar
+point clouds consist of sparse 3D data points extracted as amplitude
+peaks from the RAD tensor, where each point encodes the 3D position
+of the detection and its radial velocity. Point clouds are commonly
+represented in a bird's eye view (BEV) for top-down observation or
+in a perspective view from the sensor's viewpoint.
 \cite{srivastav2023radarsAutonomousDriving}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{images/radar_formats_2023_srivastav_radars_autonomous_vehicles.png}
-    \caption{
-        Commonly used radar data formats:
-        (a) Range-Azimuth-Doppler tensor,
-        (b) Range-Azimuth heatmap,
-        (c) Radar point cloud showing strong observations from the radar cube,
-        (d) Micro-Doppler spectrogram capturing temporal variations of object motion.
-        \cite{srivastav2023radarsAutonomousDriving}
-    }
-    \label{fig:radar_formats}
-\end{figure}
 
 \begin{figure}[H]
     \centering
@@ -1318,44 +969,6 @@ location, retaining only an average Doppler estimate per location.
         \cite{wang2021rodnetRadarObjectDetection}
     }
     \label{fig:range_azimuth_heatmap}
-\end{figure}
-
-While the formats mentioned above are commonly used to represent radar data,
-object detection commonly relies on radar point clouds for input data. The
-point cloud represents relevant observations within the radar cube as a sparse
-set of data points in 3D space, since objects typically occupy only small
-subspaces of the radar tensor. Each point corresponds to a peak in the radar
-tensor obtained using a constant false alarm rate (CFAR) peak extraction
-algorithm. CFAR classifies a cell in the radar cube as containing a signal, that
-is an echo, if its amplitude relative to the average noise floor computed from
-surrounding cells exceeds a predefined threshold. Each point in the cloud
-contains both spatial features describing its 3D location consisting of range,
-azimuth, and elevation if present, and radar specific attributes such as radial
-velocity.
-\cite{srivastav2023radarsAutonomousDriving}
-
-Radar point clouds are represented either in a bird's eye view (BEV) or in a
-perspective view, as illustrated in Figure~\ref{fig:radar_point_cloud_formats}.
-In the BEV representation, points are accumulated in a top down grid that includes
-observations even when they are occluded. In contrast, the perspective view
-represents the radar data from the viewpoint of the radar sensor and is similar
-to camera images from the ego vehicle, but with an additional depth feature and
-an associated velocity assigned to each pixel. However, radar
-perspective images have low and irregular spatial resolution due to the limited
-azimuth and elevation resolution of radar sensors. Moreover, the capability to
-capture occluded objects is lost in the perspective view.
-\cite{srivastav2023radarsAutonomousDriving}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{images/radar_point_cloud_formats_2023_srivastav_radars_autonomous_vehicles.png}
-    \caption{
-        Radar point cloud data input formats used for deep learning
-        models. The bird-eye view (BEV) (a) in a top-down grid,
-        while the perspective view (b) projects data as seen from an image.
-        \cite{srivastav2023radarsAutonomousDriving}
-    }
-    \label{fig:radar_point_cloud_formats}
 \end{figure}
 
 Overall, radar sensors provide high resolution information about object distance
@@ -1395,24 +1008,11 @@ recognition very difficult when radar data is used alone and often
 requires fusion with complementary sensors such as cameras or LiDAR,
 which limits the overall weather robustness to that of the fused sensors.
 In addition, the large radar wavelength can cause nearby surfaces, such as
-the ground or guardrails, to act as specular reflectors (i.e. mirrors),
-producing spurious observations in radar data known as clutter, as seen in
-Figure~\ref{fig:radar_multipath_clutter}, which may result in false positives.
+the ground or guardrails, to act as specular reflectors, producing spurious
+observations in radar data known as clutter that may result in false positives.
 \cite{kurniawan2023clusterfusionRadarCamera3DObjectDetection}
 \cite{karangwa2023reviewVehicleDetectionAutonomousDriving}
 \cite{srivastav2023radarsAutonomousDriving}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{images/radar_multipath_2023_srivastav_radars_autonomous_vehicles.png}
-    \caption{
-        Three multipath effects caused by reflections that produce spurious radar
-        observations with incorrect path length, velocity, or location:
-        (a) double bounce, (b) underbody reflections, and (c) mirrored ghost detections.
-        \cite{srivastav2023radarsAutonomousDriving}
-    }
-    \label{fig:radar_multipath_clutter}
-\end{figure}
 
 Table~\ref{tab:modality_comparison} summarizes the main
 advantages and disadvantages of the evaluated sensing
@@ -2272,7 +1872,7 @@ summarizes the characteristics of all discussed datasets.
 
     \setlength{\tabcolsep}{2pt}
     \begin{adjustbox}{center, scale=0.8}
-        \begin{tabular}{|C{2.5cm}|C{2cm}|C{1.8cm}|C{2.5cm}|C{1.6cm}|C{1.8cm}|C{1.5cm}|C{1.2cm}|C{1.8cm}|C{1.6cm}|}
+        \begin{tabular}{|C{2.5cm}|C{2.2cm}|C{1.8cm}|C{2.5cm}|C{1.6cm}|C{1.8cm}|C{1.5cm}|C{1.2cm}|C{1.8cm}|C{1.6cm}|}
             \hline
             \textbf{Dataset}                                                      & \textbf{Modality} & \textbf{Capture Setup} & \textbf{Perspective}     & \textbf{Altitude (m)} & \textbf{Vehicle Classes} & \textbf{Person} & \textbf{Night} & \textbf{Adverse Weather} & \textbf{Images} \\
             \hline
@@ -2300,15 +1900,15 @@ summarizes the characteristics of all discussed datasets.
             \hline
             FLIR ADAS v2 \cite{teledyne_2022_flirAdasV2Dataset}                   & RGB+T             & Vehicle                & Forward                  & \textemdash           & 9                        & \checkmark      & \checkmark     & \checkmark               & 26,442          \\
             \hline
-            KAIST ADAS \cite{choi2018kaist}                                       & RGB+T+Depth       & Vehicle                & Forward                  & \textemdash           & 1                        & \checkmark      & \checkmark     & \textemdash              & 95,000          \\
+            KAIST ADAS \cite{choi2018kaist}                                       & RGB+T+D       & Vehicle                & Forward                  & \textemdash           & 1                        & \checkmark      & \checkmark     & \textemdash              & 95,000          \\
             \hline
             M3FD \cite{liu2022m3fdDataset}                                        & RGB+T             & Vehicle                & Forward                  & \textemdash           & 5                        & \checkmark      & \checkmark     & \checkmark               & 4,200           \\
             \hline
             MSRS \cite{tang2022piafusionMSRSDataset}                              & RGB+T             & Vehicle                & Forward                  & \textemdash           & 1                        & \checkmark      & \checkmark     & \textemdash              & 1,444           \\
             \hline
-            Infraparis \cite{franchi2024infraparisRGBDepthThermalDataset}         & RGB+T+Depth       & Vehicle                & Forward                  & \textemdash           & 6                        & \checkmark      & \checkmark     & \textemdash              & 12,084          \\
+            Infraparis \cite{franchi2024infraparisRGBDepthThermalDataset}         & RGB+T+D       & Vehicle                & Forward                  & \textemdash           & 6                        & \checkmark      & \checkmark     & \textemdash              & 12,084          \\
             \hline
-            Multispectral \cite{takumi2017multispectralDatasetAutonomousVehicles} & RGB+T+NIR+MIR     & Vehicle                & Forward                  & \textemdash           & 3                        & \checkmark      & \textemdash    & \textemdash              & 7,512           \\
+            Multispectral \cite{takumi2017multispectralDatasetAutonomousVehicles} & RGB+T +NIR+MIR     & Vehicle                & Forward                  & \textemdash           & 3                        & \checkmark      & \textemdash    & \textemdash              & 7,512           \\
             \hline
             RASMD \cite{youngwan2026rasmd}                                        & RGB+SWIR          & Vehicle                & Forward                  & \textemdash           & 5                        & \checkmark      & \textemdash    & \checkmark               & 100,000         \\
             \hline
@@ -3534,7 +3134,7 @@ service from downstream applications.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{images/detection_service_flow_nunito.png}
+    \includegraphics[width=\textwidth]{images/detection_service_flow_nunito.png}
     \caption{
         The information flow of the vehicle detection service with the major classes and their interactions.
     }
