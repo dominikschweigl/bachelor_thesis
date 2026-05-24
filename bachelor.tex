@@ -195,6 +195,35 @@
 \addcontentsline{toc}{chapter}{Abstract}
 
 \begin{otherlanguage*}{english}
+Fixed ground-level traffic sensors provide limited spatial coverage, and extension to rural
+or mountainous terrain is costly. Unmanned aerial vehicle (UAV) swarms can cover large road
+segments continuously at lower deployment cost. Reliable vehicle detection across the full
+outdoor operating range is therefore required. Visible-spectrum cameras fail in low light and
+adverse weather. Thermal infrared cameras capture heat emitted by vehicles independently of
+ambient illumination, and a combined RGB and LWIR sensor system thus extends detection
+robustness beyond single-modality approaches.
+
+This thesis presents a combined RGB-thermal vehicle detection and tracking pipeline for the
+3D-Net UAV traffic monitoring project. The system runs on a Raspberry Pi~5 paired with a
+Hailo-8 neural processing unit, mounted on a twinFOLD KAT hexacopter operating alongside
+road segments at low altitude. Seven fusion architectures are trained on a pool of four 
+datasets comprising 61,055 paired images, including
+the newly collected 3D-Net dataset, a low-altitude oblique RGB-LWIR benchmark with 12,263
+image pairs. All models are evaluated at full precision and after INT8 quantization on the
+Hailo-8 accelerator.
+
+All compiled fusion architectures exceed the 20\,fps camera frame rate on the Hailo-8 at
+approximately 5\,W system power draw, under 0.3\,\% of total UAV power. Among the compiled
+architectures, late fusion provides the most favorable balance of detection accuracy
+and quantization robustness. Fusion models improve over the RGB-only
+baseline by 5 to 7 percent mAP50 under adverse weather and up to 9 percent at night. INT8
+quantization introduces a 0.1 to 5 percent mAP50 reduction for compiled fusion models.
+ByteTrack is selected as the tracker and achieves a HOTA of 0.946 at 0.36\,ms per frame on
+the Raspberry Pi~5 CPU. The end-to-end pipeline reaches a HOTA of 0.747 on the test set.
+
+To the best of our knowledge, this work presents the first systematic comparison of multiple
+RGB-LWIR fusion architectures under INT8 quantization on a dedicated edge accelerator for
+aerial vehicle traffic monitoring.
 \end{otherlanguage*}
 
 
@@ -2112,13 +2141,24 @@ required dataset assets at runtime from the S3 bucket through FiftyOne.
 
 \subsection{Dataset Statistics}
 
-For the Visdrone Dronevehicle dataset, the bounding box annotations on the
-thermal images are used instead of the RGB images, as these are a superset
-of the RGB annotations.
+The combined dataset pool consists of 61,055 aligned RGB-thermal image pairs 
+with 715,534 bounding box annotations across six classes. Figure~\ref{fig:dataset_class_distribution} 
+shows the distribution of images, annotations, and class instances across the 
+train, validation, and test splits per dataset. The annotation count is skewed 
+towards the DroneVehicle dataset, while the 3D-Net dataset contributes the 
+fewest annotations. Despite this imbalance, the 3D-Net dataset provides data 
+from the specific side-view perspective, flight height, and operational conditions of the target application, 
+which the other datasets do not cover. The image count is more balanced across datasets. 
+The large variation in annotation counts stems from differences in annotation density 
+between datasets. In terms of image count, the M3FD dataset is the smallest. 
+The car class dominates the class distribution, driven by the large number of car 
+annotations in the DroneVehicle dataset. The bus, truck, motorcycle, and person classes 
+are well represented. The bicycle class is underrepresented, with only 2,898 instances 
+across the entire dataset pool.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.65\textwidth]{images/dataset_combined.png}
+    \includegraphics[width=\textwidth]{images/dataset_combined.png}
     \caption{
         Per-dataset image counts (top left) and annotation counts (bottom left) broken down by train, validation, and test split.
         Instance counts per merged vehicle class across all datasets in the pool (right), with class mapping given in Table~\ref{tab:dataset_class_merge}.
@@ -2126,15 +2166,12 @@ of the RGB annotations.
     \label{fig:dataset_class_distribution}
 \end{figure}
 
-
 % TODO:
 % Evaluation of the dataset, including statistics on the number of images, distribution of classes, and examples of challenging scenarios (e.g., low-light, occlusions, weather conditions).
 % Inspire the evaluation from other dataset papers that I used to create
 % the training dataset
 
 % Include the showcase of the challenging samples of the included public datasets, e.g. the ones shown in RTDOD and M3FD.
-
-
 
 \newpage
 \chapter{Object Detection}
@@ -2314,18 +2351,6 @@ along two dimensions, namely the input features and the fusion function.
 Accordingly, multi-modality fusion can be split into two levels,
 selecting input features at the macro level, and constructing
 the fusion function at the micro level.~\cite{qingyun2021CFT}
-
-% TODO: Maybe investigate these:
-% Very good paper for fusion approaches:
-% Human Detection in UAV Thermal Imagery: Dataset Extension
-% and Comparative Evaluation on Embedded Platforms
-
-% TODO: Maybe use this as citation to write that fusion can degrade performance as
-% the fused features can get worse if one modality detects something and the other does not
-% then the missing modality can degrade the one with good visibility
-% Fusion Degradation - Rethinking Multi-modal Object Detection from the Perspective of
-% Mono-Modality Feature Learning (Drive)
-
 
 \subsection{Macro level feature fusion}
 
@@ -2795,34 +2820,28 @@ characteristics of this application with small relatively fast moving objects~\c
 
 \section{Model Training Pipeline}
 
-% TODO: include training details like this:
-% We use an stochastic gradient descent (SGD) optimizer with
-% an initial learning rate of 1e-2, a momentum of 0.937, and
-% a weight decay of 0.0005. All models are trained on two
-% NVIDIA® TITAN RTX™ GPUs for 200 epochs with a batch
-% size of 32. In pursuit of better performance, we adopt the
-% YOLOV5 model pre-trained on the COCO dataset [41] as
-% weight initialization. As for data augmentation, we use the
-% Mosaic method [42] which mixes four training images in one
-% image
-
 For the model training pipeline, we use the open-source MLOps platform ClearML to orchestrate and
 monitor the training process. ClearML provides experiment tracking, remote task execution, dataset
 versioning, and a web-based dashboard for visualizing metrics and comparing runs. It wraps existing
 training code with minimal changes, automatically logging hyperparameters, model artifacts, and
 performance curves throughout each experiment. The training tasks are dispatched to GPU workers
 hosted on Bernard's GPU Rack, which retrieve the training dataset from the S3 bucket through FiftyOne
-at runtime. The workers were using the 10 core Intel Xeon Silver 4210 CPUs and NVIDIA RTX 2080 Ti GPUs
-with 11 GB of VRAM, which allows us to train the YOLOv11n model with a batch size of 32 and an image size
-of 640x640.  The experiment logs, training artifacts, metrics, and debugging samples with visualized
-detections as well as well prepared plots created
-in the training application code and stored in the self-hosted ClearML server after each training run,
-which allows easy comparison and analysis of different training runs through the ClearML web interface
-with organized storage. Example views of the ClearML web interface for a training run are shown in Figure~\ref{fig:clearml_dashboard}.
-All training code, including dataset loading, model definition, and training
-loops, is implemented in Python, configuration, and environment files, that are built into docker images
-stored on an Azure container registry, where the ClearML workers execute the corresponding task docker
-container on the GPU Rack.
+at runtime. The workers use 10-core Intel Xeon Silver 4210 CPUs and NVIDIA RTX 2080 Ti GPUs with
+11 GB of VRAM. We use a stochastic gradient descent (SGD) optimizer with an initial learning rate of
+0.01, a momentum of 0.937, and a weight decay of 0.0005. All models are trained for 300 epochs with
+a batch size of 32 and an input resolution of 640x640 pixels. The single-modality YOLOv11n models are
+initialized with weights pre-trained on the COCO dataset, while the multimodal RGBT fusion variants
+are initialized by loading those same pretrained weights into the custom dual-branch architecture.
+For data augmentation, we employ Mosaic augmentation, random horizontal flipping (p = 0.5), HSV
+color-space jitter, and random scaling. The experiment logs, training artifacts, metrics, and debugging
+samples with visualized detections as well as well prepared plots created in the training application
+code are stored in the self-hosted ClearML server after each training run, which allows easy comparison
+and analysis of different training runs through the ClearML web interface with organized storage.
+Example views of the ClearML web interface for a training run are shown in
+Figure~\ref{fig:clearml_dashboard}. All training code, including dataset loading, model definition, and
+training loops, is implemented in Python, configuration, and environment files, that are built into
+Docker images stored on an Azure container registry, where the ClearML workers execute the
+corresponding task Docker container on the GPU Rack.
 
 \begin{figure}[H]
     \centering
@@ -3404,20 +3423,30 @@ in Appendix~\ref{chap:detection_accuracy_tables}.
 \end{figure}
 
 To evaluate the performance of the models on different weather and lighting conditions, the mAP
-metrics are computed separately for the adverse weather and night samples of the RTDOD dataset.
+metrics are computed separately for the adverse weather and night samples of the RTDOD dataset
+for the models trained on the data pool and RTDOD dataset respectively.
 The results are shown in Figure~\ref{fig:model_performance_by_condition} and numeric results
 are listed in Table~\ref{tab:acc_weather_night}.
-The best fusion models trained on the combined dataset show a performance improvement
-over the RGB model on both adverse weather (3-4\% mAP50) and night conditions (7-9\% mAP50).
+The best RTDOD-trained fusion models improve over the RGB model by 5--7\% mAP50 on
+adverse weather and up to 4\% on night conditions.
+The combined-dataset models show smaller gains on adverse weather (3--4\% mAP50) but
+larger gains on night conditions (6--9\% mAP50).
 The thermal modality alone performs worse than the RGB and fusion models on both conditions,
-which shows that the complementary information from both modalities combined provides
-a consistent benefit also for night and adverse weather conditions.
+which is of the fact that most vehicles in the night samples are small and the thermal modality
+is worse at small object detection as previously seen in Figure~\ref{fig:model_performance_by_size}.
 The midCMA3 and midCFT3 micro-fusion approaches slightly improve detection accuracy
-over the standard mid-fusion (0.2\%-0.7\% mAP50) on the adverse weather samples, slightly
+over the standard mid-fusion (0.2\%-0.7\% mAP50) on the adverse weather samples for 
+the data pool models, slightly
 improving over late fusion in these conditions,
-but leave the night performance unchanged.
-For the night samples, the late fusion model has roughly 3\% lower mAP50
-than the mid fusion models and the score fusion model achieved the best performance.
+but leave the night performance unchanged, while also this is not present for 
+the RTDOD models, where here the mid fusion performs better.
+For night samples, the late fusion model has roughly 3\% lower mAP50
+than the mid fusion models and the score fusion model achieved the best performance
+for the data pool models while the mid fusion variant shows best performance for the RTDOD models.
+The combined-dataset models show a mean performance decrease of 3--5\% in both mAP50
+and mAP50:95 relative to the RTDOD-trained models across all conditions.
+The early fusion model is an outlier with decreases of 8--10\%, while the score fusion
+model shows no consistent decrease and is slightly positive on some conditions.
 
 \begin{figure}[H]
     \centering
@@ -3431,20 +3460,37 @@ than the mid fusion models and the score fusion model achieved the best performa
 
 
 
-Three of the trained fusion models, specifically midCMA3, midCFT3, and score
-fusion, could not be compiled for the Hailo-8 due to hardware incompatibilities
-detailed in Section~\ref{sec:hailo_compilation}.
-The quantization evaluation therefore covers only the models for which
-compilation succeeded.
+Three of the trained fusion models (midCMA3, midCFT3, and score fusion) could not
+be compiled for the Hailo-8 due to hardware incompatibilities detailed in
+Section~\ref{sec:hailo_compilation}.
+The quantization evaluation therefore covers only the models for which compilation
+succeeded.
 
-For the remaining models that were successfully compiled, the performance drop due
-to quantization is shown in
-Figure~\ref{fig:fusion_performance_full_vs_quantized}. ...
-Some drop is expected when quantizing a model from FP32 to INT8, but the goal is to keep this drop as small as possible.
-\cite{hailoModelExplorer2026}
-Exact numerical values for both the full-precision and quantized models are listed in
-Table~\ref{tab:acc_full_precision} in Appendix~\ref{chap:detection_accuracy_tables}.
+The performance of the compiled models relative to their full-precision versions is
+shown in Figure~\ref{fig:fusion_performance_full_vs_quantized}.
+Exact numerical values are listed in Table~\ref{tab:acc_full_precision} in
+Appendix~\ref{chap:detection_accuracy_tables}.
+Quantization effects differ across datasets.
+Some quantized models perform slightly better than the
+full-precision models.
+This improvement is attributable to the additional training epochs introduced by
+quantization-aware training.
+In general, quantization causes a modest mAP50 reduction of
+0.1--5\% for fusion models.
+Single-modality models are more susceptible, and several have mAP50 drops
+exceeding 10\%.
+Among the fusion model variants, the mid and midP3 variants achieve the smallest
+mean mAP50 decrease under quantization, at 2.1\% and 1.2\% respectively, and mean
+mAP50:95 increases of 1.5\% and 2.0\% respectively.
+The late fusion model shows a mean mAP50 decrease of 2.4\% across all datasets.
+The early fusion model has the worst mean performance change under quantization.
 
+A further trend is that the performance impact of quantization grows with dataset size.
+The M3FD dataset is the smallest, and its calibration set of 2048 images covers
+nearly the entire dataset.
+The high calibration coverage contributes to the performance increase observed on this dataset.
+For the larger datasets, the calibration set represents a much smaller fraction of
+the total data, and the lower coverage leads to greater performance degradation after quantization.
 
 \begin{figure}[H]
     \centering
@@ -3457,12 +3503,16 @@ Table~\ref{tab:acc_full_precision} in Appendix~\ref{chap:detection_accuracy_tabl
     \label{fig:fusion_performance_full_vs_quantized}
 \end{figure}
 
+The late fusion model is selected for deployment on the Hailo-8 because it achieves the best
+overall performance trade-off across all object sizes, lighting conditions and it achieves the 
+best quantized performance for the data pool dataset.
+
 
 \section{Tracking Accuracy}
 
 The end-to-end tracking accuracy of the deployed pipeline is evaluated by running the
 tracking service on the 3D-Net dataset train, validation, and test splits with
-the compiled late fusion model. In contrast to the tracker selection evaluation in
+the chosen compiled late fusion model. In contrast to the tracker selection evaluation in
 Chapter~\ref{chap:tracking}, the tracker receives Hailo model predictions as input rather
 than ground truth detections. The reported metrics therefore reflect the combined effect of
 detector and tracker performance.
@@ -3628,19 +3678,17 @@ full-precision to INT8 quantization introduces small accuracy loss across all co
 models. Together, these results confirm that the Hailo-8 platform is a viable inference
 engine for multi-modal vehicle detection on a payload- and energy-constrained aerial
 platform.
-% TODO: verification of the quantization small accuracy drop claim with the results
 
 The comparison of seven fusion architectures shows that full-precision detection performance
 is broadly similar across strategies despite large differences in model complexity. The
 thermal modality contributes measurably in challenging conditions such as rain, fog, and
 low light, but only in well-aligned scenarios. This confirms that multi-modal
 sensing can add robustness beyond what an RGB-only
-model can achieve. Among the compiled architectures, mid-level fusion offers the most
-favourable balance. It matches or exceeds the performance of early and late fusion across
-most evaluation sets, shows greater robustness to residual spatial misalignment between
-modalities than early fusion, and remains fully compatible with the Hailo-8 compiler.
-Larger models and later fusion show marginal performance gains on the combined dataset,
-but these gains do not justify the additional complexity relative to mid-level fusion.
+model can achieve. Late fusion is selected for deployment on the Hailo-8. It achieves the 
+best overall
+performance trade-off across all object sizes and lighting conditions and shows the best
+quantized performance on the combined dataset while still achieving real-time performance
+on the Hailo-8.
 
 ByteTrack is identified as the appropriate tracker for this application. It achieves the
 highest tracking accuracy across all evaluated methods, with a HOTA of 0.946 and an IDF1
@@ -3774,22 +3822,22 @@ the S3 URL attached to the FiftyOne sample to confirm object presence and class.
                              & FP32 mAP@50      & 0.635            & 0.705            & 0.652  & 0.671  & 0.654  & 0.652 & 0.649 & 0.690  & 0.664 \\
                              & FP32 mAP50:95    & 0.436            & 0.462            & 0.440  & 0.458  & 0.451  & 0.449 & 0.439 & 0.467  & 0.445 \\
             \cmidrule{2-11}
-                             & INT8 mAP@50      & --               & --               & --     & --     & --     & --    & --    & --     & --    \\
-                             & INT8 mAP50:95    & --               & --               & --     & --     & --     & --    & --    & --     & --    \\
+                             & INT8 mAP@50      & 0.6368           & 0.7363           & 0.6544 & 0.6776 & 0.6869 & --    & --    & 0.6894 & --    \\
+                             & INT8 mAP50:95    & 0.4325           & 0.4839           & 0.4539 & 0.4643 & 0.4837 & --    & --    & 0.4685 & --    \\
             \midrule
             \multirow{4}{*}{RTDOD}
                              & FP32 mAP@50      & 0.784            & 0.638            & 0.784  & 0.813  & 0.815  & 0.817 & 0.817 & 0.811  & 0.773 \\
                              & FP32 mAP50:95    & 0.489            & 0.303            & 0.489  & 0.506  & 0.509  & 0.501 & 0.510 & 0.509  & 0.482 \\
             \cmidrule{2-11}
-                             & INT8 mAP@50      & --               & --               & --     & --     & --     & --    & --    & --     & --    \\
-                             & INT8 mAP50:95    & --               & --               & --     & --     & --     & --    & --    & --     & --    \\
+                             & INT8 mAP@50      & 0.4142           & 0.5911           & 0.7501 & 0.7812 & 0.7781 & --    & --    & 0.7832 & --    \\
+                             & INT8 mAP50:95    & 0.2739           & 0.2857           & 0.5064 & 0.5310 & 0.5255 & --    & --    & 0.5283 & --    \\
             \midrule
             \multirow{4}{*}{Dronevehicle}
                              & FP32 mAP@50      & 0.850            & 0.945            & 0.945  & 0.948  & 0.951  & 0.950 & 0.947 & 0.944  & 0.937 \\
                              & FP32 mAP50:95    & 0.525            & 0.696            & 0.693  & 0.697  & 0.707  & 0.701 & 0.696 & 0.696  & 0.684 \\
             \cmidrule{2-11}
-                             & INT8 mAP@50      & --               & --               & --     & --     & --     & --    & --    & --     & --    \\
-                             & INT8 mAP50:95    & --               & --               & --     & --     & --     & --    & --    & --     & --    \\
+                             & INT8 mAP@50      & 0.7353           & 0.8823           & 0.8859 & 0.8940 & 0.9065 & --    & --    & 0.8921 & --    \\
+                             & INT8 mAP50:95    & 0.4826           & 0.6674           & 0.6750 & 0.6806 & 0.6961 & --    & --    & 0.6790 & --    \\
             \midrule
             \multirow{4}{*}{3D-Net}
                              & FP32 mAP@50      & 0.970            & 0.643            & 0.987  & 0.978  & 0.955  & 0.972 & 0.981 & 0.984  & 0.988 \\
@@ -3802,8 +3850,8 @@ the S3 URL attached to the FiftyOne sample to confirm object presence and class.
                              & FP32 mAP@50      & 0.720            & 0.655            & 0.754  & 0.792  & 0.783  & 0.794 & 0.785 & 0.805  & 0.797 \\
                              & FP32 mAP50:95    & 0.448            & 0.392            & 0.497  & 0.531  & 0.532  & 0.536 & 0.531 & 0.549  & 0.542 \\
             \cmidrule{2-11}
-                             & INT8 mAP@50      & --               & --               & --     & --     & --     & --    & --    & --     & --    \\
-                             & INT8 mAP50:95    & --               & --               & --     & --     & --     & --    & --    & --     & --    \\
+                             & INT8 mAP@50      & 0.6749           & 0.5040           & 0.7365 & 0.7752 & 0.7726 & --    & --    & 0.7819 & --    \\
+                             & INT8 mAP50:95    & 0.4477           & 0.3179           & 0.5177 & 0.5557 & 0.5592 & --    & --    & 0.5622 & --    \\
             \bottomrule
         \end{tabular}
     \end{adjustbox}
@@ -3824,29 +3872,29 @@ the S3 URL attached to the FiftyOne sample to confirm object presence and class.
             \midrule
             \multirow{6}{*}{3D-Net}
                                   & \multirow{2}{*}{Small}
-                                  & mAP@50                  & --               & --               & -- & -- & -- & -- & -- & -- & --      \\
-                                  &                         & mAP50:95         & --               & -- & -- & -- & -- & -- & -- & -- & -- \\
+                                  & mAP@50   & 0.7874 & 0.4547 & 0.9765 & 0.9613 & 0.8797 & 0.7799 & 0.7942 & 0.9649 & 0.9325 \\
+                                  &          & mAP50:95 & 0.5563 & 0.1760 & 0.6658 & 0.6468 & 0.5937 & 0.5113 & 0.5574 & 0.6373 & 0.6742 \\
             \cmidrule{2-12}
                                   & \multirow{2}{*}{Medium}
-                                  & mAP@50                  & --               & --               & -- & -- & -- & -- & -- & -- & --      \\
-                                  &                         & mAP50:95         & --               & -- & -- & -- & -- & -- & -- & -- & -- \\
+                                  & mAP@50   & 0.9883 & 0.7277 & 0.9893 & 0.9846 & 0.9874 & 0.9867 & 0.9930 & 0.9926 & 0.9905 \\
+                                  &          & mAP50:95 & 0.8616 & 0.4788 & 0.8715 & 0.8560 & 0.8736 & 0.8494 & 0.8669 & 0.8627 & 0.8675 \\
             \cmidrule{2-12}
                                   & \multirow{2}{*}{Large}
-                                  & mAP@50                  & --               & --               & -- & -- & -- & -- & -- & -- & --      \\
-                                  &                         & mAP50:95         & --               & -- & -- & -- & -- & -- & -- & -- & -- \\
+                                  & mAP@50   & 0.9822 & 0.9812 & 0.9907 & 0.9829 & 0.9735 & 0.9868 & 0.9839 & 0.9835 & 0.9903 \\
+                                  &          & mAP50:95 & 0.8853 & 0.7014 & 0.9223 & 0.8777 & 0.8991 & 0.8541 & 0.8970 & 0.8929 & 0.8965 \\
             \midrule
             \multirow{6}{*}{Combined}
                                   & \multirow{2}{*}{Small}
-                                  & mAP@50                  & --               & --               & -- & -- & -- & -- & -- & -- & --      \\
-                                  &                         & mAP50:95         & --               & -- & -- & -- & -- & -- & -- & -- & -- \\
+                                  & mAP@50   & 0.7559 & 0.3250 & 0.7771 & 0.7806 & 0.7709 & 0.7882 & 0.7931 & 0.7969 & 0.7822 \\
+                                  &          & mAP50:95 & 0.4837 & 0.1519 & 0.5080 & 0.5310 & 0.5116 & 0.5148 & 0.5405 & 0.5329 & 0.5541 \\
             \cmidrule{2-12}
                                   & \multirow{2}{*}{Medium}
-                                  & mAP@50                  & --               & --               & -- & -- & -- & -- & -- & -- & --      \\
-                                  &                         & mAP50:95         & --               & -- & -- & -- & -- & -- & -- & -- & -- \\
+                                  & mAP@50   & 0.9839 & 0.6950 & 0.9745 & 0.9790 & 0.9762 & 0.9841 & 0.9830 & 0.9863 & 0.9893 \\
+                                  &          & mAP50:95 & 0.8294 & 0.4739 & 0.8062 & 0.8291 & 0.8404 & 0.8285 & 0.8300 & 0.8511 & 0.8535 \\
             \cmidrule{2-12}
                                   & \multirow{2}{*}{Large}
-                                  & mAP@50                  & --               & --               & -- & -- & -- & -- & -- & -- & --      \\
-                                  &                         & mAP50:95         & --               & -- & -- & -- & -- & -- & -- & -- & -- \\
+                                  & mAP@50   & 0.9883 & 0.9241 & 0.9728 & 0.9950 & 0.9813 & 0.9703 & 0.9712 & 0.9950 & 0.9895 \\
+                                  &          & mAP50:95 & 0.9006 & 0.6585 & 0.8419 & 0.8915 & 0.8778 & 0.8816 & 0.8518 & 0.8272 & 0.8832 \\
             \bottomrule
         \end{tabular}
     \end{adjustbox}
@@ -3855,23 +3903,29 @@ the S3 URL attached to the FiftyOne sample to confirm object presence and class.
 \begin{table}[H]
     \centering
     \caption{Detection accuracy on adverse weather and night samples of the RTDOD dataset
-        for models trained on the combined dataset.}
+        for models trained on the RTDOD dataset and the combined dataset.}
     \label{tab:acc_weather_night}
     \begin{adjustbox}{max width=\textwidth}
-        \begin{tabular}{l l r r r r r r r r r}
+        \begin{tabular}{l l l r r r r r r r r r}
             \toprule
-            \textbf{Condition} & \textbf{Metric}
+            \textbf{Condition} & \textbf{Training set} & \textbf{Metric}
                                & \textbf{RGB}     & \textbf{Thermal} & \textbf{Early}
                                & \textbf{Mid}     & \textbf{MidP3}   & \textbf{midCMA3}
-                               & \textbf{midCFT3} & \textbf{Late}    & \textbf{Score}                                                           \\
+                               & \textbf{midCFT3} & \textbf{Late}    & \textbf{Score} \\
             \midrule
-            \multirow{2}{*}{Adverse Weather}
-                               & mAP@50           & 0.791            & 0.633            & 0.742 & 0.825 & 0.791 & 0.827 & 0.833 & 0.824 & 0.828 \\
-                               & mAP50:95         & 0.440            & 0.278            & 0.390 & 0.458 & 0.433 & 0.461 & 0.458 & 0.454 & 0.471 \\
+            \multirow{4}{*}{Adverse Weather}
+                               & \multirow{2}{*}{RTDOD}    & mAP@50   & 0.807 & 0.707 & 0.841 & 0.872 & 0.862 & 0.856 & 0.871 & 0.875 & 0.824 \\
+                               &                           & mAP50:95 & 0.467 & 0.337 & 0.490 & 0.506 & 0.484 & 0.479 & 0.508 & 0.507 & 0.473 \\
+                               \cmidrule{2-12}
+                               & \multirow{2}{*}{Combined} & mAP@50   & 0.791 & 0.633 & 0.742 & 0.825 & 0.791 & 0.827 & 0.833 & 0.824 & 0.828 \\
+                               &                           & mAP50:95 & 0.440 & 0.278 & 0.390 & 0.458 & 0.433 & 0.461 & 0.458 & 0.454 & 0.471 \\
             \midrule
-            \multirow{2}{*}{Night}
-                               & mAP@50           & 0.607            & 0.514            & 0.596 & 0.674 & 0.651 & 0.674 & 0.673 & 0.641 & 0.696 \\
-                               & mAP50:95         & 0.278            & 0.227            & 0.264 & 0.324 & 0.312 & 0.327 & 0.318 & 0.327 & 0.341 \\
+            \multirow{4}{*}{Night}
+                               & \multirow{2}{*}{RTDOD}    & mAP@50   & 0.684 & 0.537 & 0.679 & 0.722 & 0.697 & 0.708 & 0.710 & 0.674 & 0.663 \\
+                               &                           & mAP50:95 & 0.331 & 0.259 & 0.351 & 0.358 & 0.339 & 0.353 & 0.342 & 0.336 & 0.348 \\
+                               \cmidrule{2-12}
+                               & \multirow{2}{*}{Combined} & mAP@50   & 0.607 & 0.514 & 0.596 & 0.674 & 0.651 & 0.674 & 0.673 & 0.641 & 0.696 \\
+                               &                           & mAP50:95 & 0.278 & 0.227 & 0.264 & 0.324 & 0.312 & 0.327 & 0.318 & 0.327 & 0.341 \\
             \bottomrule
         \end{tabular}
     \end{adjustbox}
