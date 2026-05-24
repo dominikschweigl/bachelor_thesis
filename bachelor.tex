@@ -20,6 +20,7 @@
 \usepackage{adjustbox}
 \usepackage{array}
 \usepackage{makecell}
+\usepackage{multirow}
 \newcolumntype{C}[1]{>{\centering\arraybackslash}m{#1}}
 
 
@@ -272,7 +273,7 @@ Chapter~\ref{chap:tracking} introduces multi-object tracking methods and
 reports their evaluation for this application.
 Chapter~\ref{chap:implementation} details the development and implementation
 of the detection model, including the training pipeline, the compilation to
-the edge device, and the final vehicle detection service running on the UAV.
+the edge device, and the final vehicle tracking service running on the UAV.
 Chapter~\ref{chap:evaluation} evaluates the proposed approach, followed by
 Chapter~\ref{chap:limitations}, which discusses its limitations.
 Finally, Chapter~\ref{chap:conclusion} summarizes the findings and outlines
@@ -406,7 +407,7 @@ document \cite{twinsKATspec2021}, the system has a maximum takeoff
 weight of 12\,kg and supports a payload of up to 5.5\,kg
 including batteries and sensors.
 
-The UAV achieves a typical flight endurance of approximately 30
+The UAV achieves a nominal flight endurance of 35
 minutes, with maximum flight times of up to 45 minutes under
 favorable conditions. The maximum horizontal flight speed is
 specified as 7\,m/s. Furthermore, the system is certified for
@@ -1571,7 +1572,7 @@ near the image edges visible for the vehicle near the top.
 The alignment procedure described above was first developed and applied in
 postprocessing to the recordings from the initial data collection flight.
 Both the spatial transformation matrix and the temporal synchronization approach
-were subsequently integrated into the object detection service described in
+were subsequently integrated into the object tracking service described in
 Chapter~\ref{chap:implementation}, which runs on a Raspberry Pi mounted on the drone.
 A dedicated recording mode was added to the service that applies the spatial
 transformation to each incoming thermal frame in real time.
@@ -2404,6 +2405,7 @@ performance on a vehicle and pedestrian detection dataset for both full-precisio
 and quantized models in a real-time edge deployment scenario.
 
 \subsection{Micro level feature fusion}
+\label{sec:micro_fusion}
 
 Besides the position of fusion defined in macro network architectures, the
 construction of the fusion function $F(\cdot)$ is another key factor for
@@ -2459,6 +2461,38 @@ of $F_R$ and $F_T$ simultaneously, enabling long-range interactions that are bey
 convolutional attention.
 Transformer cross-attention achieves the highest benchmark accuracy~\cite{qingyun2021CFT} but
 its quadratic token complexity makes it considerably more expensive than convolutional designs.
+
+Three micro-fusion variants are explored in this work, all applied at the mid-fusion
+position of the YOLOv11 backbone.
+The first, MidP3, restricts cross-modal feature combination to the first feature
+pyramid scale shown in Figure~\ref{fig:grid_based_architecture} rather than all
+three detection scales.
+Multi-level feature fusion can cause redundancy in aligned multispectral datasets,
+and restricting fusion to a single scale may allow for model size reduction
+without performance loss~\cite{wan2025yolov11rgbt}.
+The second is the cross-modality fusion transformer
+(CFT)~\cite{qingyun2021CFT}, applied at all three detection scales and referred
+to as midCFT3 throughout this work.
+CFT fuses both modalities by downsampling each feature map to $8{\times}8$
+patches via global average pooling.
+The 128 concatenated tokens are passed to a transformer self-attention block, and the
+attended output is upsampled by bilinear interpolation and added back to each
+modality branch.
+The two resulting modality branches are then combined by element-wise addition
+to produce the fused feature map.
+The third is the mixed local channel attention module
+(MLCA)~\cite{wan2023MLCAObjectDetection}, applied at all three detection scales
+and referred to as midCMA3 throughout this work.
+MLCA computes pre-transformer channel attention weights from two pooled representations of each
+feature map.
+A local representation is obtained by average pooling to a $5{\times}5$ spatial
+resolution, which retains spatially distributed channel statistics.
+A global representation pools each channel to a single scalar which creates a complementary, 
+spatially agnostic view of overall channel importance.
+A one-dimensional convolution is applied to each representation to model
+inter-channel dependencies.
+The resulting attention maps are summed and multiplied onto the feature map to
+produce the fused output.
 
 Regardless of the chosen object detection strategy, the detection pipeline described in this chapter
 delivers a set of bounding boxes per frame together with their class and confidence scores.
@@ -2766,6 +2800,17 @@ characteristics of this application with small relatively fast moving objects~\c
 
 \section{Model Training Pipeline}
 
+% TODO: include training details like this:
+% We use an stochastic gradient descent (SGD) optimizer with
+% an initial learning rate of 1e-2, a momentum of 0.937, and
+% a weight decay of 0.0005. All models are trained on two
+% NVIDIA® TITAN RTX™ GPUs for 200 epochs with a batch
+% size of 32. In pursuit of better performance, we adopt the
+% YOLOV5 model pre-trained on the COCO dataset [41] as
+% weight initialization. As for data augmentation, we use the
+% Mosaic method [42] which mixes four training images in one
+% image
+
 For the model training pipeline, we use the open-source MLOps platform ClearML to orchestrate and
 monitor the training process. ClearML provides experiment tracking, remote task execution, dataset
 versioning, and a web-based dashboard for visualizing metrics and comparing runs. It wraps existing
@@ -3022,6 +3067,7 @@ rounding as the identity
 function.~\cite{gholami2021surveyQuantization, hailoQuantizationFineTuning}
 
 \subsection{Compilation}
+\label{sec:hailo_compilation}
 
 The final stage maps the quantized graph onto the physical Hailo-8
 fabric, allocates each layer to one of the on-chip compute clusters,
@@ -3035,6 +3081,28 @@ wrong flag produces a binary that will not load on the
 hardware. Unusual network
 topologies can cause the allocator to report an infeasible mapping
 on the target architecture.~\cite{hailoDataflowCompilerUserGuide,hailo8_m2datasheet2021}
+
+Three fusion architectures trained in this work could not be compiled for the
+Hailo-8 due to unsupported operations.
+The midCMA3 model uses the MLCA attention module, which reshapes feature tensors
+from four dimensions to three to pass them through a one-dimensional convolution
+before reshaping back.
+The Hailo-8 operates exclusively on four-dimensional NHWC tensors and rejects
+any change in tensor rank with an
+\texttt{UnsupportedShuffleLayerError}~\cite{hailo_shuffle_reshape_5850,hailo_reshape_bchw_14560}.
+The module additionally applies a channel-wise max-pooling operation with an
+axis remapping not supported by the compiler, yielding an
+\texttt{UnsupportedReduceMaxLayerError}.
+The midCFT3 variant fails with a \texttt{FeatureSplitterLayerError} and an
+\texttt{UnsupportedShuffleLayerError}, which is consistent with the limited
+transformer support reported by other researchers and documented in the official
+Hailo community forums~\cite{suchy2026reviewYOLODETREdgeDevices,hailo_multihead_attention_968}.
+The score fusion model avoids operation-level errors but uses six detection
+heads, three per modality, rather than the three heads used by the other models.
+The allocator cannot map this topology to the available compute clusters.
+None of the three architectures were modified to enable compilation, as
+establishing equivalence to the original implementations would require separate
+validation.
 
 \subsection{Model Script}
 
@@ -3094,102 +3162,112 @@ training job described in the previous subsection and produces the
 \texttt{.hef} artifact that is consumed by the on-board HailoRT runtime.
 ~\cite{hailoDataflowCompilerUserGuide}
 The compiled model is loaded on the Raspberry Pi host to run the
-vehicle detection service, which is further outlined in the next chapter.
+vehicle tracking service, which is further outlined in the next chapter.
 
-\section{Vehicle Detection Service}
+\section{Vehicle Tracking Service}
 
-The compiled model is loaded on the Raspberry Pi host to run the vehicle
-detection service,
-which is implemented in Python and uses the natively installed HailoRT
-library to execute the model on the Hailo-8. The service runs as a docker
-container for reproducible deployment environment with the device's HailoRT runtime attached as a volume to keep
-the build process short and docker image small.
+The vehicle tracking service is implemented in Python and uses the natively
+installed HailoRT library to execute the compiled model on the Hailo-8.
+The service runs as a Docker container to provide a reproducible deployment
+environment. The HailoRT runtime is attached as a Docker volume to keep the
+image build process short and the resulting image small.
 
-The service is structured around a main inference service that continuously
-runs inference on incoming video frames from the camera system, which is
-connected to the Raspberry Pi and captures both RGB and thermal data.
-The general information flow of the service is shown in Figure~\ref{fig:detection_service_flow}.
-The flow starts with two stream capture class instances that abstract the camera RTSP streams and
-capture frames in separate threads to avoid blocking the main inference loop. The separate threads
-per stream also avoid corruption of the RGB and thermal frames due to a single process not being
-able to keep up with the incoming frame rate of both streams, which was a problem during the
-first data collection session and led to a number of corrupted frames, which had to be filtered out
-during the dataset curation process. The stream capture classes provide a single latest frame property
-that allows to access the most recent frame without blocking through a thread-safe interface. The Stream captures keep a double-ended queue
-of the latest frames, which allows to match the latest frames of both streams by timestamp, which is
-important for the inference service to run inference on timely aligned RGB and thermal frames, which is
-important for the performance of the fused model.
-These abstracted stream captures are used by the live frame provider, which reads the latest frames matched by timestamp from both streams,
-uses the alignment transform to align the thermal frame to the RGB frame as described in Section~\ref{chap:sensor_alignment},
-and provides the aligned frames to the inference service, which is responsible for instantiating the whole service,
-preprocessing the frames to match the expected input format of the model and
-running the main inference loop and does simple additional non maximum suppression with confidence filering above
-the NMS config for the hailo model to avoid the need for recompilation every time the confidence threshold is changed.
-However, the IoU threshold for NMS is entirely done on the Hailo and is set in the model script and requires recompilation to be changed.
-After non-maximum suppression, the detections are passed to the tracker, which is responsible for tracking the
-detected objects across frames and assigning consistent IDs to them, which is important for the downstream
-congestion and traffic flow analysis application. After the tracker processes the detections, the results are
-sent to a ZeroMQ publisher that publishes the results to a message broker, which allows to decouple the detection
-service from downstream applications.
+The service is structured around a central inference service that processes
+incoming video frames from the RGB and thermal cameras.
+The general information flow of the service is shown in
+Figure~\ref{fig:detection_service_flow}.
+Frame acquisition is handled by two stream capture instances, one per camera
+stream, that abstract the RTSP streams and run in separate threads to prevent
+the main inference loop from blocking.
+Thread isolation per stream also prevents frame corruption that arises when a
+single process cannot keep up with the combined frame rate of two simultaneous
+streams.
+This issue occurred during the first data collection session and produced
+corrupted frames that required removal during dataset curation.
+Each stream capture instance maintains a thread-safe double-ended queue of
+recent frames from which the latest pair can be matched by timestamp.
+The live frame provider reads these timestamp-matched frame pairs from both
+queues to ensure that inference operates on temporally aligned RGB and thermal
+frames.
+Before forwarding the pair to the inference service, the live frame provider
+applies the alignment transform to register the thermal frame to the RGB frame
+as described in Section~\ref{chap:sensor_alignment}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/detection_service_flow_nunito.png}
     \caption{
-        The information flow of the vehicle detection service with the major classes and their interactions.
+        The information flow of the vehicle tracking service with the major classes and their interactions.
     }
     \label{fig:detection_service_flow}
 \end{figure}
 
-The service also includes a performance monitor and continuously monitors the performance of the service by
-collecting per-frame diagnostics from the inference service and hardware resource usage metrics from the
-Raspberry Pi host and Hailo-8 NPU.
-To read Hailo-8 performance metrics, a parser reads binary data written by the HailoRT scheduler
-to \texttt{/tmp/hmon\_files}, which is mounted as a Docker volume to allow monitoring of the containerized
-inference service. The binary files are decoded using Protocol Buffers with the schema defined
-in \texttt{scheduler\_mon.proto}, sourced from the open-source HailoRT repository \cite{hailort_github}.
-The inference service sends per-frame monitoring information such as frame pair timestamp drift,
-the execution time of frame alignment, preprocessing, inference, post-processing, tracking, and the list of detected objects
-with their class labels, confidence scores, and bounding box coordinates to the performance monitor, which stores this per-frame diagnostics
-including cpu and hailo temperature, cpu utilization, as well as the memory usage (Hailo utilization?)
-into csv files for later analysis and also provides real-time monitoring of the service through the console.
-The power consumption of the service cannot be measured directly on the Raspberry Pi using software tools, because
-the Raspberry Pi 5 does come with PMIC (power management integrated circuit) which gives you tensions and currents in 12 branches.
-However, it does not measure the total consumption, as there are some power lines not connected to PMIC
-(5V, so no consumption of USB devices, HATs or NVMe).
-And the raspberry pi AI HAT where the Hailo-8 accelerator
-is mounted does not have the necessary INA component to support current monitoring.
-In addition, the Raspberry Pi AI HAT+ with the Hailo-8 does not provide onboard current monitoring functionality.
-The Raspberry Pi AI HAT+ product brief~\cite{raspberryPiAiHatdatasheet2026} lists no INA-series power monitoring
-integrated circuits. The extended device information for the hailo platform device control
-interface specifies disabled current monitoring for the Hailo-8 device as specified in the
-Hailo product forum by a maintainer~\cite{hailo_forum_current_monitoring2024}, which means that
-the power consumption of the Hailo-8 can also not be measured through software tools on the Raspberry Pi host.
-Therefore an external
-oscilloscope is used to measure the power consumption of the raspberry pi running the detection
-service.
+On receiving an aligned frame pair, the inference service normalizes pixel
+values and applies letterbox resizing to match the model input format before
+passing the frames through the main inference loop.
+After on-device inference, a post-processing step applies additional NMS with
+confidence filtering above the threshold set in the Hailo model configuration.
+This avoids model recompilation when the confidence threshold needs to be
+adjusted.
+The IoU threshold for NMS is applied entirely on the Hailo and is embedded in
+the model script, so it requires recompilation to change.
+After NMS, the detections are forwarded to the tracker, which assigns
+consistent object IDs across frames for use by downstream congestion and
+traffic flow analysis applications.
+The tracker output is published via a ZeroMQ publisher to a message broker,
+which decouples the tracking service from downstream consumers.
 
+The service includes a performance monitor that collects per-frame diagnostics
+from the inference service alongside hardware resource usage metrics from the
+Raspberry Pi host and the Hailo-8 NPU.
+Per-frame diagnostics include frame pair timestamp drift, execution times for
+frame alignment, preprocessing, inference, post-processing, and tracking, as
+well as the list of detected objects with their class labels, confidence
+scores, and bounding box coordinates.
+Hardware metrics include CPU and Hailo device temperatures, CPU utilization,
+memory usage, and Hailo device utilization.
+To read Hailo-8 performance metrics, a parser reads binary data written by the
+HailoRT scheduler to \texttt{/tmp/hmon\_files}, which is mounted as a Docker
+volume to expose the metrics to the containerized service.
+The binary files are decoded using Protocol Buffers with the schema defined in
+\texttt{scheduler\_mon.proto}, sourced from the open-source HailoRT
+repository~\cite{hailort_github}.
+All diagnostics are written to CSV files for offline analysis and are also
+displayed in real time on the console.
 
+The power consumption of the service cannot be measured using software tools
+on the Raspberry Pi host.
+The Raspberry Pi 5 includes a PMIC that reports voltages and currents for 12
+internal power branches, but several power lines supplying USB devices, HATs,
+and NVMe storage are not routed through the PMIC, so total board power
+consumption is not available.
+The Raspberry Pi AI HAT+ product brief~\cite{raspberryPiAiHatdatasheet2026}
+lists no INA-series current monitoring circuits, and the Hailo-8 platform
+device control interface reports current monitoring as
+disabled~\cite{hailo_forum_current_monitoring2024}.
+Therefore, an external power supply is used to measure the power consumption
+of the system during inference in Chapter~\ref{chap:evaluation}.
 
-The detection service is designed to be modular and configurable, so that different components such as the frame provider,
-the tracker, and the capturing setup can be easily swapped or configured through a yaml configuration file without changing the code
-as well as it can be selected whether evaluation metrics of the inference run should be performed at the end.
-The inference service is configured
-by reading the service configuration defined in a yaml file, where the frame provider can be chosen. The frame provider
-interface is implemented by several frame providers by the respective datasets in addition to the live provider, which
-allows to run the service on recorded videos and individual datasets for testing and evaluation purposes.
-The camera configuration at which the framerate the camera is running, the camera IP, as well as the timestamp offset
-received by the two camera RTSP streams can be defined in the service configuration file. The alignment transform properties can be defined
-in there as well and are set as specified in Section~\ref{chap:sensor_alignment}.
-In addition the ZeroMQ endpoint to which the service sends the detection results is defined in the configuration file.
-Also the tracker type can be defined in the configuration file, which allows to select between the SORT, ByteTrack, and OCSORT
-trackers, which are implemented in the service and run on the CPU to track the detected objects across frames and assign consistent
-IDs to them, which is important for downstream applications such as trajectory prediction and traffic flow analysis.
-In addition the configuration file allows to define two capturing setups, where the individual camera streams can be enabled to
-be captured and stored or and detection recorder that stores the video of the aligned frames with or without detection visualizations
-or to disable the capturing.
-Lastly the service configuration file allows to define monitoring settings, where for example the hardware resource usage poll rate
-can be defined, which was set to every 30 frames to avoid performance degradation due to too frequent polling and I/O wait times.
+The tracking service is designed to be modular and configurable through a YAML
+configuration file, so that key components can be swapped or tuned without
+code changes.
+The frame provider interface abstracts the source of input frames and is
+implemented by a live camera provider as well as by dataset-specific providers
+for each evaluation dataset, which allows the service to run on recorded video
+for testing and evaluation.
+Camera settings such as frame rate, IP address, and RTSP timestamp offset for
+both streams are defined in the configuration file, as are the alignment
+transform parameters described in Section~\ref{chap:sensor_alignment} and the
+ZeroMQ endpoint for publishing detection results.
+The tracker type is also configurable; supported options are SORT, ByteTrack,
+and OCSORT, all of which run on the CPU to assign consistent object IDs across
+frames.
+Two capture modes are configurable per stream: raw stream capture and
+detection recording, where the latter stores the aligned frame video with or
+without detection overlays.
+Capture can also be disabled entirely.
+The hardware resource poll rate in the monitoring configuration was set to
+every 30 frames to avoid performance degradation from frequent I/O polling.
 
 \newpage
 \chapter{Evaluation}
@@ -3197,14 +3275,221 @@ can be defined, which was set to every 30 frames to avoid performance degradatio
 
 \section{Detection Accuracy}
 
+The primary measurement used for determining the detection accuracy of the trained
+models is the mean average precision (mAP). The mAP is computed by first calculating
+the average precision (AP) per class, which summarises the area under the
+precision-recall curve, and then averaging those per-class values across all classes. 
+Precision and recall are defined in terms of true positives,
+false positives, and false negatives, where a predicted bounding box counts as a true
+positive only if its intersection over union (IoU) with the matching ground-truth box
+meets or exceeds a given threshold $t$. The IoU measures the ratio of the overlapping
+area to the combined area of the predicted and ground-truth boxes, with
+$\text{IoU} \geq t$ indicating a correct detection. 
+\cite{padilla2020surveyPerformanceMetricsObjectDetection}
 
-% model size with parameters and FLOPS
+Two variants of this threshold are used throughout this evaluation. The first is
+mAP@50, which applies a fixed IoU threshold of $t = 0.50$ and thus rewards detectors
+that localise objects approximately. The second is mAP50:95, which averages mAP
+values computed at ten IoU thresholds ranging from $0.50$ to $0.95$ in steps of $0.05$
+and therefore penalises imprecise bounding-box localisation.
+\cite{padilla2020surveyPerformanceMetricsObjectDetection}
+
+The object detectors evaluated in this section are the single-modality RGB and 
+thermal models, the different macro fusion approaches of early, mid,
+late, and score fusion, which concatenate the feature maps at
+different stages of the object detector as described in 
+Chapter~\ref{chap:object_detection}. In addition, the micro-fusion variants MidP3, midCFT3, and midCMA3 applied at
+the mid-fusion position are evaluated, as described in
+Section~\ref{sec:micro_fusion}.
+
+The object detector performance on the dataset validation sets is shown in 
+Figure~\ref{fig:fusion_performance_full_precision}. Despite the vast differences
+in model parameter count and computational cost in terms of floating-point operations 
+(FLOPS) seen in Figure~\ref{fig:model_complexity}, the detection performances
+are relatively equal in most cases.
+The model performances very high for our 3D-Net dataset, which is because
+the dataset is relatively easy and only has clear daytime images with good visibility
+and a low amount of occlusions with a small number of objects per frame.
+The most similar dataset to our 3D-Net dataset is the RTDOD dataset in terms of
+perspective and objects, includes more challengin conditions such as rain, fog, evening,
+and night conditions with denser object distributions resulting in lower performance.
+What is notable is that for both the RTDOD and the 3D-Net datasets, the
+thermal modality performs significantly worse than the rest, while for the M3FD and
+Visdrone Dronevehicle datasets the thermal modality performs better or equal to the rest.
+The reason for this is that the RTDOD and 3D-Net datasets have more spatio-temporal
+misalignment between the RGB and thermal modalities than the other two datasets and
+the RGB labels are used for evaluation. 
+For the larger combined dataset, the performance trends show that the performance tends to
+increase with increasing model size and later fusion, while this trend is
+not clear from the individual datasets.
+Exact numerical results are listed in Table~\ref{tab:acc_full_precision}
+in Appendix~\ref{chap:detection_accuracy_tables}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/fusion_performance_full_precision.png}
+    \caption{
+        Fusion Model variant performances on the validation sets of the M3fd, RTDOD, Visdrone
+        Dronevehicle, 3D-Net and the combined datasets in full precision.
+    }
+    \label{fig:fusion_performance_full_precision}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/fusion_model_complexity.png}
+    \caption{
+        Comparison of the fusion Model variant model parameters and FLOPS.
+    }
+    \label{fig:model_complexity}
+\end{figure}
+
+To evaluate the performance of the models on different object sizes, the mAP metrics are
+computed separately for small, medium, and large objects. Here we adopt the most common
+object size classification from the COCO dataset into small, medium and large objects.
+The classification is based on the area of the object bounding box, where small
+objects have less than $32^2$ pixels, medium objects range from $32^2$ to $96^2$ pixels,
+and large objects have an area of more than $96^2$ pixels.
+~\cite{lin2014microsoftCOCO, kisantal2019augmentationSmallObjectDetection, chen2020fourPillarsSmallObjectDetectionSurvey}
+
+The per-size mAP computation begins with a global IoU-based matching step that assigns 
+each prediction to at most one ground-truth box. This one-to-one assignment is resolved 
+before any size bin is considered. A matched prediction is then attributed to the size 
+bin of the ground-truth box it was assigned to. If that ground-truth box falls in the 
+small, medium, or large area range, the prediction is counted as a true positive for 
+that bin, regardless of the area of the predicted bounding box. Predictions that remain 
+unmatched after the global step are attributed to the size bin whose area range contains 
+their predicted bounding-box area and are counted as false positives. Ground-truth boxes 
+that are never matched to a prediction are counted as false negatives in their respective 
+size bin.
+
+Figure~\ref{fig:model_performance_by_size} shows the detection performance on the 3D-Net dataset
+for models trained on the 3D-Net dataset alone and the combined dataset, reported separately
+for small, medium, and large objects. Performance on small objects is lower than on medium
+and large objects across all models. This is a known trend in object detection, as small
+objects provide limited visual information for the
+detector~\cite{kisantal2019augmentationSmallObjectDetection, chen2020fourPillarsSmallObjectDetectionSurvey}.
+The thermal modality achieves similar mAP50 on large objects as the RGB and fusion models,
+but shows lower mAP50:95. This precision gap arises because the RGB modality was used
+for annotation and the two modalities are not perfectly aligned, so a correct thermal
+detection appears geometrically imprecise when evaluated against RGB labels.
+On small and medium objects, the thermal modality performs significantly worse than RGB,
+as object features are less distinguishable in the thermal domain. On large and medium
+objects, the RGB and fusion models achieve comparable performance. On small objects, the
+fusion models perform significantly better than the RGB model, which demonstrates the
+benefit of the additional thermal information for object detection.
+
+The transition to the combined dataset does not impact performance on large and medium
+objects significantly and slightly improves results for some models on large objects.
+On small objects, however, the performance advantage of the fusion models over the RGB
+model disappears. The additional datasets were captured with
+thermal cameras of different types and post-processing pipelines. Thermal cameras vary
+more widely than RGB cameras in their sensing technology and signal processing. This
+result hints that the
+camera variability hinders the detection of camera-specific fine-grained thermal
+features needed for the fusion advantage on small objects.
+
+The micro-fusion variants midCMA3 and midCFT3 show small performance improvements over
+the standard mid-fusion across all object sizes. The improvement is most visible in the
+small object category for models trained on the combined dataset. These variants do not,
+however, reproduce the thermal advantage over RGB that the standard early, mid, and late
+fusion models achieve. The midCMA3 and midCFT3 data-pool models outperform the standard
+mid-fusion model in the small object category, but remain below the late fusion model.
+Exact numerical results are listed in Table~\ref{tab:acc_3dnet_size}
+in Appendix~\ref{chap:detection_accuracy_tables}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/model_performance_object_size.png}
+    \caption{
+        Comparison on the validation set of the 3D-Net dataset of the detection models 
+        trained on the 3D-Net dataset and the combined dataset for small, medium, and large objects.
+    }
+    \label{fig:model_performance_by_size}
+\end{figure}
+
+
+Three of the trained fusion models, specifically midCMA3, midCFT3, and score
+fusion, could not be compiled for the Hailo-8 due to hardware incompatibilities
+detailed in Section~\ref{sec:hailo_compilation}.
+The quantization evaluation therefore covers only the models for which
+compilation succeeded.
+
+For the remaining models that were successfully compiled, the performance drop due 
+to quantization is shown in
+Figure~\ref{fig:fusion_performance_full_vs_quantized}. ...
+Some drop is expected when quantizing a model from FP32 to INT8, but the goal is to keep this drop as small as possible.
+\cite{hailoModelExplorer2026}
+Exact numerical values for both the full-precision and quantized models are listed in
+Table~\ref{tab:acc_full_precision} in Appendix~\ref{chap:detection_accuracy_tables}.
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/fusion_performance_full_vs_quantized.png}
+    \caption{
+        Comparison of the full precision and quantized fusion Model variant performances 
+        on the validation sets of the M3fd, RTDOD, Visdrone Dronevehicle, 3D-Net and the 
+        combined datasets.
+    }
+    \label{fig:fusion_performance_full_vs_quantized}
+\end{figure}
+
+
+\section{Tracking Accuracy}
+
+The end-to-end tracking accuracy of the deployed pipeline is evaluated by running the
+tracking service on the 3D-Net dataset train, validation, and test splits with
+the compiled late fusion model. In contrast to the tracker selection evaluation in
+Chapter~\ref{chap:tracking}, the tracker receives Hailo model predictions as input rather
+than ground truth detections. The reported metrics therefore reflect the combined effect of
+detector and tracker performance.
+
+The evaluation results are given in Table~\ref{tab:tracking_accuracy_splits}. The train split
+achieves a HOTA of 0.780 in detection box output mode, while validation and test reach 0.735
+and 0.747 respectively. The lower scores on the held-out splits reflect the reduced detection
+accuracy on unseen footage. The MOTP values of 0.912 and 0.906 on validation and test contrast
+with the value of 1.000 reported in the tracker selection evaluation, where ground truth
+detections were used as input and box alignment was exact by construction.
+
+As in the tracker selection evaluation, the tracker-predicted bounding box output consistently
+reduces DetA and MOTP across all splits while IDF1 remains largely unchanged. The detection
+bounding box output mode is therefore retained for the deployed service.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{l r cccccccc}
+        \toprule
+        Split & Frames & HOTA  & DetA  & AssA  & MOTA  & MOTP  & IDF1  & IDP   & IDR   \\
+        \midrule
+        \multicolumn{10}{l}{\textit{Detection bounding boxes as output}}              \\
+        \midrule
+        Train &  8{,}485 & 0.780 & 0.851 & 0.715 & 0.906 & 0.931 & 0.825 & 0.838 & 0.811 \\
+        Val   &  1{,}889 & 0.735 & 0.761 & 0.712 & 0.816 & 0.912 & 0.810 & 0.837 & 0.785 \\
+        Test  &  1{,}889 & 0.747 & 0.756 & 0.740 & 0.826 & 0.906 & 0.824 & 0.872 & 0.780 \\
+        All   & 12{,}263 & 0.754 & 0.828 & 0.688 & 0.887 & 0.925 & 0.796 & 0.813 & 0.780 \\
+        \midrule
+        \multicolumn{10}{l}{\textit{Tracker-predicted bounding boxes as output}}      \\
+        \midrule
+        Train &  8{,}485 & 0.716 & 0.774 & 0.665 & 0.899 & 0.862 & 0.822 & 0.835 & 0.809 \\
+        Val   &  1{,}889 & 0.673 & 0.692 & 0.655 & 0.803 & 0.847 & 0.805 & 0.831 & 0.780 \\
+        Test  &  1{,}889 & 0.683 & 0.690 & 0.680 & 0.820 & 0.839 & 0.820 & 0.868 & 0.777 \\
+        All   & 12{,}263 & 0.691 & 0.753 & 0.638 & 0.879 & 0.856 & 0.793 & 0.810 & 0.776 \\
+        \bottomrule
+    \end{tabular}
+    \caption{
+        ByteTrack tracking accuracy on the 3D-Net dataset using Hailo model predictions as
+        input. Top: detection bounding boxes as output. Bottom: tracker-predicted bounding boxes.
+    }
+    \label{tab:tracking_accuracy_splits}
+\end{table}
 
 \section{Embedded Inference Performance}
 
-The inference performance of the compiled models is evaluated by running the detection service
+The inference performance of the compiled models is evaluated by running the tracking service
 on the Raspberry Pi 5 with the Hailo-8 accelerator and recording the per-frame inference time
-and frames per second (fps). Power draw is measured simultaneously using an external power supply
+of the model executionand frames per second (fps) of the full tracking service pipeline. Power 
+draw is measured simultaneously using an external power supply
 and a custom USB-C cable, as shown in Figure~\ref{fig:power_measurement_setup}.
 The measurements are collected on the train and validation sets of the 3D-Net dataset,
 preceded by a one-minute warm-up period and followed by a two-minute measurement window
@@ -3254,154 +3539,122 @@ combined energy of $2 \times 12\,\text{Ah} \times 22.2\,\text{V} \approx 533\,\t
 With a measured in-flight power draw of 1{,}600\,W, the theoretical maximum flight time is 
 $533\,\text{Wh} / 1{,}600\,\text{W} \approx 20\,\text{min}$, reducing to roughly 
 $0.75 \times 20\,\text{min} \approx 15\,\text{min}$ when accounting for the recommended 
-75\,\% usable capacity limit of LiPo cells. The 5\,W power draw of the Raspberry~Pi~5 running the detection service 
+75\,\% usable capacity limit of LiPo cells. The 5\,W power draw of the Raspberry~Pi~5 running the tracking service 
 represents $5\,\text{W} / 1{,}600\,\text{W} \approx 0.3\,\%$ of the total system power 
 consumption, corresponding to a flight time reduction of under 3 seconds and is therefore 
 negligible.
 
 
-
-
-% Good paper showing quantization and optimization for edge devices evaluation:
-% Human Detection in UAV Thermal Imagery: Dataset Extension
-% and Comparative Evaluation on Embedded Platforms
-
-
-Multi-Perspective RGB and Infrared Dataset
-for UAV Detection IEEE Access 2025 is good
-as source for expected lower performance of the early fusion model
-due to residual spatial misalignment
-
-The performance of
-RGB and infrared fusion detection methods that directly fuse misaligned features is not ideal.
-Therefore, achieving spatial alignment between RGB and infrared modalities is crucial.
-Fusion methods that combine features in later stages of the network, such as mid-level fusion, are more robust to misalignment and can
-achieve better performance in the presence of residual misalignment, as they have
-more operations to align the features before fusion.
-\cite{he2023misalignedRGBTadaptiveCalibration}
-And even after sensor alignment, there is residual alignment both in all the training datasets
-used as well as during operation.
-
-Some drop is expected when quantizing a model from FP32 to INT8, but the goal is to keep this drop as small as possible.
-\cite{hailoModelExplorer2026}
-
-The proposed midCMA3 fusion architecture cannot be compiled for execution on the
-Hailo-8 neural processing unit due to three categories of fundamental hardware
-incompatibilities. First, the CrossMLCAv2 cross-modal attention module implements
-an ECA (Efficient Channel Attention) mechanism that internally reshapes feature
-tensors from four dimensions to three in order to feed a one-dimensional
-convolution, then reshapes back. The Hailo-8 hardware exclusively operates on
-four-dimensional (NHWC) tensors, and any change in tensor rank is rejected by the
-Dataflow Compiler with an \texttt{UnsupportedShuffleLayerError}
-\cite{hailo_shuffle_reshape_3228, hailo_shuffle_reshape_5850,
-    hailo_reshape_bchw_14560}. Second, the channel-wise max-pooling operation
-(\texttt{ReduceMax} on the channel axis) used within the spatial attention
-sub-module is not correctly handled during the compiler's internal
-NCHW-to-NHWC axis remapping, yielding an
-\texttt{UnsupportedReduceMaxLayerError} even when the operation formally
-satisfies the stated requirement of reducing along the features axis with
-\texttt{keepdim=True} \cite{hailo_transformer_decoder_11480}. Third, the C2PSA
-module at the top of the backbone uses a multi-head self-attention block whose
-tensor splitting occurs along the sequence axis rather than the channel axis ---
-which Hailo-8 does not support --- and whose attention scores are normalised with
-a Softmax operation that the compiler only accepts in the specific context of a
-rank-two output following a fully-connected layer
-\cite{hailo_multihead_attention_968, hailo_softmax_7222}. All three limitations
-are confirmed as unresolved hardware constraints in the official Hailo community
-forums, where Hailo engineers have acknowledged that transformer-style and
-ECA-style attention blocks are not robustly supported on Hailo-8
-\cite{hailo_yolov12_12130}. As a result, the midCMA3 model in its current form
-cannot be quantised or compiled to a HEF (Hailo Executable Format) binary without
-fundamentally redesigning the fusion and backbone attention modules to use
-exclusively four-dimensional convolution-based operations such as
-Squeeze-and-Excitation attention.
-
-% @misc{hailo_shuffle_reshape_3228,
-%   title        = {{UnsupportedShuffleLayerError} when using {Reshape} node in {ONNX}},
-%   howpublished = {Hailo Community Forum.
-%                   \url{https://community.hailo.ai/t/unsupportedshufflelayererror-when-using-reshape-node-in-onnx/3228}},
-%   note         = {Accessed: 2026-05-04}
-% }
-
-% @misc{hailo_shuffle_reshape_5850,
-%   title        = {{UnsupportedShuffleLayerError} while parsing {ONNX} model},
-%   howpublished = {Hailo Community Forum.
-%                   \url{https://community.hailo.ai/t/unsupportedshufflelayererror-while-parsing-onnx-model/5850}},
-%   note         = {Accessed: 2026-05-04}
-% }
-
-% @misc{hailo_reshape_bchw_14560,
-%   title        = {{BCHW} to {BCP} simple reshape model error},
-%   howpublished = {Hailo Community Forum.
-%                   \url{https://community.hailo.ai/t/bchw-bcp-simple-reshape-model-error/14560}},
-%   note         = {Accessed: 2026-05-04}
-% }
-
-% @misc{hailo_multihead_attention_968,
-%   title        = {Error while parsing {ONNX} file created from
-%                   \texttt{torch.nn.MultiHeadAttention}},
-%   howpublished = {Hailo Community Forum.
-%                   \url{https://community.hailo.ai/t/error-while-parsing-onnx-file-created-from-torch-nn-multiheadattention/968}},
-%   note         = {Accessed: 2026-05-04}
-% }
-
-% @misc{hailo_yolov12_12130,
-%   title        = {{YOLOv12} support},
-%   howpublished = {Hailo Community Forum.
-%                   \url{https://community.hailo.ai/t/yolov12-support/12130}},
-%   note         = {Accessed: 2026-05-04}
-% }
-
-% @misc{hailo_transformer_decoder_11480,
-%   title        = {Parse transformer decoder},
-%   howpublished = {Hailo Community Forum.
-%                   \url{https://community.hailo.ai/t/parse-transformer-decoder/11480}},
-%   note         = {Accessed: 2026-05-04}
-% }
-
-% @misc{hailo_softmax_7222,
-%   title        = {Parser {ONNX} model failed ({UnsupportedSoftmaxLayerError})},
-%   howpublished = {Hailo Community Forum.
-%                   \url{https://community.hailo.ai/t/paser-onnx-model-failed/7222}},
-%   note         = {Accessed: 2026-05-04}
-% }
-
-% @misc{hailo_onnxruntime_17956,
-%   title        = {Handling unsupported operations with {ONNXRuntime}},
-%   howpublished = {Hailo Community Forum.
-%                   \url{https://community.hailo.ai/t/handling-unsupported-operations-with-onnxruntime/17956}},
-%   note         = {Accessed: 2026-05-04}
-% }
-
-
-
-% TODO:
-
-% Explain the evaluation metrics used to assess model performance.
-
-% Analyse results using the loss function convergence.
-
-% Analyse latency etc on recorded Videos and Test Setup using Raspberry + Hailo.
-
-% Maybe do some feature alignment Analysis for the rgb and thermal branches.
-
-% Do a lot of Analysis on the data and object detection results.
-
-% Dimensionality reduction and visualization of the feature space for the RGB and thermal branches to understand how the model is learning to fuse the two modalities.
-
-% Metrics like mAP, precision, recall, F1-score, and inference time should 
-% be reported for both single-modality and fused models. Additionally, an ablation 
-% study could be conducted to assess the contribution of each modality to the overall 
-% performance.
-
 \newpage
 \chapter{Limitations}
 \label{chap:limitations}
-Lipsum \ldots
+
+The collected 3D-Net dataset is relatively small and restricted to clear daytime conditions
+at a single road segment, due to regulatory constraints on drone flights. The dataset
+contains few occlusion scenarios, and no traffic congestion phenomena are captured. This
+limits the ability to evaluate downstream models for congestion and traffic flow analysis
+within the 3D-Net project. Further data collection sessions are needed.
+
+Adverse weather conditions and geographic diversity are partially addressed through the
+public RGB-thermal datasets DroneVehicle, RTDOD, and M3FD. However, these datasets were
+collected with different sensors, at different altitudes, and from different viewing angles
+than the 3D-Net configuration. The resulting domain gap introduces uncertainty about
+whether the detection performance measured on the combined training distribution translates
+to the actual sensor setup in operational conditions.
+
+All fusion variants share the same YOLOv11n base architecture, which makes the conclusions about
+fusion strategy effectiveness specific to this detector family. Alternative base
+detectors are not evaluated. Three of the evaluated fusion architectures (midCFT3, midCMA3,
+and score fusion) could not be compiled for the Hailo-8 NPU due to unsupported operators.
+The on-device comparison is therefore restricted to a subset of the candidate architectures,
+and the relative embedded performance of the excluded models cannot be assessed.
+The micro-fusion attention mechanisms were only evaluated within the mid-fusion architecture.
+Their effect on other fusion architectures remains unknown.
+
+The tracker comparison is carried out only on the 3D-Net dataset recorded at 6 fps under
+favourable daytime conditions. The evaluation does not include sequences with adverse
+weather or high vehicle density. This limits the generalisability of the ByteTrack
+selection to more demanding operational scenarios. Additionally, the operational system
+processes 20 fps video streams. The impact of this higher frame rate on tracker performance
+is not evaluated.
+
+Although the 3D-Net project targets a cooperative swarm of multiple UAVs, the project team
+deliberately assigned vehicle tracking and congestion classification to a single drone
+instance with one sensor system.
+All experiments in this thesis are therefore conducted with a single UAV. Wider surveillance
+coverage is achievable by moving UAVs along road segments and intersections, but the field
+of view at any given time is limited to the sensor system of one drone. Multi-agent
+perception scenarios, such as merging detections from overlapping fields of view or managing
+vehicle hand-offs between agents, are not evaluated.
 
 \newpage
 \chapter{Conclusion and Future Work}
 \label{chap:conclusion}
+
+This thesis investigated the perception component of a UAV-based traffic monitoring system
+operating under strict payload and power constraints. Two research questions guided the work.
+The first asked whether reliable real-time vehicle detection is achievable on a UAV edge
+device equipped with RGB and thermal sensors. The second asked what impact different sensor
+fusion strategies have on detection performance in this context.
+
+The evaluation confirms that real-time detection is achievable within the operational
+constraints. All fusion architectures successfully compiled for the Hailo-8 NPU exceed the
+20\,fps camera frame rate under INT8 quantization. The combined Raspberry Pi~5 and Hailo-8
+system draws approximately 5\,W during inference. This represents 0.3\,\% of the total UAV
+power draw and reduces practical flight time by under three seconds. The transition from
+full-precision to INT8 quantization introduces small accuracy loss across all compiled
+models. Together, these results confirm that the Hailo-8 platform is a viable inference
+engine for multi-modal vehicle detection on a payload- and energy-constrained aerial
+platform.
+% TODO: verification of the quantization small accuracy drop claim with the results
+
+The comparison of seven fusion architectures shows that full-precision detection performance
+is broadly similar across strategies despite large differences in model complexity. The
+thermal modality contributes measurably in challenging conditions such as rain, fog, and
+low light, but only in well-aligned scenarios. This confirms that multi-modal 
+sensing can add robustness beyond what an RGB-only
+model can achieve. Among the compiled architectures, mid-level fusion offers the most
+favourable balance. It matches or exceeds the performance of early and late fusion across
+most evaluation sets, shows greater robustness to residual spatial misalignment between
+modalities than early fusion, and remains fully compatible with the Hailo-8 compiler.
+Larger models and later fusion show marginal performance gains on the combined dataset,
+but these gains do not justify the additional complexity relative to mid-level fusion.
+
+ByteTrack is identified as the appropriate tracker for this application. It achieves the
+highest tracking accuracy across all evaluated methods, with a HOTA of 0.946 and an IDF1
+of 0.954, while also achieving the lowest per-frame latency at 0.36\,ms on the
+Raspberry~Pi~5 CPU. Re-identification features and camera motion compensation provide no
+benefit under the predictable aerial viewpoint of this application, where objects follow
+consistent trajectories with few sustained occlusions. Motion-based association in
+combination with a high-quality detector is therefore sufficient.
+
+The thesis makes three contributions to the 3D-Net project. First, the 3D-Net dataset
+provides a low-altitude oblique paired RGB-LWIR benchmark for vehicle detection. 
+Second, to the best of our knowledge, this work presents the first
+systematic comparison of multiple RGB-LWIR fusion architectures evaluated under INT8
+quantization on a dedicated edge accelerator for aerial vehicle traffic monitoring. Third,
+the modular YAML-configurable tracking service provides a message queue vehicle stream for the
+downstream congestion classification and multi-agent coordination components of the broader
+project.
+
+Several directions remain open for future work. The 3D-Net dataset currently covers
+only daytime, clear-weather sequences at moderate vehicle densities. An extension to adverse
+weather, nighttime conditions, and higher traffic densities would broaden the evaluation
+scope and make downstream congestion analysis feasible. Tracker performance has been assessed
+at the 3D-Net datasets 6\,fps. A dedicated evaluation at the operational frame rate of 20\,fps under demanding
+traffic conditions would confirm that latency and tracking quality hold under deployment
+conditions. Three fusion architectures could not be compiled for the Hailo-8 due to
+unsupported operators. An investigation of operator substitutions or modified architecture
+variants for these models could resolve these incompatibilities and establish their effect
+on quantized performance. The fusion strategy evaluation was conducted with YOLOv11n as the
+base detector. The observed performance may be specific to this detector
+family. An evaluation with alternative base detectors would establish its consistency across
+architectures. The micro-fusion attention mechanisms were only explored within mid-level
+fusion. It should be investigated whether other macro fusion architectures could benefit similarly. 
+Finally, this work does not address multi-agent tracking, which could
+increase the simultaneous coverage of the monitored area. A dedicated study of
+detection fusion across overlapping sensor fields of view and of vehicle identity continuity
+across hand-offs between agents would close this gap.
 
 \newpage
 \appendix
@@ -3476,6 +3729,106 @@ provides clear object boundaries even at night, where vehicles and people are
 thermally distinct from their surroundings.
 When the visible channel is ambiguous, open the corresponding thermal image via
 the S3 URL attached to the FiftyOne sample to confirm object presence and class.
+
+\newpage
+
+\chapter{Detection Accuracy Tables}
+\label{chap:detection_accuracy_tables}
+
+\begin{table}[H]
+    \centering
+    \caption{Full-precision (FP32) and quantized (INT8) detection accuracy of all fusion
+             model variants on the validation sets of all datasets.}
+    \label{tab:acc_full_precision}
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{l l r r r r r r r r r}
+        \toprule
+        \textbf{Dataset} & \textbf{Metric}
+            & \textbf{RGB} & \textbf{Thermal} & \textbf{Early}
+            & \textbf{Mid} & \textbf{MidP3} & \textbf{midCMA3}
+            & \textbf{midCFT3} & \textbf{Late} & \textbf{Score} \\
+        \midrule
+        \multirow{4}{*}{M3FD}
+            & FP32 mAP@50   & 0.635 & 0.705 & 0.652 & 0.671 & 0.654 & 0.652 & 0.649 & 0.690 & 0.664 \\
+            & FP32 mAP50:95 & 0.436 & 0.462 & 0.440 & 0.458 & 0.451 & 0.449 & 0.439 & 0.467 & 0.445 \\
+            \cmidrule{2-11}
+            & INT8 mAP@50   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+            & INT8 mAP50:95 & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+        \midrule
+        \multirow{4}{*}{RTDOD}
+            & FP32 mAP@50   & 0.784 & 0.638 & 0.784 & 0.813 & 0.815 & 0.817 & 0.817 & 0.811 & 0.773 \\
+            & FP32 mAP50:95 & 0.489 & 0.303 & 0.489 & 0.506 & 0.509 & 0.501 & 0.510 & 0.509 & 0.482 \\
+            \cmidrule{2-11}
+            & INT8 mAP@50   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+            & INT8 mAP50:95 & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+        \midrule
+        \multirow{4}{*}{Dronevehicle}
+            & FP32 mAP@50   & 0.850 & 0.945 & 0.945 & 0.948 & 0.951 & 0.950 & 0.947 & 0.944 & 0.937 \\
+            & FP32 mAP50:95 & 0.525 & 0.696 & 0.693 & 0.697 & 0.707 & 0.701 & 0.696 & 0.696 & 0.684 \\
+            \cmidrule{2-11}
+            & INT8 mAP@50   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+            & INT8 mAP50:95 & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+        \midrule
+        \multirow{4}{*}{3D-Net}
+            & FP32 mAP@50   & 0.970 & 0.643 & 0.987 & 0.978 & 0.955 & 0.972 & 0.981 & 0.984 & 0.988 \\
+            & FP32 mAP50:95 & 0.808 & 0.345 & 0.801 & 0.797 & 0.793 & 0.766 & 0.798 & 0.798 & 0.825 \\
+            \cmidrule{2-11}
+            & INT8 mAP@50   & 0.9261 & 0.4894 & 0.9036 & 0.9651 & 0.9534 & -- & -- & 0.9347 & -- \\
+            & INT8 mAP50:95 & 0.7277 & 0.3058 & 0.7712 & 0.8311 & 0.8271 & -- & -- & 0.8052 & -- \\
+        \midrule
+        \multirow{4}{*}{Combined}
+            & FP32 mAP@50   & 0.720 & 0.655 & 0.754 & 0.792 & 0.783 & 0.794 & 0.785 & 0.805 & 0.797 \\
+            & FP32 mAP50:95 & 0.448 & 0.392 & 0.497 & 0.531 & 0.532 & 0.536 & 0.531 & 0.549 & 0.542 \\
+            \cmidrule{2-11}
+            & INT8 mAP@50   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+            & INT8 mAP50:95 & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \caption{Per-object-size detection accuracy on the 3D-Net validation set for models
+             trained on the 3D-Net dataset and the combined dataset.}
+    \label{tab:acc_3dnet_size}
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{l l l r r r r r r r r r}
+        \toprule
+        \textbf{Training set} & \textbf{Size} & \textbf{Metric}
+            & \textbf{RGB} & \textbf{Thermal} & \textbf{Early} 
+            & \textbf{Mid} & \textbf{MidP3} & \textbf{midCMA3} 
+            & \textbf{midCFT3} & \textbf{Late} & \textbf{Score} \\
+        \midrule
+        \multirow{6}{*}{3D-Net}
+            & \multirow{2}{*}{Small}
+                & mAP@50   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+            & & mAP50:95   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+            \cmidrule{2-12}
+            & \multirow{2}{*}{Medium}
+                & mAP@50   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+            & & mAP50:95   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+            \cmidrule{2-12}
+            & \multirow{2}{*}{Large}
+                & mAP@50   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+            & & mAP50:95   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+        \midrule
+        \multirow{6}{*}{Combined}
+            & \multirow{2}{*}{Small}
+                & mAP@50   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+            & & mAP50:95   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+            \cmidrule{2-12}
+            & \multirow{2}{*}{Medium}
+                & mAP@50   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+            & & mAP50:95   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+            \cmidrule{2-12}
+            & \multirow{2}{*}{Large}
+                & mAP@50   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+            & & mAP50:95   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
 
 \newpage
 
