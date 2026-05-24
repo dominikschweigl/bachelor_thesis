@@ -246,7 +246,7 @@ on the inference pipeline within these constraints.
 
 The thesis introduces a low-altitude oblique paired RGB-LWIR dataset and
 evaluates seven fusion architectures spanning early, mid, late,
-and score fusion strategies on the self-collected and public datasets. 
+and score fusion strategies on the self-collected and public datasets.
 The best-performing architecture
 is deployed on a Hailo-8 accelerator under INT8 quantization. To the best of
 our knowledge, no prior work reports a multi-architecture RGB-LWIR fusion
@@ -330,12 +330,12 @@ drone for traffic flow estimation
 \cite{khan2018UAVTrafficSignalisedIntersections, khan2018UAVtrafficUrbanRoundabouts} and
 safety analysis
 \cite{yang2021functionalSafetyRiskSignalisedIntersections,
-vuong2021intersectionMixedTrafficSafetyCloudModel}.
+    vuong2021intersectionMixedTrafficSafetyCloudModel}.
 In addition, lane-change risk has been examined from drone footage of interchange
 merging areas and freeway segments
 \cite{gu2019UAVcrashRiskInterchangeMerging,park2018laneChangeRiskTrajectoryData}.
 The DARTS system of \citet{li2025DARTSdroneTrafficIncidentDetection} explored
-incident detection on an interstate highway with real-time inference through onboard 
+incident detection on an interstate highway with real-time inference through onboard
 thermal imaging. They report 99\,\% accuracy for incident detection on their self-collected dataset
 with a successful incident detection during an interstate field test.
 
@@ -418,9 +418,9 @@ all tyrolian areas.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.65\textwidth]{images/twinFOLD_KAT.jpg}
+    \includegraphics[width=0.5\textwidth]{images/twinFOLD_KAT.jpg}
     \caption{
-        The twinFOLD KAT heavy-payload hexacopter including the
+        The twinFOLD KAT UAV including the
         mounted sensor system on the first data collection mission.
     }
     \label{fig:twinFOLD_KAT}
@@ -441,12 +441,7 @@ organization.
 
 \begin{figure}[H]
     \centering
-    \setlength{\tabcolsep}{0pt}
-    \begin{tabular}{ccc}
-        \includegraphics[width=0.333\textwidth]{images/jetson_nano_dev_kit}      &
-        \includegraphics[width=0.333\textwidth]{images/jetson_xavier_nx_dev_kit} &
-        \includegraphics[width=0.333\textwidth]{images/raspberry_hailo_kit}
-    \end{tabular}
+    \includegraphics[width=\textwidth]{images/processing_units.png}
     \caption{The three evaluated onboard processing platforms. Left: Jetson Nano Developer Kit~\cite{img_jetsonnano_devkit}. Centre: Jetson Xavier NX Developer Kit~\cite{img_jetsonxaviernx_devkit}. Right: Raspberry Pi 5 with Hailo-8 AI HAT\texttt{+}~\cite{img_raspberrypi_aihat}.}
     \label{fig:processing_units}
 \end{figure}
@@ -563,7 +558,7 @@ Figure~\ref{fig:raspberryPiBracket}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.65\textwidth]{images/raspberry_bracket_mount.png}
+    \includegraphics[width=0.9\textwidth]{images/raspberry_bracket_mount.png}
     \caption{
         3D-printed mounting bracket alone (left), bracket with Raspberry Pi 5 and Hailo-8 module
         assembled (center), and the unit mounted on the underside of the twinFOLD KAT UAV (right).
@@ -657,7 +652,7 @@ region (\SI{1}{\milli\meter} to \SI{1}{\meter}), where radar operates.
 Shorter wavelengths provide higher spatial detail and fine-grained information like texture and color, but are more
 susceptible to atmospheric absorption and scattering by fog, rain, and aerosols.
 In contrast, longer wavelengths penetrate adverse weather more effectively but
-provide lower spatial resolution due to their lower energy content 
+provide lower spatial resolution due to their lower energy content
 and the larger areas they must view in consequence to obtain a detectable signal.
 \cite[pp.~6, 10, 386, 481]{lillesand2015remoteSensing}
 
@@ -784,12 +779,12 @@ temperature relative to, their surroundings such as vehicles and personnel.
     \label{fig:black_body_radiation}
 \end{figure}
 
-As shown in Figure~\ref{fig:vehicle_thermal_radiation}, thermographic measurements 
-of the Volkswagen e-Golf and Golf 1.5TSI after 30 minutes of city driving 
-at 5$^\circ$C and $-1~^\circ$C reveal characteristic heat patterns across 
-both vehicles. The combustion engine's hood exhibits a pronounced temperature 
-increase, while the electric vehicle's front surface remains near ambient 
-temperature. Additional signatures from tires, wheel arches, headlights, and 
+As shown in Figure~\ref{fig:vehicle_thermal_radiation}, thermographic measurements
+of the Volkswagen e-Golf and Golf 1.5TSI after 30 minutes of city driving
+at 5$^\circ$C and $-1~^\circ$C reveal characteristic heat patterns across
+both vehicles. The combustion engine's hood exhibits a pronounced temperature
+increase, while the electric vehicle's front surface remains near ambient
+temperature. Additional signatures from tires, wheel arches, headlights, and
 windows provide stable and detectable thermal patterns for infrared-based vehicle detection.
 \cite{svorc2020detectionElectricVehicleThermal}
 
@@ -877,7 +872,7 @@ safety consideration \cite{royo2019overviewLiDARAutonomousVehicles}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{images/lidar_point_cloud_melotti_2020_multimodal_recognition.png}
+    \includegraphics[width=0.65\textwidth]{images/lidar_point_cloud_melotti_2020_multimodal_recognition.png}
     \caption{
         Example obtained from KITTI 2D Object
         Detection Dataset. The 3D point cloud is projected onto
@@ -938,7 +933,7 @@ short microwave pulses and detects the reflected signals using
 antennas. The range of objects is estimated from the time delay of
 the returned signal, their radial velocity from the Doppler shift,
 and their angular position from phase differences across the antenna
-array, which allows estimation of both azimuth (horizontal) and 
+array, which allows estimation of both azimuth (horizontal) and
 elevation (vertical) angles.
 \cite[pp.~389, 400]{lillesand2015remoteSensing}
 \cite{kurniawan2023clusterfusionRadarCamera3DObjectDetection}
@@ -1129,7 +1124,7 @@ appropriate battery capacity planning.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.45\textwidth]{images/wiris_enterprise_shadow.png}
+    \includegraphics[width=0.4\textwidth]{images/wiris_enterprise_shadow.png}
     \vspace{-1em}
     \caption{
         The Workswell WIRIS Enterprise multi-sensor system.
@@ -1219,7 +1214,7 @@ Samples of the recorded scenes are shown in Figure~\ref{fig:recorded_scenes}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/3d_net_dataset_samples.png}
+    \includegraphics[width=0.9\textwidth]{images/3d_net_dataset_samples.png}
     \caption{
         Aligned sample frames from the recorded scenes. The top row shows RGB frames, while the bottom row shows the corresponding thermal frames.
     }
@@ -1301,7 +1296,7 @@ selected, resulting in two videos with equal numbers of synchronized frames.
 While this step eliminated the progressive temporal drift, a constant offset
 between the videos remained due to different recording start times. This
 offset was estimated by identifying a distinct and easily recognizable event
-in both videos (e.g., two cars crossing). The difference between the 
+in both videos (e.g., two cars crossing). The difference between the
 corresponding timestamps yielded an offset of 2.6\,seconds.
 The final synchronization was achieved by shifting one video by this offset
 and repeating the frame-matching procedure. This resulted in temporally
@@ -1405,7 +1400,7 @@ tangent ratio of the FOVs:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{images/pinhole_fov_scale.png}
+    \includegraphics[width=0.8\textwidth]{images/pinhole_fov_scale.png}
     \vspace{-1em}
     \caption{
         Illustration of pinhole model for FOV scaling in one dimension.
@@ -1482,7 +1477,7 @@ within typical manufacturing tolerances for camera alignment:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{images/boresight_misalignment_approximation.png}
+    \includegraphics[width=0.8\textwidth]{images/boresight_misalignment_approximation.png}
     \vspace{-1em}
     \caption{
         Illustration of the pinhole model for boresight angle approximation.
@@ -1526,7 +1521,7 @@ of $4.12~\text{px}$.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{images/parallax_shift.png}
+    \includegraphics[width=0.5\textwidth]{images/parallax_shift.png}
     \vspace{-1em}
     \caption{
         Illustration of the pinhole camera model used to approximate
@@ -1558,7 +1553,7 @@ near the image edges visible for the vehicle near the top.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/camera_alignment_results.png}
+    \includegraphics[width=0.9\textwidth]{images/camera_alignment_results.png}
     \vspace{-1em}
     \caption{
         Qualitative RGB--thermal alignment results (thermal in BWRGB).
@@ -1623,7 +1618,7 @@ Figure~\ref{fig:annotation_tools} shows the interfaces of both tools.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{images/cvat_fiftyone_showcase.png}
+    \includegraphics[width=0.9\textwidth]{images/cvat_fiftyone_showcase.png}
     \vspace{-1em}
     \caption{
         Left: CVAT annotation interface with a car bounding box drawn on a sample frame.
@@ -1745,7 +1740,7 @@ The shape scatter reveals the relationship between object height and width.
 Persons appear as tall, narrow boxes because their vertical body silhouette dominates from an aerial viewpoint.
 Bicycles share a similar aspect ratio but shift toward slightly greater width.
 Cars and buses form a compact diagonal band with low aspect-ratio variance.
-Trucks occupy the largest bounding box sizes and show the widest spread in both width and height, but the distribution 
+Trucks occupy the largest bounding box sizes and show the widest spread in both width and height, but the distribution
 goes towards wide horizontal bounding boxes with increasing size.
 
 
@@ -1762,7 +1757,7 @@ These limitations motivate the inclusion of the public datasets described in Sec
 \section{Public Visible-Thermal Datasets}
 \label{sec:public_datasets}
 
-UAV datasets typically distinguish between nadir views, where the camera points 
+UAV datasets typically distinguish between nadir views, where the camera points
 straight downward, and oblique views, where the camera is tilted at an angle to the ground.
 Among UAV-based RGB-thermal datasets, the DroneVehicle dataset
 \cite{sun2022droneVehicleRGBThermalUAVDataset} is one of the largest,
@@ -1875,49 +1870,49 @@ summarizes the characteristics of all discussed datasets.
     \begin{adjustbox}{center, scale=0.8}
         \begin{tabular}{|C{2.5cm}|C{2.2cm}|C{1.8cm}|C{2.5cm}|C{1.6cm}|C{1.8cm}|C{1.5cm}|C{1.2cm}|C{1.8cm}|C{1.6cm}|}
             \hline
-            \textbf{Dataset}                                                      & \textbf{Modality} & \textbf{Capture Setup} & \textbf{Perspective}     & \textbf{Altitude (m)} & \textbf{Vehicle Classes} & \textbf{Person} & \textbf{Night} & \textbf{Adverse Weather} & \textbf{Images} \\
+            \textbf{Dataset}                                                      & \textbf{Modality} & \textbf{Capture Setup} & \textbf{Perspective} & \textbf{Altitude (m)} & \textbf{Vehicle Classes} & \textbf{Person} & \textbf{Night} & \textbf{Adverse Weather} & \textbf{Images} \\
             \hline
-            DroneVehicle \cite{sun2022droneVehicleRGBThermalUAVDataset}           & RGB+T             & UAV                    & Nadir / Oblique          & 80\textemdash120      & 5                        & \textemdash     & \checkmark     & \textemdash              & 28,439          \\
+            DroneVehicle \cite{sun2022droneVehicleRGBThermalUAVDataset}           & RGB+T             & UAV                    & Nadir / Oblique      & 80\textemdash120      & 5                        & \textemdash     & \checkmark     & \textemdash              & 28,439          \\
             \hline
-            VTUAV \cite{zhang2022VTUAVDataset}                                    & RGB+T             & UAV                    & Nadir / Oblique          & 5\textemdash20        & 9                        & \checkmark      & \checkmark     & \textemdash              & 1,700,000       \\
+            VTUAV \cite{zhang2022VTUAVDataset}                                    & RGB+T             & UAV                    & Nadir / Oblique      & 5\textemdash20        & 9                        & \checkmark      & \checkmark     & \textemdash              & 1,700,000       \\
             \hline
-            VAID \cite{li2020aerialVehicleDetectionVAIDDataset}                   & RGB               & UAV                    & Nadir / Oblique          & 90                    & 7                        & \textemdash     & \textemdash    & \textemdash              & 5,937           \\
+            VAID \cite{li2020aerialVehicleDetectionVAIDDataset}                   & RGB               & UAV                    & Nadir / Oblique      & 90                    & 7                        & \textemdash     & \textemdash    & \textemdash              & 5,937           \\
             \hline
-            VEDAI \cite{razakarivony2016VEDAIdataset}                             & RGB+T             & UAV                    & Nadir                    & \textemdash           & 6                        & \textemdash     & \textemdash    & \textemdash              & 1,210           \\
+            VEDAI \cite{razakarivony2016VEDAIdataset}                             & RGB+T             & UAV                    & Nadir                & \textemdash           & 6                        & \textemdash     & \textemdash    & \textemdash              & 1,210           \\
             \hline
-            M3OT \cite{nie2025m3ot}                                               & RGB+T             & UAV                    & Nadir / Oblique          & 100\textemdash200     & 1                        & \textemdash     & \checkmark     & \textemdash              & 21,580          \\
+            M3OT \cite{nie2025m3ot}                                               & RGB+T             & UAV                    & Nadir / Oblique      & 100\textemdash200     & 1                        & \textemdash     & \checkmark     & \textemdash              & 21,580          \\
             \hline
-            RTDOD \cite{feng2023rtdodDataset}                                     & RGB+T             & UAV                    & Nadir / Oblique          & \textemdash           & 5                        & \checkmark      & \checkmark     & \checkmark               & 16,192          \\
+            RTDOD \cite{feng2023rtdodDataset}                                     & RGB+T             & UAV                    & Nadir / Oblique      & \textemdash           & 5                        & \checkmark      & \checkmark     & \checkmark               & 16,192          \\
             \hline
-            TrafficNight \cite{zhang2024trafficNightDataset}                      & RGB+T+D           & UAV                    & Nadir                    & \textemdash           & 6                        & \textemdash     & \checkmark     & \textemdash              & 2,200           \\
+            TrafficNight \cite{zhang2024trafficNightDataset}                      & RGB+T+D           & UAV                    & Nadir                & \textemdash           & 6                        & \textemdash     & \checkmark     & \textemdash              & 2,200           \\
             \hline
-            HIT-UAV \cite{suo2023hitUAVDataset}                                   & T                 & UAV                    & Nadir / Oblique          & 60\textemdash130      & 1                        & \checkmark      & \checkmark     & \textemdash              & 2,898           \\
+            HIT-UAV \cite{suo2023hitUAVDataset}                                   & T                 & UAV                    & Nadir / Oblique      & 60\textemdash130      & 1                        & \checkmark      & \checkmark     & \textemdash              & 2,898           \\
             \hline
-            MONET \cite{riz2023monetDataset}                                      & T                 & UAV                    & Forward / Oblique         & 20\textemdash130     & 1                        & \checkmark      & \checkmark     & \textemdash              & 53,000          \\
+            MONET \cite{riz2023monetDataset}                                      & T                 & UAV                    & Forward / Oblique    & 20\textemdash130      & 1                        & \checkmark      & \checkmark     & \textemdash              & 53,000          \\
             \hline
-            UAVDT \cite{du2018UAVDTDataset}                                       & RGB               & UAV                    & Forward / Side           & 10\textemdash70       & 3                        & \textemdash     & \checkmark     & \checkmark               & 80,000          \\
+            UAVDT \cite{du2018UAVDTDataset}                                       & RGB               & UAV                    & Forward / Side       & 10\textemdash70       & 3                        & \textemdash     & \checkmark     & \checkmark               & 80,000          \\
             \hline
-            AU-AIR \cite{bozcan2020auAirDataset}                                  & RGB               & UAV                    & Forward / Oblique        & 5\textemdash30        & 8                        & \textemdash     & \textemdash    & \textemdash              & 32,823          \\
+            AU-AIR \cite{bozcan2020auAirDataset}                                  & RGB               & UAV                    & Forward / Oblique    & 5\textemdash30        & 8                        & \textemdash     & \textemdash    & \textemdash              & 32,823          \\
             \hline
-            FLIR ADAS v2 \cite{teledyne_2022_flirAdasV2Dataset}                   & RGB+T             & Vehicle                & Forward                  & \textemdash           & 9                        & \checkmark      & \checkmark     & \checkmark               & 26,442          \\
+            FLIR ADAS v2 \cite{teledyne_2022_flirAdasV2Dataset}                   & RGB+T             & Vehicle                & Forward              & \textemdash           & 9                        & \checkmark      & \checkmark     & \checkmark               & 26,442          \\
             \hline
-            KAIST ADAS \cite{choi2018kaist}                                       & RGB+T+D       & Vehicle                & Forward                  & \textemdash           & 1                        & \checkmark      & \checkmark     & \textemdash              & 95,000          \\
+            KAIST ADAS \cite{choi2018kaist}                                       & RGB+T+D           & Vehicle                & Forward              & \textemdash           & 1                        & \checkmark      & \checkmark     & \textemdash              & 95,000          \\
             \hline
-            M3FD \cite{liu2022m3fdDataset}                                        & RGB+T             & Vehicle                & Forward                  & \textemdash           & 5                        & \checkmark      & \checkmark     & \checkmark               & 4,200           \\
+            M3FD \cite{liu2022m3fdDataset}                                        & RGB+T             & Vehicle                & Forward              & \textemdash           & 5                        & \checkmark      & \checkmark     & \checkmark               & 4,200           \\
             \hline
-            MSRS \cite{tang2022piafusionMSRSDataset}                              & RGB+T             & Vehicle                & Forward                  & \textemdash           & 1                        & \checkmark      & \checkmark     & \textemdash              & 1,444           \\
+            MSRS \cite{tang2022piafusionMSRSDataset}                              & RGB+T             & Vehicle                & Forward              & \textemdash           & 1                        & \checkmark      & \checkmark     & \textemdash              & 1,444           \\
             \hline
-            Infraparis \cite{franchi2024infraparisRGBDepthThermalDataset}         & RGB+T+D       & Vehicle                & Forward                  & \textemdash           & 6                        & \checkmark      & \checkmark     & \textemdash              & 12,084          \\
+            Infraparis \cite{franchi2024infraparisRGBDepthThermalDataset}         & RGB+T+D           & Vehicle                & Forward              & \textemdash           & 6                        & \checkmark      & \checkmark     & \textemdash              & 12,084          \\
             \hline
-            Multispectral \cite{takumi2017multispectralDatasetAutonomousVehicles} & RGB+T +NIR+MIR     & Vehicle                & Forward                  & \textemdash           & 3                        & \checkmark      & \textemdash    & \textemdash              & 7,512           \\
+            Multispectral \cite{takumi2017multispectralDatasetAutonomousVehicles} & RGB+T +NIR+MIR    & Vehicle                & Forward              & \textemdash           & 3                        & \checkmark      & \textemdash    & \textemdash              & 7,512           \\
             \hline
-            RASMD \cite{youngwan2026rasmd}                                        & RGB+SWIR          & Vehicle                & Forward                  & \textemdash           & 5                        & \checkmark      & \textemdash    & \checkmark               & 100,000         \\
+            RASMD \cite{youngwan2026rasmd}                                        & RGB+SWIR          & Vehicle                & Forward              & \textemdash           & 5                        & \checkmark      & \textemdash    & \checkmark               & 100,000         \\
             \hline
-            DAWN \cite{kenk2020dawn}                                              & RGB               & Vehicle                & Forward                  & \textemdash           & 4                        & \checkmark      & \textemdash    & \checkmark               & 1,000           \\
+            DAWN \cite{kenk2020dawn}                                              & RGB               & Vehicle                & Forward              & \textemdash           & 4                        & \checkmark      & \textemdash    & \checkmark               & 1,000           \\
             \hline
-            ACDC \cite{sakaridis2025acdcDatasetAdverseConditions}                 & RGB               & Vehicle                & Forward                  & \textemdash           & 5                        & \checkmark      & \checkmark     & \checkmark               & 5,509           \\
+            ACDC \cite{sakaridis2025acdcDatasetAdverseConditions}                 & RGB               & Vehicle                & Forward              & \textemdash           & 5                        & \checkmark      & \checkmark     & \checkmark               & 5,509           \\
             \hline
-            LLVIP \cite{jia2021llvip}                                             & RGB+T             & CCTV                   & Oblique           & \textemdash                  & \textemdash              & \checkmark      & \checkmark     & \textemdash              & 16,836          \\
+            LLVIP \cite{jia2021llvip}                                             & RGB+T             & CCTV                   & Oblique              & \textemdash           & \textemdash              & \checkmark      & \checkmark     & \textemdash              & 16,836          \\
             \hline
         \end{tabular}
     \end{adjustbox}
@@ -2077,7 +2072,7 @@ and FieldScale applied to an image from the FLIR(v2) dataset \cite{teledyne_2022
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.65\textwidth]{images/thermal_preprocessing_becker_2025_fusion_confusion.png}
+    \includegraphics[width=0.9\textwidth]{images/thermal_preprocessing_becker_2025_fusion_confusion.png}
     \caption{
         Examples showing the results of the preprocessing
         methods HE, CLAHE, and Fieldscale.
@@ -2146,9 +2141,9 @@ of the RGB annotations.
 \label{chap:object_detection}
 
 Object detection is the task of localizing and classifying all objects present in an image.
-Each detected object is represented as a tuple of a bounding box, parameterized as center 
+Each detected object is represented as a tuple of a bounding box, parameterized as center
 coordinates, width, and height, and a class label~\cite{zou2023objectDetectionSurvey, redmon2016YOLO}.
-Detection models are grouped into three families, namely proposal-based detectors, 
+Detection models are grouped into three families, namely proposal-based detectors,
 grid-based detectors, and query-based detectors~\cite{bhowmik2023unionOverIntersections}.
 These families are briefly introduced and justification for the choice of grid-based detectors is given.
 
@@ -2487,7 +2482,7 @@ MLCA computes pre-transformer channel attention weights from two pooled represen
 feature map.
 A local representation is obtained by average pooling to a $5{\times}5$ spatial
 resolution, which retains spatially distributed channel statistics.
-A global representation pools each channel to a single scalar which creates a complementary, 
+A global representation pools each channel to a single scalar which creates a complementary,
 spatially agnostic view of overall channel importance.
 A one-dimensional convolution is applied to each representation to model
 inter-channel dependencies.
@@ -2757,7 +2752,7 @@ re-identification module, which runs feature extraction for each detected object
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{images/tracker_latency_distributions.png}
+    \includegraphics[width=\textwidth]{images/tracker_latency_distributions.png}
     \caption{
         Per-frame Latency distributions of the evaluated trackers on the 3D-Net dataset.
         (Left) all frames, (Right) only frames with at least 1 detection.
@@ -2831,7 +2826,7 @@ container on the GPU Rack.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{images/clearml_interface.png}
+    \includegraphics[width=\textwidth]{images/clearml_interface.png}
     \caption{
         Example views of the ClearML web interface for a training run, showing the scalar metrics across
         training iterations (left), the plot section (center), and the created debugging samples (right).
@@ -2878,7 +2873,7 @@ it~\cite{hailo8_productBrief2023}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{images/hailo_software_suite.png}
+    \includegraphics[width=0.75\textwidth]{images/hailo_software_suite.png}
     \caption{
         Overview of the Hailo-8 software
         suite~\cite{hailo8_productBrief2023}.
@@ -2903,7 +2898,7 @@ ones~\cite{hailoDataflowCompilerUserGuide}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{images/hailo_software_suite.png}
+    \includegraphics[width=0.75\textwidth]{images/hailo_software_suite.png}
     \caption{
         Overview of the Hailo-8 model build
         process.~\cite{hailo8_productBrief2023}.
@@ -3278,13 +3273,13 @@ every 30 frames to avoid performance degradation from frequent I/O polling.
 The primary measurement used for determining the detection accuracy of the trained
 models is the mean average precision (mAP). The mAP is computed by first calculating
 the average precision (AP) per class, which summarises the area under the
-precision-recall curve, and then averaging those per-class values across all classes. 
+precision-recall curve, and then averaging those per-class values across all classes.
 Precision and recall are defined in terms of true positives,
 false positives, and false negatives, where a predicted bounding box counts as a true
 positive only if its intersection over union (IoU) with the matching ground-truth box
 meets or exceeds a given threshold $t$. The IoU measures the ratio of the overlapping
 area to the combined area of the predicted and ground-truth boxes, with
-$\text{IoU} \geq t$ indicating a correct detection. 
+$\text{IoU} \geq t$ indicating a correct detection.
 \cite{padilla2020surveyPerformanceMetricsObjectDetection}
 
 Two variants of this threshold are used throughout this evaluation. The first is
@@ -3294,17 +3289,17 @@ values computed at ten IoU thresholds ranging from $0.50$ to $0.95$ in steps of 
 and therefore penalises imprecise bounding-box localisation.
 \cite{padilla2020surveyPerformanceMetricsObjectDetection}
 
-The object detectors evaluated in this section are the single-modality RGB and 
+The object detectors evaluated in this section are the single-modality RGB and
 thermal models, the different macro fusion approaches of early, mid,
 late, and score fusion, which concatenate the feature maps at
-different stages of the object detector as described in 
+different stages of the object detector as described in
 Chapter~\ref{chap:object_detection}. In addition, the micro-fusion variants MidP3, midCFT3, and midCMA3 applied at
 the mid-fusion position are evaluated, as described in
 Section~\ref{sec:micro_fusion}.
 
-The object detector performance on the dataset validation sets is shown in 
+The object detector performance on the dataset validation sets is shown in
 Figure~\ref{fig:fusion_performance_full_precision}. Despite the vast differences
-in model parameter count and computational cost in terms of floating-point operations 
+in model parameter count and computational cost in terms of floating-point operations
 (FLOPS) seen in Figure~\ref{fig:model_complexity}, the detection performances
 are relatively equal in most cases.
 The model performances very high for our 3D-Net dataset, which is because
@@ -3318,7 +3313,7 @@ thermal modality performs significantly worse than the rest, while for the M3FD 
 Visdrone Dronevehicle datasets the thermal modality performs better or equal to the rest.
 The reason for this is that the RTDOD and 3D-Net datasets have more spatio-temporal
 misalignment between the RGB and thermal modalities than the other two datasets and
-the RGB labels are used for evaluation. 
+the RGB labels are used for evaluation.
 For the larger combined dataset, the performance trends show that the performance tends to
 increase with increasing model size and later fusion, while this trend is
 not clear from the individual datasets.
@@ -3327,7 +3322,7 @@ in Appendix~\ref{chap:detection_accuracy_tables}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{images/fusion_performance_full_precision.png}
+    \includegraphics[width=\textwidth]{images/fusion_performance_full_precision.png}
     \caption{
         Fusion Model variant performances on the validation sets of the M3fd, RTDOD, Visdrone
         Dronevehicle, 3D-Net and the combined datasets in full precision.
@@ -3337,7 +3332,7 @@ in Appendix~\ref{chap:detection_accuracy_tables}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{images/fusion_model_complexity.png}
+    \includegraphics[width=\textwidth]{images/fusion_model_complexity.png}
     \caption{
         Comparison of the fusion Model variant model parameters and FLOPS.
     }
@@ -3352,15 +3347,15 @@ objects have less than $32^2$ pixels, medium objects range from $32^2$ to $96^2$
 and large objects have an area of more than $96^2$ pixels.
 ~\cite{lin2014microsoftCOCO, kisantal2019augmentationSmallObjectDetection, chen2020fourPillarsSmallObjectDetectionSurvey}
 
-The per-size mAP computation begins with a global IoU-based matching step that assigns 
-each prediction to at most one ground-truth box. This one-to-one assignment is resolved 
-before any size bin is considered. A matched prediction is then attributed to the size 
-bin of the ground-truth box it was assigned to. If that ground-truth box falls in the 
-small, medium, or large area range, the prediction is counted as a true positive for 
-that bin, regardless of the area of the predicted bounding box. Predictions that remain 
-unmatched after the global step are attributed to the size bin whose area range contains 
-their predicted bounding-box area and are counted as false positives. Ground-truth boxes 
-that are never matched to a prediction are counted as false negatives in their respective 
+The per-size mAP computation begins with a global IoU-based matching step that assigns
+each prediction to at most one ground-truth box. This one-to-one assignment is resolved
+before any size bin is considered. A matched prediction is then attributed to the size
+bin of the ground-truth box it was assigned to. If that ground-truth box falls in the
+small, medium, or large area range, the prediction is counted as a true positive for
+that bin, regardless of the area of the predicted bounding box. Predictions that remain
+unmatched after the global step are attributed to the size bin whose area range contains
+their predicted bounding-box area and are counted as false positives. Ground-truth boxes
+that are never matched to a prediction are counted as false negatives in their respective
 size bin.
 
 Figure~\ref{fig:model_performance_by_size} shows the detection performance on the 3D-Net dataset
@@ -3400,13 +3395,40 @@ in Appendix~\ref{chap:detection_accuracy_tables}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{images/model_performance_object_size.png}
+    \includegraphics[width=\textwidth]{images/model_performance_object_size.png}
     \caption{
-        Comparison on the validation set of the 3D-Net dataset of the detection models 
+        Comparison on the validation set of the 3D-Net dataset of the detection models
         trained on the 3D-Net dataset and the combined dataset for small, medium, and large objects.
     }
     \label{fig:model_performance_by_size}
 \end{figure}
+
+To evaluate the performance of the models on different weather and lighting conditions, the mAP
+metrics are computed separately for the adverse weather and night samples of the RTDOD dataset.
+The results are shown in Figure~\ref{fig:model_performance_by_condition} and numeric results
+are listed in Table~\ref{tab:acc_weather_night}.
+The best fusion models trained on the combined dataset show a performance improvement
+over the RGB model on both adverse weather (3-4\% mAP50) and night conditions (7-9\% mAP50).
+The thermal modality alone performs worse than the RGB and fusion models on both conditions,
+which shows that the complementary information from both modalities combined provides
+a consistent benefit also for night and adverse weather conditions.
+The midCMA3 and midCFT3 micro-fusion approaches slightly improve detection accuracy
+over the standard mid-fusion (0.2\%-0.7\% mAP50) on the adverse weather samples, slightly
+improving over late fusion in these conditions,
+but leave the night performance unchanged.
+For the night samples, the late fusion model has roughly 3\% lower mAP50
+than the mid fusion models and the score fusion model achieved the best performance.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/weather_night_evaluation.png}
+    \caption{
+        Comparison of the fusion methods on the adverse weather and
+        night samples of the RTDOD dataset.
+    }
+    \label{fig:model_performance_by_condition}
+\end{figure}
+
 
 
 Three of the trained fusion models, specifically midCMA3, midCFT3, and score
@@ -3415,7 +3437,7 @@ detailed in Section~\ref{sec:hailo_compilation}.
 The quantization evaluation therefore covers only the models for which
 compilation succeeded.
 
-For the remaining models that were successfully compiled, the performance drop due 
+For the remaining models that were successfully compiled, the performance drop due
 to quantization is shown in
 Figure~\ref{fig:fusion_performance_full_vs_quantized}. ...
 Some drop is expected when quantizing a model from FP32 to INT8, but the goal is to keep this drop as small as possible.
@@ -3426,10 +3448,10 @@ Table~\ref{tab:acc_full_precision} in Appendix~\ref{chap:detection_accuracy_tabl
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{images/fusion_performance_full_vs_quantized.png}
+    \includegraphics[width=\textwidth]{images/fusion_performance_full_vs_quantized.png}
     \caption{
-        Comparison of the full precision and quantized fusion Model variant performances 
-        on the validation sets of the M3fd, RTDOD, Visdrone Dronevehicle, 3D-Net and the 
+        Comparison of the full precision and quantized fusion Model variant performances
+        on the validation sets of the M3fd, RTDOD, Visdrone Dronevehicle, 3D-Net and the
         combined datasets.
     }
     \label{fig:fusion_performance_full_vs_quantized}
@@ -3460,20 +3482,20 @@ bounding box output mode is therefore retained for the deployed service.
     \centering
     \begin{tabular}{l r cccccccc}
         \toprule
-        Split & Frames & HOTA  & DetA  & AssA  & MOTA  & MOTP  & IDF1  & IDP   & IDR   \\
+        Split & Frames   & HOTA  & DetA  & AssA  & MOTA  & MOTP  & IDF1  & IDP   & IDR   \\
         \midrule
-        \multicolumn{10}{l}{\textit{Detection bounding boxes as output}}              \\
+        \multicolumn{10}{l}{\textit{Detection bounding boxes as output}}                 \\
         \midrule
-        Train &  8{,}485 & 0.780 & 0.851 & 0.715 & 0.906 & 0.931 & 0.825 & 0.838 & 0.811 \\
-        Val   &  1{,}889 & 0.735 & 0.761 & 0.712 & 0.816 & 0.912 & 0.810 & 0.837 & 0.785 \\
-        Test  &  1{,}889 & 0.747 & 0.756 & 0.740 & 0.826 & 0.906 & 0.824 & 0.872 & 0.780 \\
+        Train & 8{,}485  & 0.780 & 0.851 & 0.715 & 0.906 & 0.931 & 0.825 & 0.838 & 0.811 \\
+        Val   & 1{,}889  & 0.735 & 0.761 & 0.712 & 0.816 & 0.912 & 0.810 & 0.837 & 0.785 \\
+        Test  & 1{,}889  & 0.747 & 0.756 & 0.740 & 0.826 & 0.906 & 0.824 & 0.872 & 0.780 \\
         All   & 12{,}263 & 0.754 & 0.828 & 0.688 & 0.887 & 0.925 & 0.796 & 0.813 & 0.780 \\
         \midrule
-        \multicolumn{10}{l}{\textit{Tracker-predicted bounding boxes as output}}      \\
+        \multicolumn{10}{l}{\textit{Tracker-predicted bounding boxes as output}}         \\
         \midrule
-        Train &  8{,}485 & 0.716 & 0.774 & 0.665 & 0.899 & 0.862 & 0.822 & 0.835 & 0.809 \\
-        Val   &  1{,}889 & 0.673 & 0.692 & 0.655 & 0.803 & 0.847 & 0.805 & 0.831 & 0.780 \\
-        Test  &  1{,}889 & 0.683 & 0.690 & 0.680 & 0.820 & 0.839 & 0.820 & 0.868 & 0.777 \\
+        Train & 8{,}485  & 0.716 & 0.774 & 0.665 & 0.899 & 0.862 & 0.822 & 0.835 & 0.809 \\
+        Val   & 1{,}889  & 0.673 & 0.692 & 0.655 & 0.803 & 0.847 & 0.805 & 0.831 & 0.780 \\
+        Test  & 1{,}889  & 0.683 & 0.690 & 0.680 & 0.820 & 0.839 & 0.820 & 0.868 & 0.777 \\
         All   & 12{,}263 & 0.691 & 0.753 & 0.638 & 0.879 & 0.856 & 0.793 & 0.810 & 0.776 \\
         \bottomrule
     \end{tabular}
@@ -3488,7 +3510,7 @@ bounding box output mode is therefore retained for the deployed service.
 
 The inference performance of the compiled models is evaluated by running the tracking service
 on the Raspberry Pi 5 with the Hailo-8 accelerator and recording the per-frame inference time
-of the model executionand frames per second (fps) of the full tracking service pipeline. Power 
+of the model executionand frames per second (fps) of the full tracking service pipeline. Power
 draw is measured simultaneously using an external power supply
 and a custom USB-C cable, as shown in Figure~\ref{fig:power_measurement_setup}.
 The measurements are collected on the train and validation sets of the 3D-Net dataset,
@@ -3506,7 +3528,7 @@ with current and voltage sampled at one-second intervals.
 
 Figure~\ref{fig:embedded_inference_performance} shows the results, where bar heights represent
 the mean and candlestick error bars indicate the minimum, maximum, 25th percentile, 75th percentile,
-and median. All quantized models achieve real-time performance above the 20\,fps threshold of the 
+and median. All quantized models achieve real-time performance above the 20\,fps threshold of the
 camera setup.
 A consistent trend is observable across model sizes. Inference time increases and fps decreases as
 the number of model parameters grows from the single-modality models to the late fusion model.
@@ -3525,23 +3547,23 @@ across all models.
         \includegraphics[width=\textwidth]{images/inference_stats.png}
     \end{minipage}
     \caption{
-        Power draw and inference time on the Raspberry Pi 5 running the tracking 
+        Power draw and inference time on the Raspberry Pi 5 running the tracking
         service with the compiled detection models.
     }
     \label{fig:embedded_inference_performance}
 \end{figure}
 
-The KAT drone is equipped with two 6S LiPo (lithium polymer) batteries with a capacity of 
-12{,}000\,mAh each, where 6S denotes six lithium polymer cells connected in series, with a 
-single cell having a nominal voltage of 3.7\,V, yielding a nominal pack voltage of 
-$6 \times 3.7\,\text{V} = 22.2\,\text{V}$. Connected in parallel, the two packs provide a 
-combined energy of $2 \times 12\,\text{Ah} \times 22.2\,\text{V} \approx 533\,\text{Wh}$. 
-With a measured in-flight power draw of 1{,}600\,W, the theoretical maximum flight time is 
-$533\,\text{Wh} / 1{,}600\,\text{W} \approx 20\,\text{min}$, reducing to roughly 
-$0.75 \times 20\,\text{min} \approx 15\,\text{min}$ when accounting for the recommended 
-75\,\% usable capacity limit of LiPo cells. The 5\,W power draw of the Raspberry~Pi~5 running the tracking service 
-represents $5\,\text{W} / 1{,}600\,\text{W} \approx 0.3\,\%$ of the total system power 
-consumption, corresponding to a flight time reduction of under 3 seconds and is therefore 
+The KAT drone is equipped with two 6S LiPo (lithium polymer) batteries with a capacity of
+12{,}000\,mAh each, where 6S denotes six lithium polymer cells connected in series, with a
+single cell having a nominal voltage of 3.7\,V, yielding a nominal pack voltage of
+$6 \times 3.7\,\text{V} = 22.2\,\text{V}$. Connected in parallel, the two packs provide a
+combined energy of $2 \times 12\,\text{Ah} \times 22.2\,\text{V} \approx 533\,\text{Wh}$.
+With a measured in-flight power draw of 1{,}600\,W, the theoretical maximum flight time is
+$533\,\text{Wh} / 1{,}600\,\text{W} \approx 20\,\text{min}$, reducing to roughly
+$0.75 \times 20\,\text{min} \approx 15\,\text{min}$ when accounting for the recommended
+75\,\% usable capacity limit of LiPo cells. The 5\,W power draw of the Raspberry~Pi~5 running the tracking service
+represents $5\,\text{W} / 1{,}600\,\text{W} \approx 0.3\,\%$ of the total system power
+consumption, corresponding to a flight time reduction of under 3 seconds and is therefore
 negligible.
 
 
@@ -3555,7 +3577,7 @@ contains few occlusion scenarios, and no traffic congestion phenomena are captur
 limits the ability to evaluate downstream models for congestion and traffic flow analysis
 within the 3D-Net project. Further data collection sessions are needed.
 
-Adverse weather conditions and geographic diversity are partially addressed through the
+Adverse weather conditions, night scenes, and geographic diversity are partially addressed through the
 public RGB-thermal datasets DroneVehicle, RTDOD, and M3FD. However, these datasets were
 collected with different sensors, at different altitudes, and from different viewing angles
 than the 3D-Net configuration. The resulting domain gap introduces uncertainty about
@@ -3611,7 +3633,7 @@ platform.
 The comparison of seven fusion architectures shows that full-precision detection performance
 is broadly similar across strategies despite large differences in model complexity. The
 thermal modality contributes measurably in challenging conditions such as rain, fog, and
-low light, but only in well-aligned scenarios. This confirms that multi-modal 
+low light, but only in well-aligned scenarios. This confirms that multi-modal
 sensing can add robustness beyond what an RGB-only
 model can achieve. Among the compiled architectures, mid-level fusion offers the most
 favourable balance. It matches or exceeds the performance of early and late fusion across
@@ -3629,7 +3651,7 @@ consistent trajectories with few sustained occlusions. Motion-based association 
 combination with a high-quality detector is therefore sufficient.
 
 The thesis makes three contributions to the 3D-Net project. First, the 3D-Net dataset
-provides a low-altitude oblique paired RGB-LWIR benchmark for vehicle detection. 
+provides a low-altitude oblique paired RGB-LWIR benchmark for vehicle detection.
 Second, to the best of our knowledge, this work presents the first
 systematic comparison of multiple RGB-LWIR fusion architectures evaluated under INT8
 quantization on a dedicated edge accelerator for aerial vehicle traffic monitoring. Third,
@@ -3650,7 +3672,7 @@ on quantized performance. The fusion strategy evaluation was conducted with YOLO
 base detector. The observed performance may be specific to this detector
 family. An evaluation with alternative base detectors would establish its consistency across
 architectures. The micro-fusion attention mechanisms were only explored within mid-level
-fusion. It should be investigated whether other macro fusion architectures could benefit similarly. 
+fusion. It should be investigated whether other macro fusion architectures could benefit similarly.
 Finally, this work does not address multi-agent tracking, which could
 increase the simultaneous coverage of the monitored area. A dedicated study of
 detection fusion across overlapping sensor fields of view and of vehicle identity continuity
@@ -3738,95 +3760,120 @@ the S3 URL attached to the FiftyOne sample to confirm object presence and class.
 \begin{table}[H]
     \centering
     \caption{Full-precision (FP32) and quantized (INT8) detection accuracy of all fusion
-             model variants on the validation sets of all datasets.}
+        model variants on the validation sets of all datasets.}
     \label{tab:acc_full_precision}
     \begin{adjustbox}{max width=\textwidth}
-    \begin{tabular}{l l r r r r r r r r r}
-        \toprule
-        \textbf{Dataset} & \textbf{Metric}
-            & \textbf{RGB} & \textbf{Thermal} & \textbf{Early}
-            & \textbf{Mid} & \textbf{MidP3} & \textbf{midCMA3}
-            & \textbf{midCFT3} & \textbf{Late} & \textbf{Score} \\
-        \midrule
-        \multirow{4}{*}{M3FD}
-            & FP32 mAP@50   & 0.635 & 0.705 & 0.652 & 0.671 & 0.654 & 0.652 & 0.649 & 0.690 & 0.664 \\
-            & FP32 mAP50:95 & 0.436 & 0.462 & 0.440 & 0.458 & 0.451 & 0.449 & 0.439 & 0.467 & 0.445 \\
+        \begin{tabular}{l l r r r r r r r r r}
+            \toprule
+            \textbf{Dataset} & \textbf{Metric}
+                             & \textbf{RGB}     & \textbf{Thermal} & \textbf{Early}
+                             & \textbf{Mid}     & \textbf{MidP3}   & \textbf{midCMA3}
+                             & \textbf{midCFT3} & \textbf{Late}    & \textbf{Score}                                                               \\
+            \midrule
+            \multirow{4}{*}{M3FD}
+                             & FP32 mAP@50      & 0.635            & 0.705            & 0.652  & 0.671  & 0.654  & 0.652 & 0.649 & 0.690  & 0.664 \\
+                             & FP32 mAP50:95    & 0.436            & 0.462            & 0.440  & 0.458  & 0.451  & 0.449 & 0.439 & 0.467  & 0.445 \\
             \cmidrule{2-11}
-            & INT8 mAP@50   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-            & INT8 mAP50:95 & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-        \midrule
-        \multirow{4}{*}{RTDOD}
-            & FP32 mAP@50   & 0.784 & 0.638 & 0.784 & 0.813 & 0.815 & 0.817 & 0.817 & 0.811 & 0.773 \\
-            & FP32 mAP50:95 & 0.489 & 0.303 & 0.489 & 0.506 & 0.509 & 0.501 & 0.510 & 0.509 & 0.482 \\
+                             & INT8 mAP@50      & --               & --               & --     & --     & --     & --    & --    & --     & --    \\
+                             & INT8 mAP50:95    & --               & --               & --     & --     & --     & --    & --    & --     & --    \\
+            \midrule
+            \multirow{4}{*}{RTDOD}
+                             & FP32 mAP@50      & 0.784            & 0.638            & 0.784  & 0.813  & 0.815  & 0.817 & 0.817 & 0.811  & 0.773 \\
+                             & FP32 mAP50:95    & 0.489            & 0.303            & 0.489  & 0.506  & 0.509  & 0.501 & 0.510 & 0.509  & 0.482 \\
             \cmidrule{2-11}
-            & INT8 mAP@50   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-            & INT8 mAP50:95 & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-        \midrule
-        \multirow{4}{*}{Dronevehicle}
-            & FP32 mAP@50   & 0.850 & 0.945 & 0.945 & 0.948 & 0.951 & 0.950 & 0.947 & 0.944 & 0.937 \\
-            & FP32 mAP50:95 & 0.525 & 0.696 & 0.693 & 0.697 & 0.707 & 0.701 & 0.696 & 0.696 & 0.684 \\
+                             & INT8 mAP@50      & --               & --               & --     & --     & --     & --    & --    & --     & --    \\
+                             & INT8 mAP50:95    & --               & --               & --     & --     & --     & --    & --    & --     & --    \\
+            \midrule
+            \multirow{4}{*}{Dronevehicle}
+                             & FP32 mAP@50      & 0.850            & 0.945            & 0.945  & 0.948  & 0.951  & 0.950 & 0.947 & 0.944  & 0.937 \\
+                             & FP32 mAP50:95    & 0.525            & 0.696            & 0.693  & 0.697  & 0.707  & 0.701 & 0.696 & 0.696  & 0.684 \\
             \cmidrule{2-11}
-            & INT8 mAP@50   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-            & INT8 mAP50:95 & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-        \midrule
-        \multirow{4}{*}{3D-Net}
-            & FP32 mAP@50   & 0.970 & 0.643 & 0.987 & 0.978 & 0.955 & 0.972 & 0.981 & 0.984 & 0.988 \\
-            & FP32 mAP50:95 & 0.808 & 0.345 & 0.801 & 0.797 & 0.793 & 0.766 & 0.798 & 0.798 & 0.825 \\
+                             & INT8 mAP@50      & --               & --               & --     & --     & --     & --    & --    & --     & --    \\
+                             & INT8 mAP50:95    & --               & --               & --     & --     & --     & --    & --    & --     & --    \\
+            \midrule
+            \multirow{4}{*}{3D-Net}
+                             & FP32 mAP@50      & 0.970            & 0.643            & 0.987  & 0.978  & 0.955  & 0.972 & 0.981 & 0.984  & 0.988 \\
+                             & FP32 mAP50:95    & 0.808            & 0.345            & 0.801  & 0.797  & 0.793  & 0.766 & 0.798 & 0.798  & 0.825 \\
             \cmidrule{2-11}
-            & INT8 mAP@50   & 0.9261 & 0.4894 & 0.9036 & 0.9651 & 0.9534 & -- & -- & 0.9347 & -- \\
-            & INT8 mAP50:95 & 0.7277 & 0.3058 & 0.7712 & 0.8311 & 0.8271 & -- & -- & 0.8052 & -- \\
-        \midrule
-        \multirow{4}{*}{Combined}
-            & FP32 mAP@50   & 0.720 & 0.655 & 0.754 & 0.792 & 0.783 & 0.794 & 0.785 & 0.805 & 0.797 \\
-            & FP32 mAP50:95 & 0.448 & 0.392 & 0.497 & 0.531 & 0.532 & 0.536 & 0.531 & 0.549 & 0.542 \\
+                             & INT8 mAP@50      & 0.9261           & 0.4894           & 0.9036 & 0.9651 & 0.9534 & --    & --    & 0.9347 & --    \\
+                             & INT8 mAP50:95    & 0.7277           & 0.3058           & 0.7712 & 0.8311 & 0.8271 & --    & --    & 0.8052 & --    \\
+            \midrule
+            \multirow{4}{*}{Combined}
+                             & FP32 mAP@50      & 0.720            & 0.655            & 0.754  & 0.792  & 0.783  & 0.794 & 0.785 & 0.805  & 0.797 \\
+                             & FP32 mAP50:95    & 0.448            & 0.392            & 0.497  & 0.531  & 0.532  & 0.536 & 0.531 & 0.549  & 0.542 \\
             \cmidrule{2-11}
-            & INT8 mAP@50   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-            & INT8 mAP50:95 & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-        \bottomrule
-    \end{tabular}
+                             & INT8 mAP@50      & --               & --               & --     & --     & --     & --    & --    & --     & --    \\
+                             & INT8 mAP50:95    & --               & --               & --     & --     & --     & --    & --    & --     & --    \\
+            \bottomrule
+        \end{tabular}
     \end{adjustbox}
 \end{table}
 
 \begin{table}[H]
     \centering
     \caption{Per-object-size detection accuracy on the 3D-Net validation set for models
-             trained on the 3D-Net dataset and the combined dataset.}
+        trained on the 3D-Net dataset and the combined dataset.}
     \label{tab:acc_3dnet_size}
     \begin{adjustbox}{max width=\textwidth}
-    \begin{tabular}{l l l r r r r r r r r r}
-        \toprule
-        \textbf{Training set} & \textbf{Size} & \textbf{Metric}
-            & \textbf{RGB} & \textbf{Thermal} & \textbf{Early} 
-            & \textbf{Mid} & \textbf{MidP3} & \textbf{midCMA3} 
-            & \textbf{midCFT3} & \textbf{Late} & \textbf{Score} \\
-        \midrule
-        \multirow{6}{*}{3D-Net}
-            & \multirow{2}{*}{Small}
-                & mAP@50   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-            & & mAP50:95   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+        \begin{tabular}{l l l r r r r r r r r r}
+            \toprule
+            \textbf{Training set} & \textbf{Size}           & \textbf{Metric}
+                                  & \textbf{RGB}            & \textbf{Thermal} & \textbf{Early}
+                                  & \textbf{Mid}            & \textbf{MidP3}   & \textbf{midCMA3}
+                                  & \textbf{midCFT3}        & \textbf{Late}    & \textbf{Score}                                           \\
+            \midrule
+            \multirow{6}{*}{3D-Net}
+                                  & \multirow{2}{*}{Small}
+                                  & mAP@50                  & --               & --               & -- & -- & -- & -- & -- & -- & --      \\
+                                  &                         & mAP50:95         & --               & -- & -- & -- & -- & -- & -- & -- & -- \\
             \cmidrule{2-12}
-            & \multirow{2}{*}{Medium}
-                & mAP@50   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-            & & mAP50:95   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+                                  & \multirow{2}{*}{Medium}
+                                  & mAP@50                  & --               & --               & -- & -- & -- & -- & -- & -- & --      \\
+                                  &                         & mAP50:95         & --               & -- & -- & -- & -- & -- & -- & -- & -- \\
             \cmidrule{2-12}
-            & \multirow{2}{*}{Large}
-                & mAP@50   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-            & & mAP50:95   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-        \midrule
-        \multirow{6}{*}{Combined}
-            & \multirow{2}{*}{Small}
-                & mAP@50   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-            & & mAP50:95   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+                                  & \multirow{2}{*}{Large}
+                                  & mAP@50                  & --               & --               & -- & -- & -- & -- & -- & -- & --      \\
+                                  &                         & mAP50:95         & --               & -- & -- & -- & -- & -- & -- & -- & -- \\
+            \midrule
+            \multirow{6}{*}{Combined}
+                                  & \multirow{2}{*}{Small}
+                                  & mAP@50                  & --               & --               & -- & -- & -- & -- & -- & -- & --      \\
+                                  &                         & mAP50:95         & --               & -- & -- & -- & -- & -- & -- & -- & -- \\
             \cmidrule{2-12}
-            & \multirow{2}{*}{Medium}
-                & mAP@50   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-            & & mAP50:95   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+                                  & \multirow{2}{*}{Medium}
+                                  & mAP@50                  & --               & --               & -- & -- & -- & -- & -- & -- & --      \\
+                                  &                         & mAP50:95         & --               & -- & -- & -- & -- & -- & -- & -- & -- \\
             \cmidrule{2-12}
-            & \multirow{2}{*}{Large}
-                & mAP@50   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-            & & mAP50:95   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-        \bottomrule
-    \end{tabular}
+                                  & \multirow{2}{*}{Large}
+                                  & mAP@50                  & --               & --               & -- & -- & -- & -- & -- & -- & --      \\
+                                  &                         & mAP50:95         & --               & -- & -- & -- & -- & -- & -- & -- & -- \\
+            \bottomrule
+        \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \caption{Detection accuracy on adverse weather and night samples of the RTDOD dataset
+        for models trained on the combined dataset.}
+    \label{tab:acc_weather_night}
+    \begin{adjustbox}{max width=\textwidth}
+        \begin{tabular}{l l r r r r r r r r r}
+            \toprule
+            \textbf{Condition} & \textbf{Metric}
+                               & \textbf{RGB}     & \textbf{Thermal} & \textbf{Early}
+                               & \textbf{Mid}     & \textbf{MidP3}   & \textbf{midCMA3}
+                               & \textbf{midCFT3} & \textbf{Late}    & \textbf{Score}                                                           \\
+            \midrule
+            \multirow{2}{*}{Adverse Weather}
+                               & mAP@50           & 0.791            & 0.633            & 0.742 & 0.825 & 0.791 & 0.827 & 0.833 & 0.824 & 0.828 \\
+                               & mAP50:95         & 0.440            & 0.278            & 0.390 & 0.458 & 0.433 & 0.461 & 0.458 & 0.454 & 0.471 \\
+            \midrule
+            \multirow{2}{*}{Night}
+                               & mAP@50           & 0.607            & 0.514            & 0.596 & 0.674 & 0.651 & 0.674 & 0.673 & 0.641 & 0.696 \\
+                               & mAP50:95         & 0.278            & 0.227            & 0.264 & 0.324 & 0.312 & 0.327 & 0.318 & 0.327 & 0.341 \\
+            \bottomrule
+        \end{tabular}
     \end{adjustbox}
 \end{table}
 
