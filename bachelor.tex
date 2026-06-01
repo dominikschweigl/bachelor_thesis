@@ -611,16 +611,7 @@ requirements. After modality evaluation, the selected
 hardware \textit{Workswell WIRIS Enterprise} is described,
 including its specifications and the rationale for its selection.
 
-% TODO: Maybe write here that I was tasked with selecting the 
-%       sensor system, and that I evaluated the different modalities 
-%       based on the requirements of UAV-based vehicle detection, 
-%       comparing their strengths and weaknesses in terms of spatial 
-%       resolution, robustness to illumination changes, weather tolerance, 
-%       geometric information content, and computational requirements. 
-
-
 \subsection{Remote Sensing}
-
 
 Remote sensing in the context of UAV-based vehicle detection is
 the acquisition of information about the Earth's surface and objects on it
@@ -1073,82 +1064,61 @@ modalities for UAV-based vehicle detection.
 \subsection{Sensor System}
 \label{sec:sensor_system}
 
-% TODO: refine the wording of this section
-
 Based on this evaluation, a multimodal configuration combining
-RGB and LWIR imaging was selected. Optical imaging provide the
-the most informative visual features under favorable lighting conditions
-of all modalities.
-The inclusion of a thermal camera provides a way to
-fill the blind spots in optical environmental perception
-in low-light and adverse weather conditions.
-To make up for the limitations of optical cameras, LWIR imaging was selected
-as a complementary modality because of its independence of external
-illumination and robustness to atmospheric scattering in adverse weather
-due to it's longer wavelength.
-For these reasons, we can expect to obtain
-better performance by using the strong points of the color
-and the thermal images throughout the day.
-LiDAR was disregarded due to the fact that its performance
-degrades significantly in fog, rain, and snow, which are precisely the
-conditions under which RGB cameras also fail as seen in Table~\ref{tab:modality_comparison}. The
-NIR spectrum
-used by LiDAR lies very close to the visible spectrum.
-Radar was also disregarded due to its low spatial resolution,
-which requires fusion with complementary
-sensors such as cameras or LiDAR to achieve reliable object
-recognition, which would limit the overall weather robustness
-to that of the fused sensors.
-The selected RGB and LWIR modalities provide a good balance of
-complementary strengths and weaknesses for vehicle detection,
-though they are not without limitations as previously discussed.
-It was deemed that the combination of these two modalities would provide a
-sufficiently rich data source for
-object detection under a wide range of conditions.
+RGB and LWIR imaging was selected. RGB cameras provide the most
+informative visual features under favorable lighting conditions
+among all evaluated modalities.
+LWIR imaging was selected as a complementary modality because of
+its independence from external illumination and its robustness to
+atmospheric scattering at longer wavelengths.
+These properties allow LWIR to fill the perception gaps that optical
+cameras exhibit in low-light and adverse weather conditions.
 
-A big limitation of this configuration is that it does not include
-active sensors such as LiDAR or radar, which provide depth information.
-This would be very beneficial for the later stage of traffic jam
-classification, as it would allow for more accurate estimation of the
-distance to detected vehicles and their relative speed, which are important
-cues for traffic jam classification. For this reason, a laser-based
-distance measurement was desired in the selected hardware platform,
-which can provide some depth information. An initial idea was to
-integrate this modality with the existing RGB and LWIR sensors to
-give the model depth information which can be used to better predict
-vehicle bounding box sizes. However, it was decided that this modality is not
-used for object detection in this project
-due to the fact that it only provides a single distance measurement
-in the center of the field of view which can be vastly different
-from the actual position of detected vehicles, making it unsuitable
-for estimating vehicle size in the image, and is not robust to adverse weather conditions, as it
-operates in the same near-infrared spectrum as LiDAR. Therefore,
-it was decided that the laser-based distance measurement would be
-reserved for later use in traffic jam classification.
+LiDAR was excluded because its performance in fog, rain, and snow is
+comparable to that of RGB cameras, as shown in
+Table~\ref{tab:modality_comparison}.
+Its operating spectrum in the near-infrared lies close to the visible
+range, which limits its weather robustness advantage over optical sensors.
+Radar was also excluded because its low spatial resolution requires
+fusion with cameras or LiDAR to achieve reliable object recognition,
+which constrains overall weather robustness to that of the fused sensors.
+Despite the limitations discussed in the preceding section, the RGB and
+LWIR modalities provide a complementary balance of strengths for vehicle
+detection under a wide range of conditions.
+
+A notable limitation of this configuration is the absence of active
+sensors such as LiDAR or radar, which provide depth information.
+Depth data would benefit the traffic congestion classification stage, where
+vehicle distance and relative speed are important cues.
+A laser-based distance measurement was therefore included in the selected
+hardware platform as a partial substitute.
+The inclusion of this modality in the object detection pipeline was
+considered, with the aim of providing depth information for vehicle
+bounding box size estimation.
+This approach was rejected because the sensor delivers a single distance
+measurement at the optical axis, which may differ considerably from the
+positions of detected vehicles and is therefore unsuitable for per-vehicle
+size estimation.
+The laser-based distance measurement is consequently reserved for the
+traffic congestion classification stage.
 
 Based on this specification, sensor data acquisition is performed using the
-\textit{Workswell WIRIS Enterprise} seen in Figure~\ref{fig:WIRIS_Enterprise}.
-The WIRIS Enterprise integrates the three sensing
-modalities: RGB imaging at resolution 1920\,×\,1080 pixels, thermal imaging
-at resolution 640\,×\,512 pixels, and laser-based
-central distance measurement along the optical axis of up to 1500\,m.
-These values are below the maximum specifications listed for the
-WORKswell WIRIS Enterprise, but they are the maximum that can be achieved
-during simultaneous video recording and are sufficient for the intended application, as the RGB
-and LWIR resolutions are comparable to those of existing datasets used
-for training and evaluation of vehicle detection models.
-This multi-sensor system is
-specifically designed for use with UAVs and significantly reduces
-the complexity of mounting the three sensors on the drone by requiring
-only a single gimbal.
-Its weight is specified at less than
-680\,g, and its dimensions are approximately 76\,×\,107\,×\,102\,mm.
-The system operates with a supply voltage between 9\,V and 36\,V
-DC and has a typical power consumption of approximately
-18\,W (peak consumption around 21\,W). These specifications
-allow integration into the drone's power system with
-appropriate battery capacity planning.
-\cite{worksellWIRISspec2022}
+\textit{Workswell WIRIS Enterprise}, shown in Figure~\ref{fig:WIRIS_Enterprise}.
+The WIRIS Enterprise provides RGB imaging at 1920\,×\,1080 pixels,
+LWIR imaging at 640\,×\,512 pixels, and a laser-based distance measurement
+along the optical axis of up to 1500\,m.
+These values fall below the hardware limits of the device and represent
+the maximum achievable during simultaneous video recording.
+The system is designed for UAV integration and requires only a single
+gimbal mount for all three sensors.
+This reduces the mechanical complexity of the sensor installation relative
+to mounting the sensors separately.
+Its weight is specified at less than 680\,g, and its dimensions are
+approximately 76\,×\,107\,×\,102\,mm.
+The system operates at a supply voltage between 9\,V and 36\,V DC, with
+a typical power consumption of 18\,W and a peak of 21\,W.
+These power requirements are within the range of standard UAV power
+systems~\cite{worksellWIRISspec2022}.
 
 
 \begin{figure}[H]
@@ -1163,28 +1133,27 @@ appropriate battery capacity planning.
 \end{figure}
 
 
-A primary reason for the \textit{Workswell WIRIS Enterprise} is the
-out-of-the-box spatial alignment it provides between these two sensor types.
-This is an advantage as RGB and infrared sensors generally suffer from
-inherent misalignment because they occupy different physical positions on a
-device, resulting in different coordinate systems, mismatched fields of view,
-and differing sampling frequencies that introduce temporal offsets — and for
-moving objects, these temporal gaps result in spatial misalignment as well.
-Many existing multi-modal fusion methods assume that visible-infrared image
-pairs are perfectly geometrically aligned and fuse features directly, but in
-practice, paired images remain only weakly aligned, with objects differing
-not only in position but also in scale and angle, as illustrated in
-Figure~\ref{fig:rgb_thermal_misalignment}.
-The practical severity of this problem is well documented: in the DroneVehicle
-dataset, which provides RGB-thermal image pairs captured from a UAV
-perspective, more than 20\% of bounding boxes exhibit misalignment defined as
-a position or size offset of at least 3 pixels or an angular offset of at
-least 3 degrees.
-Such misalignment directly degrades detection performance, producing
-low-quality bounding box predictions and undermine fusion methods that rely
-on aligned feature maps.
-\cite{yuan2022crossModalAlignmentVehicleDetection}
-\cite{he2023misalignedRGBTadaptiveCalibration}
+A primary reason for selecting the \textit{Workswell WIRIS Enterprise}
+is the factory-aligned spatial correspondence it provides between the
+RGB and LWIR sensors.
+RGB and infrared sensors mounted at different physical positions on a
+device operate with different coordinate systems and mismatched fields
+of view.
+They also differ in sampling frequency, which introduces temporal offsets
+that cause spatial misalignment for moving objects.
+Many existing multi-modal fusion methods assume perfect geometric alignment
+between visible-infrared image pairs and fuse features directly.
+In practice, however, paired images are only weakly aligned, with objects
+differing in position, scale, and angle.
+Figure~\ref{fig:rgb_thermal_misalignment} illustrates this misalignment.
+This problem is documented in the DroneVehicle dataset, which provides
+RGB-thermal pairs from a UAV perspective.
+More than 20\% of bounding boxes in that dataset exhibit a position or
+size offset of at least 3 pixels or an angular offset of at least
+3 degrees.
+Misalignment of this magnitude produces incorrect bounding box predictions
+and undermines fusion methods that rely on aligned feature
+maps~\cite{yuan2022crossModalAlignmentVehicleDetection}\cite{he2023misalignedRGBTadaptiveCalibration}.
 
 \begin{figure}[H]
     \centering
@@ -1260,10 +1229,8 @@ of the current scene to maximize image contrast.
 Since per-flight reconfiguration to environmental conditions is not foreseen,
 ambient temperature and relative humidity were left at their default values of
 20\,\textdegree C and 50\,\%.
-The object distance was set to 25\,m to match the typical operating altitude of the drone.
+The object distance was set to 30\,m to match the typical operating altitude of the drone.
 
-% TODO: add more details on data collection, such as flight patterns, duration, 
-% and conditions
 
 \subsection{Sensor Alignment}
 \label{chap:sensor_alignment}
@@ -1544,9 +1511,9 @@ Consequently, a constant boresight correction provides a good
 approximation for distant scenes, but becomes increasingly
 inaccurate for nearby objects. For the drone application considered
 here, the camera baseline is $b = 0.10$,m and the operating distance
-is about $d = 25$,m. Substituting these values into
+is about $d = 30$,m. Substituting these values into
 Equation~\ref{eq:parallax_shift} yields a maximum parallax shift
-of $4.12~\text{px}$.
+of $3.43~\text{px}$.
 
 \begin{figure}[H]
     \centering
@@ -1832,7 +1799,7 @@ includes only two primary object classes, person and vehicle.
 In addition to thermal-only datasets, several UAV datasets provide only RGB
 imagery. The UAVDT dataset \cite{du2018UAVDTDataset} contains approximately
 80,000 RGB images captured at altitudes from 10 to above 70 meters, including
-front, side, and bird’s-eye views with three vehicle classes under day, night,
+front, side, and bird's-eye views with three vehicle classes under day, night,
 and adverse weather conditions. The AU-AIR dataset \cite{bozcan2020auAirDataset}
 provides 32,823 RGB frames from low altitudes between 5 and 30 meters with
 viewing angles from 45 to 90 degrees and eight vehicle classes but only daytime
@@ -1883,9 +1850,6 @@ for pedestrian detection in low-light conditions. Table \ref{tab:rgb_thermal_dat
 summarizes the characteristics of all discussed datasets.
 
 % TODO: add bounding box number column
-
-% TODO: have better classification of datasets with low-altitude, high-altitude,
-% ground-level like in \cite{becker2025fusionOrConfusionDatasetPooling}
 
 \newpage
 \begin{table}[H]
@@ -2131,7 +2095,7 @@ visualization tool that organizes machine learning datasets by storing
 sample-level annotations, metadata, and file references (URLs) in a
 structured, queryable format. Maintaining the datasets in a
 cloud-accessible location is important for the remote training pipeline
-managed by ClearML as further outlined in Section~\ref{chap:training_pipeline}.
+managed by ClearML as further outlined in Section~\ref{sec:model_training_pipeline}.
 
 an open-source machine learning operations (MLOps)
 platform responsible for orchestrating and monitoring machine learning
@@ -2501,7 +2465,7 @@ modality branch.
 The two resulting modality branches are then combined by element-wise addition
 to produce the fused feature map.
 The third is the mixed local channel attention module
-(MLCA)~\cite{wan2023MLCAObjectDetection}, applied at all three detection scales
+(MLCA)~\cite{wan2023MLCA}, applied at all three detection scales
 and referred to as midCMA3 throughout this work.
 MLCA computes pre-transformer channel attention weights from two pooled representations of each
 feature map.
@@ -2819,6 +2783,7 @@ characteristics of this application with small relatively fast moving objects~\c
 \label{chap:implementation}
 
 \section{Model Training Pipeline}
+\label{sec:model_training_pipeline}
 
 For the model training pipeline, we use the open-source MLOps platform ClearML to orchestrate and
 monitor the training process. ClearML provides experiment tracking, remote task execution, dataset
