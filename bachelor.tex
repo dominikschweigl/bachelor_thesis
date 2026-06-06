@@ -15,6 +15,15 @@
 \setlength{\aboverulesep}{0pt}
 \setlength{\belowrulesep}{0pt}
 \renewcommand{\arraystretch}{0.95}
+
+\usepackage{caption}
+\captionsetup{skip=4pt}
+\captionsetup[figure]{belowskip=-18pt}
+\setlength{\textfloatsep}{18pt}
+\setlength{\intextsep}{16pt}
+\RedeclareSectionCommand[beforeskip=1.2\baselineskip,afterskip=0.5\baselineskip]{section}
+\RedeclareSectionCommand[beforeskip=0.8\baselineskip,afterskip=0.4\baselineskip]{subsection}
+\RedeclareSectionCommand[beforeskip=0.6\baselineskip,afterskip=0.3\baselineskip]{subsubsection}
 \usepackage{pifont}
 \usepackage{siunitx}
 \usepackage{amssymb}
@@ -424,7 +433,9 @@ examined through a comparison of relevant sensor modalities,
 providing justification for the selected approach. Finally, an
 overview of the overall system integration is provided.
 
+\vspace{-2em}
 \section{UAV Platform}
+\vspace{-0.5em}
 
 The 3D-Net project envisions a coordinated fleet of four UAVs with distinct operational roles
 and automated battery-based replacement to sustain continuous road coverage.
@@ -460,8 +471,9 @@ all tyrolian areas.
     \label{fig:twinFOLD_KAT}
 \end{figure}
 
-
+\vspace{-2em}
 \section{Onboard Processing Unit}
+\vspace{-0.5em}
 
 Onboard data processing requires a platform capable of
 real-time multimodal inference under strict weight, size, and power
@@ -475,8 +487,13 @@ organization.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/processing_units.png}
-    \caption{The three evaluated onboard processing platforms. Left: Jetson Nano Developer Kit~\cite{img_jetsonnano_devkit}. Centre: Jetson Xavier NX Developer Kit~\cite{img_jetsonxaviernx_devkit}. Right: Raspberry Pi 5 with Hailo-8 AI HAT\texttt{+}~\cite{img_raspberrypi_aihat}.}
+    \includegraphics[width=0.8\textwidth]{images/processing_units.png}
+    \caption{
+        The three evaluated onboard processing platforms. Jetson Nano 
+        Developer Kit (left)~\cite{img_jetsonnano_devkit}, Jetson Xavier 
+        NX Developer Kit (center)~\cite{img_jetsonxaviernx_devkit}, and 
+        Raspberry Pi 5 with Hailo-8 AI HAT\texttt{+} (right)~\cite{img_raspberrypi_aihat}.
+    }
     \label{fig:processing_units}
 \end{figure}
 
@@ -515,9 +532,9 @@ deployment.
 
 \begin{table}[H]
     \centering
-    \caption{Comparison of evaluated onboard processing platforms for UAV deployment. RPi weight determined ourselves.~\cite{raspberryPi5datasheet2026,hailo8_m2datasheet2021,jetsonNanoComputeModuleDatasheet2024,jetsonNanoDeveloperKitSpecification2020, jetsonNanoDeveloperKitWeight2019, jetsonXavierNXDatasheet2020, jetsonXavierNXDevKitSpecification2020, jetsonXavierNXDevkitWeight}}
+    \caption{Comparison of evaluated onboard processing platforms for UAV deployment.~\cite{raspberryPi5datasheet2026,hailo8_m2datasheet2021,jetsonNanoComputeModuleDatasheet2024,jetsonNanoDeveloperKitSpecification2020, jetsonNanoDeveloperKitWeight2019, jetsonXavierNXDatasheet2020, jetsonXavierNXDevKitSpecification2020, jetsonXavierNXDevkitWeight}}
     \label{tab:opu_comparison}
-    \footnotesize
+    \scriptsize
     \setlength{\tabcolsep}{4pt}
     \rowcolors{2}{rowlight}{rowdark}
     \begin{tabular}{|lccc|}
@@ -553,9 +570,9 @@ No literature was found that benchmarks all three platforms
 against each other directly on computer vision tasks.
 However, \citet{filippou2025edge} compare the Hailo-8 to the Jetson Nano
 and report a 4.58$\times$ throughput improvement for the Hailo-8 on the
-YOLOv8n model with 2 million parameters~\cite{yaseen2024yolov8indepthexplorationinternal}
+YOLOv8n model with 2 million parameters
 and a 3.42$\times$ advantage on the larger YOLOv8s model with 9 million
-parameters~\cite{yaseen2024yolov8indepthexplorationinternal}.
+parameters~\cite{yaseen2024yolov8}.
 For the Jetson Xavier NX relative to the Jetson Nano,
 \citet{feng2022benchmarkPerformanceYoloEdgeDevices} report a
 3.65$\times$ throughput gain on the YOLOv3-tiny model with 8.8 million
@@ -595,7 +612,7 @@ Figure~\ref{fig:raspberryPiBracket}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{images/raspberry_bracket_mount.png}
+    \includegraphics[width=\textwidth]{images/raspberry_bracket_mount.png}
     \caption{
         3D-printed mounting bracket alone (left), bracket with Raspberry Pi 5 and Hailo-8 module
         assembled (center), and the unit mounted on the underside of the twinFOLD KAT UAV (right).
@@ -603,8 +620,9 @@ Figure~\ref{fig:raspberryPiBracket}.
     \label{fig:raspberryPiBracket}
 \end{figure}
 
-
+\vspace{-2.5em}
 \section{Sensor System}
+\vspace{-0.5em}
 
 The choice of the sensor system was primarily driven by the
 selection of suitable data modalities for reliable vehicle
@@ -617,8 +635,9 @@ resolution, robustness to illumination changes, weather
 tolerance, geometric information content, and computational
 requirements. After modality evaluation, the selected
 hardware \textit{Workswell WIRIS Enterprise} is described,
-including its specifications and the rationale for its selection.
+including specifications and the selection rationale.
 
+\vspace{-1em}
 \subsection{Remote Sensing}
 
 Remote sensing in the context of UAV-based vehicle detection is
@@ -656,7 +675,7 @@ radar and LiDAR transmit their own energy and record the return signal
 \end{figure}
 
 As illustrated in Figure~\ref{fig:electromagnetic_spectrum},
-the electromagnetic spectrum spans a wide range of radiation bands
+the electromagnetic spectrum spans radiation bands
 characterized by wavelength. The regions most relevant to remote sensing
 are the visible band (\SIrange{0.4}{0.7}{\micro\meter}), where optical
 cameras operate; the near-infrared, where LiDAR typically operates at
@@ -690,6 +709,7 @@ detection. The evaluation covers how each modality captures different
 aspects of the environment and how its performance varies under
 different environmental conditions.
 
+\vspace{-0.6em}
 \paragraph{Optical Imaging}
 
 RGB cameras are passive sensors that capture visible light reflected
@@ -698,9 +718,7 @@ array of photosensitive detectors, where each detector is sensitive to
 one of three spectral bands (red, green, or blue). The recorded
 brightness values across all three bands are combined to produce a
 color image.
-\cite[pp.~66, 81, 93]{szeliski2022computerVision}
-\cite[pp.~89, 115]{lillesand2015remoteSensing}
-\cite{agrawal2019comparativeRemoteSensing}
+\citetext{\citealp[pp.~66, 81, 93]{szeliski2022computerVision}; \citealp[pp.~89, 115]{lillesand2015remoteSensing}; \citealp{agrawal2019comparativeRemoteSensing}}
 
 Cameras are the most widely used remote sensing modality in autonomous
 traffic applications for good reason. RGB cameras offer exceptionally
@@ -717,8 +735,7 @@ traffic applications.
 Their ubiquity has been further amplified by rapid advances in deep learning
 and convolutional neural networks, which have significantly improved scene
 object detection performance.
-\cite{soltanirad2025autonomousTransportationPerception}
-\cite{bustos2023reviewObjectDetectionIR}
+\cite{soltanirad2025autonomousTransportationPerception,bustos2023reviewObjectDetectionIR}
 
 Despite these strengths, reliance on visual-spectrum imaging alone is
 insufficient for robust perception. Cameras, although equipped with
@@ -747,19 +764,15 @@ illustrated in Figure~\ref{fig:camera_lighting_defects}.
 To address these limitations, alternative remote sensing modalities
 aimed at enabling more robust vehicle detection beyond the constraints
 of the visible spectrum are explored in the following.
-\cite{kenk2020dawn}
-\cite{yahiaoui2020sunGlareDetection}
-\cite{youngwan2026rasmd}
-\cite{jia2021llvip}
+\cite{kenk2020dawn,yahiaoui2020sunGlareDetection,jin2026rasmd,jia2021llvip}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/camera_lighting_defects_collection.png}
-    \vspace{-1em}
     \caption{
         Collection of lighting conditions and environmental factors that
         negatively impact vehicle detection in camera images.
-        ~\cite{kenk2020dawn, yahiaoui2020sunGlareDetection, youngwan2026rasmd, jia2021llvip}
+        ~\cite{kenk2020dawn, yahiaoui2020sunGlareDetection, jin2026rasmd, jia2021llvip}
     }
     \label{fig:camera_lighting_defects}
 \end{figure}
@@ -768,32 +781,28 @@ of the visible spectrum are explored in the following.
 \paragraph{Infrared Imaging}
 
 Infrared imaging is a passive remote sensing modality that captures
-electromagnetic radiation in the infrared spectrum, which lies just
+electromagnetic radiation in the infrared spectrum, just
 beyond the visible range. Unlike optical imaging, which relies
 on reflected sunlight or artificial illumination, infrared sensors
-detect radiation emitted by objects themselves. This
-independence from external light sources enables detection both
-during daylight and at night without reliance on solar illumination.
-While the optical design principles of infrared sensors closely
-resemble those of optical cameras, the detector array is engineered
-to respond to the longer wavelengths characteristic of infrared
-radiation.
+detect radiation emitted by objects themselves. This independence 
+from external illumination enables day and night detection.
+Infrared sensor optics follow the same principles as optical cameras, 
+but the detector array responds to the longer wavelengths.
 \cite[pp.~243]{lillesand2015remoteSensing}
 
-Of particular relevance to infrared imaging is the concept of blackbody radiation.
+Blackbody radiation is central to infrared imaging.
 All objects emit thermal radiation as a function of their temperature, and the
-blackbody model describes this behavior for an ideal radiator that fully absorbs
+blackbody model describes an ideal radiator that fully absorbs
 and reemits all incident energy.
-As Figure~\ref{fig:black_body_radiation} shows, both the total emitted energy and its
-spectral distribution vary with temperature: higher temperatures produce greater
-total radiation and shift the peak toward shorter wavelengths, a relationship known
-as Wien's displacement law. The sun approximates a 6000~K blackbody, with a spectral
+As Figure~\ref{fig:black_body_radiation} shows, both emitted energy and spectral distribution vary with temperature. Higher temperatures produce greater
+total radiation and shift the peak toward shorter wavelengths, according to Wien's 
+displacement law. The sun approximates a 6000~K blackbody, with a spectral
 peak near 0.5~$\mu$m, while Earth's surface at ${\sim}300$~K or 27~$^\circ$C peaks at
 ${\sim}9.7~\mu$m. Consequently, the long-wave infrared
-(LWIR) band (8--14~$\mu$m) is of particular interest for object detection, as it
-captures thermal radiation emitted by objects at typical Earth surface temperatures,
-enabling the detection of targets that exhibit a thermal contrast with, or elevated
-temperature relative to, their surroundings such as vehicles and personnel.
+(LWIR) band (8--14~$\mu$m) is of interest for object detection, as it
+captures thermal radiation from objects at Earth surface temperatures,
+enabling the detection of targets such as vehicles and personnel that exhibit a 
+temperature contrast relative to their surroundings.
 \cite[pp.~7,~218]{lillesand2015remoteSensing}
 
 \begin{figure}[H]
@@ -812,17 +821,16 @@ of the Volkswagen e-Golf and Golf 1.5TSI after 30 minutes of city driving
 at 5$^\circ$C and $-1~^\circ$C reveal characteristic heat patterns across
 both vehicles. The combustion engine's hood exhibits a pronounced temperature
 increase, while the electric vehicle's front surface remains near ambient
-temperature. Additional signatures from tires, wheel arches, headlights, and
-windows provide stable and detectable thermal patterns for infrared-based vehicle detection.
+temperature. Tire, wheel arch, headlight, and window signatures provide 
+detectable thermal patterns for infrared-based vehicle detection.
 \cite{svorc2020detectionElectricVehicleThermal}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/vehicle_thermal_radiation_tichy_2021_thermal_vehicle_feature_detection.png}
-    \vspace{-1em}
     \caption{
         Example of thermal measurements of the \textit{Volkswagen e-Golf} and
-        \textit{Volkswagen Golf 1.5 TSI} after 30 minutes of city driving. Modified after
+        \textit{Golf 1.5 TSI} after 30 minutes of city driving. Modified after
         \cite{svorc2020detectionElectricVehicleThermal}
     }
     \label{fig:vehicle_thermal_radiation}
@@ -856,35 +864,35 @@ fog~\cite{rivera2022analysisThermalExtremeFog}.
     \centering
     \includegraphics[width=0.9\textwidth]{images/comparison_recognition_vis_nir_swir_lwir_pinchon2018allWeatherVision.png}
     \caption{
-        VIS, NIR, SWIR, and LWIR imagery under adverse conditions: glare
-        from oncoming headlights (top) and fog tunnel recordings
-        (bottom). Modified after~\cite{pinchon2018allWeatherVision}.
+        VIS, NIR, SWIR, and LWIR imagery under adverse conditions of
+        headlight glare (top) and fog tunnel (bottom). 
+        Modified after~\cite{pinchon2018allWeatherVision}.
     }
     \label{fig:comparison_recognition_vis_nir_swir_lwir}
 \end{figure}
 
-Thermal imaging, however, comes with its own set of limitations. Compared to RGB sensors,
-thermal cameras generally offer lower spatial resolution, since the low energy content and
-low emitted radiation of long-wavelength radiation, as seen in Fig.~\ref{fig:black_body_radiation},
-requires sensing larger areas to obtain a detectable signal. This also results in generally
+Thermal imaging, however, has its own limitations. Compared to RGB sensors,
+thermal cameras generally offer lower spatial resolution, as the low energy of 
+long-wavelength radiation (Fig.~\ref{fig:black_body_radiation}) requires larger 
+sensing areas for a detectable signal. This also results in generally
 lower image contrast than in the visible spectrum \cite[p.~6-8]{lillesand2015remoteSensing}.
-Thermal images also lack the visual detail, texture, and color information that visible
-cameras provide, all of which are important cues for object recognition and classification
+Thermal images also lack the visual detail, texture, and color information of optical
+cameras, all important cues for recognition and classification
 \cite{bustos2023reviewObjectDetectionIR}.
 
+\newpage
 Environmental conditions further constrain thermal performance by reducing the temperature
-difference between objects and their surroundings.Wind accelerates the cooling of warm objects and rain causes water to absorb much of the
-objects thermal energy, both producing a more uniform background and diminishing contrast
+difference between objects and their surroundings. Wind cools warm objects and rain absorbs 
+their thermal energy, both producing a more uniform background and diminishing contrast
 \cite{stlaurent2007combinationColorThermal, bustos2023reviewObjectDetectionIR}.
 Solar heating further affects thermal contrast, as it warms objects differently depending
 on their thermal inertia. Asphalt and vehicles
-heat up considerably during the day, while water, trees, and people change comparatively
-little \cite{stlaurent2007combinationColorThermal, choi2018kaist}. In summer, this can
-reduce the temperature contrast between vehicles and background as the entire scene heats up,
-lowering thermal
-performance precisely when optical cameras perform very well under clear-sky conditions.
+heat considerably by day, while water, trees, and people change little~\cite{stlaurent2007combinationColorThermal, choi2018kaist}. 
+In summer, this can reduce the temperature contrast between vehicles and background 
+as the entire scene heats up. This reduces thermal performance precisely when optical 
+cameras perform well under clear-sky conditions.
 
-
+\vspace{-0.6em}
 \paragraph{LiDAR}
 
 LiDAR (Light Detection and Ranging) is an active remote sensing technique
@@ -902,14 +910,12 @@ safety consideration \cite{royo2019overviewLiDARAutonomousVehicles}.
     \centering
     \includegraphics[width=0.65\textwidth]{images/lidar_point_cloud_melotti_2020_multimodal_recognition.png}
     \caption{
-        Example obtained from KITTI 2D Object
-        Detection Dataset. The 3D point cloud is projected onto
-        the image and coloured proportionally to the measured distance.
+        KITTI 2D Object Detection Dataset sample with the 
+        3D point cloud projected onto the image and coloured by distance.
         \cite{melotti2020multimodalCameraLiDARRecognition}
     }
     \label{fig:lidar_point_cloud}
 \end{figure}
-
 
 
 Two factors constrain the maximum measurable object recognition range in LiDAR systems.
@@ -928,18 +934,16 @@ range to approximately \SI{6}{\meter} and introduces numerous false
 measurements, as illustrated in Figure~\ref{fig:fog_chamber_rgb_lidar_radar}.
 Therefore, LiDAR is a viable solution for night driving, yet unreliable
 under adverse weather conditions.
-\cite{bijelic2020seeingThroughFog}
-\cite{kim2023analysisLiDARPerformanceFogRain}
+\cite{bijelic2020seeingThroughFog, kim2023analysisLiDARPerformanceFogRain}
 
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{images/fog_chamber_rgb_lidar_radar_bijelic_2020_seeing_through_fog.png}
     \caption{
-        Multimodal sensor response of RGB camera, scanning lidar, and radar
-        in a fog chamber with dense fog. Reference recordings under clear
-        conditions shown in the first row, recordings in fog with
-        visibility of \SI{23}{\meter} shown in the second row.
+        RGB camera, lidar, and radar responses in a fog 
+        chamber under clear conditions (top)
+        and dense fog at \SI{23}{\meter} visibility (bottom).
         \cite{bijelic2020seeingThroughFog}
     }
     \label{fig:fog_chamber_rgb_lidar_radar}
@@ -949,9 +953,9 @@ The second factor limiting object recognition range is the limited
 information content of point clouds. Unlike RGB images, point clouds
 lack texture and color information, and their sparsity worsens with
 distance, making it difficult to recognize objects at longer ranges.
-\cite{wang2023lidarOnly3DObjectDetection}
-\cite{qi2020imvotenet}
+\cite{wang2023lidarOnly3DObjectDetection, qi2020imvotenet}
 
+\vspace{-0.6em}
 \paragraph{Radar}
 
 The basic operating principle of imaging radar (Radio Detection and
@@ -963,9 +967,7 @@ the returned signal, their radial velocity from the Doppler shift,
 and their angular position from phase differences across the antenna
 array, which allows estimation of both azimuth (horizontal) and
 elevation (vertical) angles.
-\cite[pp.~389, 400]{lillesand2015remoteSensing}
-\cite{kurniawan2023clusterfusionRadarCamera3DObjectDetection}
-\cite{srivastav2023radarsAutonomousDriving}
+\citetext{\citealp[pp.~389, 400]{lillesand2015remoteSensing}; \citealp{kurniawan2023clusterfusionRadarCamera3DObjectDetection}; \citealp{srivastav2023radarsAutonomousDriving}}
 
 Radar data can be represented in several formats, including the
 range-azimuth-Doppler (RAD) tensor, the range-azimuth heatmap, and
@@ -978,7 +980,7 @@ dimension, as seen in Figure~\ref{fig:range_azimuth_heatmap}. Radar
 point clouds consist of sparse 3D data points extracted as amplitude
 peaks from the RAD tensor, where each point encodes the 3D position
 of the detection and its radial velocity. Point clouds are commonly
-represented in a bird's eye view (BEV) for top-down observation or
+represented in a bird's eye view or
 in a perspective view from the sensor's viewpoint.
 \cite{srivastav2023radarsAutonomousDriving}
 
@@ -986,10 +988,9 @@ in a perspective view from the sensor's viewpoint.
     \centering
     \includegraphics[width=\textwidth]{images/range_azimuth_map_2021_wang_rodnet.png}
     \caption{
-        Example Images of range-azimuth heatmaps with corresponding RGB images.
-        Leftmost image shows two pedestrians detected as a single azimuth peak.
-        Right image shows detection of occluded vehicle.
-        Rightmost images shows detection independent of sunlight.
+        Range-azimuth heatmaps with corresponding RGB images.
+        Examples depict two pedestrians merged into a single azimuth 
+        peak (left), an occluded vehicle (center), and light-independent detection (right).
         \cite{wang2021rodnetRadarObjectDetection}
     }
     \label{fig:range_azimuth_heatmap}
@@ -1008,35 +1009,31 @@ through adverse weather conditions with little attenuation, as
 illustrated in Figure~\ref{fig:signal_attenuation_radar_lidar}.
 This also enables radar to detect objects over long distances and
 to observe objects under partial occlusion.
-\cite{kurniawan2023clusterfusionRadarCamera3DObjectDetection}
-\cite{karangwa2023reviewVehicleDetectionAutonomousDriving}
-\cite{srivastav2023radarsAutonomousDriving}
+\cite{kurniawan2023clusterfusionRadarCamera3DObjectDetection, karangwa2023reviewVehicleDetectionAutonomousDriving, srivastav2023radarsAutonomousDriving}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{images/signal_attenuation_radar_lidar_2023_srivastav_radars_autonomous_vehicles.png}
+    \includegraphics[width=\textwidth]{images/signal_attenuation_radar_lidar_2023_srivastav_radars_autonomous_vehicles.png}
     \caption{
-        A comparison of signal power attenuation in moderate and
-        heavy rain (left) and in moderate and dense fog conditions (right).
-        Both lidar and radar perform well in heavy rain conditions, but
-        lidar undergoes significant attenuation in fog while radar is unaffected.
+        Signal power attenuation of lidar and radar in rain (left) and fog (right).
+        Both sensors tolerate heavy rain, fog strongly attenuates lidar.
         \cite{srivastav2023radarsAutonomousDriving}
     }
     \label{fig:signal_attenuation_radar_lidar}
 \end{figure}
 
-However, radar sensors typically provide low angular resolution due to
+However, radar sensors provide low angular resolution due to
 antenna array size constraints and therefore produce sparse and partial
 point clouds of detected objects. This sparsity makes reliable object
-recognition very difficult when radar data is used alone and often
-requires fusion with complementary sensors such as cameras or LiDAR,
-which limits the overall weather robustness to that of the fused sensors.
+recognition difficult when radar data is used alone and often
+requires fusion with complementary sensors such as cameras or LiDAR.
+This limits the overall weather robustness to that of the fused sensors.
 In addition, the large radar wavelength can cause nearby surfaces, such as
 the ground or guardrails, to act as specular reflectors, producing spurious
 observations in radar data known as clutter that may result in false positives.
-\cite{kurniawan2023clusterfusionRadarCamera3DObjectDetection}
-\cite{karangwa2023reviewVehicleDetectionAutonomousDriving}
-\cite{srivastav2023radarsAutonomousDriving}
+\cite{kurniawan2023clusterfusionRadarCamera3DObjectDetection, 
+karangwa2023reviewVehicleDetectionAutonomousDriving, 
+srivastav2023radarsAutonomousDriving}
 
 Table~\ref{tab:modality_comparison} summarizes the main
 advantages and disadvantages of the evaluated sensing
@@ -1046,7 +1043,7 @@ modalities for UAV-based vehicle detection.
     \centering
     \caption{Qualitative comparison of sensing modalities for vehicle detection.}
     \label{tab:modality_comparison}
-    \small
+    \scriptsize
     \setlength{\tabcolsep}{8pt}
     \rowcolors{2}{rowlight}{rowdark}
     \begin{tabular}{|lcccc|}
@@ -1071,8 +1068,9 @@ modalities for UAV-based vehicle detection.
 \end{table}
 \rowcolors{1}{}{}
 
-\subsection{Sensor System}
-\label{sec:sensor_system}
+\vspace{-1em}
+\subsection{Sensor Selection}
+\label{sec:sensor_selection}
 
 Based on this evaluation, a multimodal configuration combining
 RGB and LWIR imaging was selected. RGB cameras provide the most
@@ -1134,7 +1132,6 @@ systems~\cite{worksellWIRISspec2022}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.4\textwidth]{images/wiris_enterprise_shadow.png}
-    \vspace{-1em}
     \caption{
         The Workswell WIRIS Enterprise multi-sensor system.
         \cite{worksellWIRISspec2022}
@@ -1163,15 +1160,13 @@ size offset of at least 3 pixels or an angular offset of at least
 3 degrees.
 Misalignment of this magnitude produces incorrect bounding box predictions
 and undermines fusion methods that rely on aligned feature
-maps~\cite{yuan2022crossModalAlignmentVehicleDetection}\cite{he2023misalignedRGBTadaptiveCalibration}.
+maps~\cite{yuan2022crossModalAlignmentVehicleDetection,he2023misalignedRGBTadaptiveCalibration}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.45\textwidth]{images/rgb_thermal_misalignment_yuan_2022_crossmodal_alignment.png}
-    \vspace{-1em}
     \caption{
-        Illustration of the spatial modality misalignment problem.
-        \cite{yuan2022crossModalAlignmentVehicleDetection}
+        The spatial modality misalignment problem.~\cite{yuan2022crossModalAlignmentVehicleDetection}
     }
     \label{fig:rgb_thermal_misalignment}
 \end{figure}
@@ -1205,6 +1200,7 @@ This chapter first describes the data collection process, then outlines existing
 public UAV datasets and justifies the inclusion of public datasets for
 this project.
 
+\vspace{-2em}
 \section{Data Collection}
 
 As previously described in Chapter~\ref{chap:hardware}, the data collection is performed using the
@@ -1222,7 +1218,7 @@ Samples of the recorded scenes are shown in Figure~\ref{fig:recorded_scenes}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{images/3d_net_dataset_samples.png}
+    \includegraphics[width=\textwidth]{images/3d_net_dataset_samples.png}
     \caption{
         Aligned sample frames from the recorded scenes. The top row shows RGB frames, while the bottom row shows the corresponding thermal frames.
     }
@@ -1256,9 +1252,8 @@ Figure~\ref{fig:bounding_box_degradation_misalignment}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{images/misalignment_degrading_bounding_box_he_2023.png}
-    \vspace{-1em}
     \caption{
-        Illustration of low-quality bounding boxes caused by spatial misalignment.
+        Low-quality bounding boxes caused by spatial misalignment.
         Adapted from \cite{he2023misalignedRGBTadaptiveCalibration}.
     }
     \label{fig:bounding_box_degradation_misalignment}
@@ -1279,6 +1274,7 @@ data collection flight and are corrected in the following procedure.
 Temporal misalignment arose from differing frame rates between the two cameras, and spatial
 misalignment arose from physical differences in sensor placement and field of view.
 
+\vspace{-0.6em}
 \paragraph{Temporal Misalignment}
 The temporal misalignment was primarily caused by differences in the sampling
 rates of the two cameras. The RGB camera captured frames at 20\,fps, whereas
@@ -1341,6 +1337,7 @@ one of the videos by this temporal offset and applying the same frame matching a
 as before with the new offset. This resulted in two videos that were temporally aligned
 with a maximum temporal frame pairing offset of 55 ms across 15 minute videos.
 
+\vspace{-0.6em}
 \paragraph{Spatial Misalignment}
 After temporal alignment, spatial alignment between the two modalities was
 addressed. The spatial misalignment originates from three independent
@@ -1352,6 +1349,7 @@ listed in Table~\ref{tab:camera_params}.
 
 \begin{table}[h]
     \centering
+    \scriptsize
     \rowcolors{2}{rowlight}{rowdark}
     \begin{tabular}{|lcc|}
         \toprule
@@ -1410,9 +1408,8 @@ tangent ratio of the FOVs:
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{images/pinhole_fov_scale.png}
-    \vspace{-1em}
     \caption{
-        Illustration of pinhole model for FOV scaling in one dimension.
+        The pinhole model for FOV scaling in one dimension.
     }
     \label{fig:pinhole_fov_scale}
 \end{figure}
@@ -1487,9 +1484,8 @@ within typical manufacturing tolerances for camera alignment:
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{images/boresight_misalignment_approximation.png}
-    \vspace{-1em}
     \caption{
-        Illustration of the pinhole model for boresight angle approximation.
+        The pinhole model for boresight angle approximation.
         (a) Focal length in pixels derived from FOV and resolution.
         (b) Angular misalignment derived from pixel offset and focal length.
     }
@@ -1531,9 +1527,8 @@ of $3.43~\text{px}$.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\textwidth]{images/parallax_shift.png}
-    \vspace{-1em}
     \caption{
-        Illustration of the pinhole camera model used to approximate
+        The pinhole camera model used to approximate
         the parallax-induced pixel shift $\Delta\mathrm{px}$.
     }
     \label{fig:parallax_error}
@@ -1562,8 +1557,7 @@ near the image edges visible for the vehicle near the top.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{images/camera_alignment_results.png}
-    \vspace{-1em}
+    \includegraphics[width=\textwidth]{images/camera_alignment_results.png}
     \caption{
         Qualitative RGB--thermal alignment results (thermal in BWRGB).
         (a) Near-object parallax on a bench.
@@ -1589,6 +1583,7 @@ As a result, the training data and the model input during production are
 processed by the same system.
 This guarantees consistent input representations across data collection and deployment.
 
+\vspace{-1em}
 \subsection{Annotation}
 
 The aligned RGB and thermal video streams were sampled to extract individual frames for annotation.
@@ -1627,12 +1622,10 @@ Figure~\ref{fig:annotation_tools} shows the interfaces of both tools.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{images/cvat_fiftyone_showcase.png}
-    \vspace{-1em}
+    \includegraphics[width=\textwidth]{images/cvat_fiftyone_showcase.png}
     \caption{
-        Left: CVAT annotation interface with a car bounding box drawn on a sample frame.
-        Right: FiftyOne dataset browser showing per-sample metadata fields including
-        recording location, date, and dataset split.
+        CVAT annotation interface with a car bounding box (left) and FiftyOne dataset browser
+        displaying samples with metadata including location, date, and split (right).
     }
     \label{fig:annotation_tools}
 \end{figure}
@@ -1675,6 +1668,7 @@ when the visible channel was ambiguous.
 A limitation of this approach is that the residual spatial misalignment discussed in
 Section~\ref{chap:sensor_alignment} may cause bounding boxes to fit the thermal channel less precisely.
 
+\vspace{-1em}
 \subsection{Thermal Color Format Conversion}
 
 During the first data collection flight session, the camera was set to BWRGB mode, which encodes
@@ -1702,11 +1696,10 @@ for the original, simply mapped and interpolated versions are shown in Figure~\r
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/comparison_thermal_postprocessing.png}
-    \vspace{-1em}
     \caption{
-        Right: Original BWRGB thermal image. Left: Postprocessed grayscale thermal image using the WIRIS palette mapping.
-        Center: Postprocessed grayscale thermal image using the WIRIS palette mapping with nearest neighbour interpolation.
-        The BWRGB color palette from the WIRIS Enterprise user manual \cite{worksellWIRISuserManual2023} is shown to the right.
+        Original BWRGB thermal image (right), postprocessed grayscale with WIRIS palette mapping (left),
+        and the same with nearest-neighbour interpolation (center).
+        The BWRGB palette shown at right is from~\cite{worksellWIRISuserManual2023}.
     }
     \label{fig:thermal_postprocessing_comparison}
 \end{figure}
@@ -1727,19 +1720,17 @@ Figure~\ref{fig:self_collected_stats} (left) shows the class distribution across
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/3d_net_dataset_statistics.png}
-    \vspace{-1em}
+    \includegraphics[width=\textwidth]{images/3d_net_dataset_statistics_vertical.png}
     \caption{
-        Statistics of the self-collected dataset after background reduction and annotation.
-        Left: annotated frame and bounding box counts per train, validation, and test split.
-        Center: normalized bounding box area distribution per class.
-        Right: normalized bounding box size scatter plot showing the relationship between bounding box width and height across all classes.
+        Self-collected dataset statistics after background reduction and annotation.
+        Frame (n) and object counts per split (top), normalized bounding box area distribution per class (center),
+        and normalized bounding box width-height scatter plot (bottom) are shown.
     }
     \label{fig:self_collected_stats}
 \end{figure}
 
 All classes occupy approximately $0.1\%$ to $1\%$ of the normalized image area, which is in accordance with
-other UAV vehicle object detection datasets\cite{feng2023rtdodDataset,sun2022droneVehicleRGBThermalUAVDataset}.
+other UAV vehicle object detection datasets~\cite{feng2023rtdodDataset,sun2022droneVehicleRGBThermalUAVDataset}.
 Truck bounding boxes form a narrow peak in the area distribution.
 This concentration reflects a single stationary truck that was present in the background of 2 scenes during the collection flights.
 Generally, the classes show a peak around $0.1\%$ with a long tail towards larger sizes as the vehicles move closer
@@ -1763,8 +1754,10 @@ In addition, motorcycle and bus instances are underrepresented, with at most $12
 samples in the training split respectively.
 These limitations motivate the inclusion of the public datasets described in Section~\ref{sec:public_datasets}.
 
+\vspace{-2em}
 \section{Public Visible-Thermal Datasets}
 \label{sec:public_datasets}
+\vspace{-0.5em}
 
 UAV datasets typically distinguish between nadir views, where the camera points
 straight downward, and oblique views, where the camera is tilted at an angle to the ground.
@@ -1845,7 +1838,7 @@ on adverse weather. The Multispectral dataset
 \cite{takumi2017multispectralDatasetAutonomousVehicles} contains 7,512 aligned
 RGB, thermal, near-infrared, and mid-infrared image pairs under day and night
 but includes only includes person, bike, and vehicle object classes. The RASMD
-dataset \cite{youngwan2026rasmd} provides approximately 100,000 RGB-SWIR image
+dataset \cite{jin2026rasmd} provides approximately 100,000 RGB-SWIR image
 pairs under adverse weather with multiple vehicle classes but does not include
 thermal LWIR imagery.
 
@@ -1896,7 +1889,7 @@ summarizes the characteristics of all discussed datasets.
             MSRS \cite{tang2022piafusionMSRSDataset}                              & RGB+T             & Vehicle                & Forward              & \textemdash           & 1                        & \checkmark      & \checkmark     & \textemdash              & 1,444           \\
             Infraparis \cite{franchi2024infraparisRGBDepthThermalDataset}         & RGB+T+D           & Vehicle                & Forward              & \textemdash           & 6                        & \checkmark      & \checkmark     & \textemdash              & 12,084          \\
             Multispectral \cite{takumi2017multispectralDatasetAutonomousVehicles} & RGB+T +NIR+MIR    & Vehicle                & Forward              & \textemdash           & 3                        & \checkmark      & \textemdash    & \textemdash              & 7,512           \\
-            RASMD \cite{youngwan2026rasmd}                                        & RGB+SWIR          & Vehicle                & Forward              & \textemdash           & 5                        & \checkmark      & \textemdash    & \checkmark               & 100,000         \\
+            RASMD \cite{jin2026rasmd}                                        & RGB+SWIR          & Vehicle                & Forward              & \textemdash           & 5                        & \checkmark      & \textemdash    & \checkmark               & 100,000         \\
             DAWN \cite{kenk2020dawn}                                              & RGB               & Vehicle                & Forward              & \textemdash           & 4                        & \checkmark      & \textemdash    & \checkmark               & 1,000           \\
             ACDC \cite{sakaridis2025acdcDatasetAdverseConditions}                 & RGB               & Vehicle                & Forward              & \textemdash           & 5                        & \checkmark      & \checkmark     & \checkmark               & 5,509           \\
             LLVIP \cite{jia2021llvip}                                             & RGB+T             & CCTV                   & Oblique              & \textemdash           & \textemdash              & \checkmark      & \checkmark     & \textemdash              & 16,836          \\
@@ -1972,7 +1965,7 @@ matching the HBB format of RTDOD and M3FD.
 
 
 \begin{table}[H]
-    \footnotesize
+    \scriptsize
     \centering
     \rowcolors{2}{rowlight}{rowdark}
     \begin{tabular}{|>{\centering\arraybackslash}p{2.2cm}>{\centering\arraybackslash}p{2.6cm}>{\centering\arraybackslash}p{2.6cm}>{\centering\arraybackslash}p{2.2cm}>{\centering\arraybackslash}p{2.2cm}|}
@@ -2020,7 +2013,9 @@ where the last 10\% of the images in each video segment belonging
 to the trainval set were used as
 the validation set, and the rest were used for training.
 
+\vspace{-0.8em}
 \subsection{Thermal Preprocessing}
+\vspace{-0.2em}
 
 Infrared imagery is sensitive to variations in temperature,
 sensor characteristics, and environmental conditions. Thus,
@@ -2048,16 +2043,16 @@ and FieldScale applied to an image from the FLIR(v2) dataset \cite{teledyne_2022
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{images/thermal_preprocessing_becker_2025_fusion_confusion.png}
+    \includegraphics[width=\textwidth]{images/thermal_preprocessing_becker_2025_fusion_confusion.png}
     \caption{
-        Examples showing the results of the preprocessing
+        The results of preprocessing
         methods HE, CLAHE, and Fieldscale.
         \cite{becker2025fusionOrConfusionDatasetPooling}
     }
     \label{fig:thermal_preprocessing}
 \end{figure}
 
-However, the experiments in \cite{becker2025fusionOrConfusionDatasetPooling}
+However, the experiments in \citet{becker2025fusionOrConfusionDatasetPooling}
 showed that applying these preprocessing techniques to already low dynamic
 range infrared images did not lead to significant performance improvements
 across datasets, and trained models appeared to internally compensate for
@@ -2067,7 +2062,6 @@ clusters remained unchanged after preprocessing.
 Consequently,
 unified thermal preprocessing
 is not performed for the dataset pool.
-\cite{becker2025fusionOrConfusionDatasetPooling}
 
 The three datasets were uploaded to an Amazon S3-compatible bucket
 hosted on the PlusServer cloud platform, which serves as the centralized
@@ -2084,29 +2078,30 @@ experiments. During training runs, ClearML dispatches workloads to the
 GPU workers hosted on Bernard's GPU Rack. The workers must retrieve the
 required dataset assets at runtime from the S3 bucket through FiftyOne.
 
+\vspace{-1em}
 \subsection{Dataset Statistics}
+\vspace{-0.2em}
 
-The combined dataset pool consists of 61,055 aligned RGB-thermal image pairs 
-with 715,534 bounding box annotations across six classes. Figure~\ref{fig:dataset_class_distribution} 
-shows the distribution of images, annotations, and class instances across the 
-train, validation, and test splits per dataset. The annotation count is skewed 
-towards the DroneVehicle dataset, while the 3D-Net dataset contributes the 
-fewest annotations. Despite this imbalance, the 3D-Net dataset provides data 
-from the specific side-view perspective, flight height, and operational conditions of the target application, 
-which the other datasets do not cover. The image count is more balanced across datasets. 
-The large variation in annotation counts stems from differences in annotation density 
-between datasets. In terms of image count, the M3FD dataset is the smallest. 
-The car class dominates the class distribution, driven by the large number of car 
-annotations in the DroneVehicle dataset. The bus, truck, motorcycle, and person classes 
-are well represented. The bicycle class is underrepresented, with only 2,898 instances 
-across the entire dataset pool.
+The combined dataset pool consists of 61,055 aligned RGB-thermal image pairs
+with 715,534 object annotations across six classes. Figure~\ref{fig:dataset_class_distribution}
+shows the distribution of images, annotations, and class instances across the
+train, validation, and test splits. Annotation counts are skewed towards
+DroneVehicle, while 3D-Net contributes the fewest. Despite this imbalance,
+3D-Net provides data from the specific side-view perspective, flight height,
+and operational conditions of the target application that the other datasets
+do not cover. Image counts are more balanced across datasets, with M3FD being
+the smallest, and the variation in annotation counts reflects differences in
+annotation density. The car class dominates the class distribution due to the
+large number of DroneVehicle annotations, while bus, truck, motorcycle, and
+person classes are well represented. The bicycle class is underrepresented
+in the dataset.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/dataset_combined.png}
     \caption{
-        Per-dataset image counts (top left) and annotation counts (bottom left) broken down by train, validation, and test split.
-        Instance counts per merged vehicle class across all datasets in the pool (right), with class mapping given in Table~\ref{tab:dataset_class_merge}.
+        Per-dataset image and annotation counts per split (left) 
+        and instance counts per merged vehicle class across all datasets (right).
     }
     \label{fig:dataset_class_distribution}
 \end{figure}
@@ -2129,7 +2124,9 @@ Detection models are grouped into three families, namely proposal-based detector
 grid-based detectors, and query-based detectors~\cite{bhowmik2023unionOverIntersections}.
 These families are briefly introduced and justification for the choice of grid-based detectors is given.
 
+\vspace{-2em}
 \section{Proposal-based Detectors}
+\vspace{-0.5em}
 
 Proposal-based detectors operate in two sequential stages.
 A region proposal method first generates a set of candidate regions likely to contain objects.
@@ -2155,18 +2152,21 @@ but at inference times two to three times higher~\cite{carranza2020performanceSi
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.49\textwidth]{images/faster_rcnn_architecture_ren_2016.png}
     \hfill
-    \includegraphics[width=0.49\textwidth]{images/fpn_architecture_tsung_2017.png}
+    \includegraphics[width=0.42\textwidth]{images/faster_rcnn_architecture_ren_2016.png}
+    \hfill
+    \includegraphics[width=0.42\textwidth]{images/fpn_architecture_tsung_2017.png}
+    \hfill
     \caption{
-        (Left) An illustration of the Faster R-CNN architecture, which is a representative proposal-based detector \cite{ren2016fasterRCNN}.
-        (Right) An illustration of the Feature Pyramid Network architecture \cite{lin2017featurePyramidNetworks}.
+        The Faster R-CNN architecture (left) as a representative proposal-based detector \cite{ren2016fasterRCNN}.
+        The Feature Pyramid Network architecture (right) \cite{lin2017featurePyramidNetworks}.
     }
     \label{fig:proposal_based_architecture}
 \end{figure}
 
-
+\vspace{-2em}
 \section{Grid-based Detectors}
+\vspace{-0.5em}
 
 Modern single-stage detectors share a common three-component architecture, illustrated in Figure~\ref{fig:grid_based_architecture}.
 The backbone is a deep convolutional network that processes the input image and produces multi-scale feature maps.
@@ -2177,7 +2177,7 @@ The head consumes the neck output and directly predicts bounding box coordinates
     \centering
     \includegraphics[width=0.6\textwidth]{images/yolov11n_architecture_wang_2025.png}
     \caption{
-        An illustration of the YOLOv11n architecture, showing the backbone, neck, and detection head \cite{wang2025raCottnet}.
+        The YOLOv11n architecture, including the backbone, neck, and detection head \cite{wang2025raCottnet}.
     }
     \label{fig:grid_based_architecture}
 \end{figure}
@@ -2214,7 +2214,9 @@ duplicates~\cite{advzemovic2025deepLearningMultiObjectTrackingSurvey, zhao2024DE
 Most YOLO variants rely on NMS during inference, although end-to-end training approaches such as
 those in YOLOv10 reduce this dependency~\cite{ge2021yolox}.
 
+\vspace{-2em}
 \section{Query-based Detectors}
+\vspace{-0.5em}
 
 DETR (DEtection TRansformer)~\cite{carion2020DETR} reformulates object detection as a set prediction problem.
 The model consists of four main components, as illustrated in Figure~\ref{fig:detr_architecture}.
@@ -2244,9 +2246,9 @@ single-stage detectors~\cite{guo2024damsdet, yuan2024c2former, kotthapalli2025yo
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{images/detr_architecture_carion_2020.png}
+    \includegraphics[width=\textwidth]{images/detr_architecture_carion_2020.png}
     \caption{
-        An illustration of the DETR architecture, which is a representative transformer-based detector \cite{carion2020DETR}.
+        The DETR architecture as a representative query-based detector \cite{carion2020DETR}.
     }
     \label{fig:detr_architecture}
 \end{figure}
@@ -2274,10 +2276,11 @@ NPU~\cite{suchy2026reviewYOLODETREdgeDevices}. For these reasons, query-based de
 suitable for our application. Grid-based detectors are chosen for their better speed compared to proposal-based
 detectors and very competitive accuracy.
 
-
+\vspace{-2em}
 \section{Multispectral Feature Fusion}
+\vspace{-0.5em}
 
-As outlined in Section~\ref{sec:sensor_system}, visible light and thermal
+As outlined in Section~\ref{sec:sensor_selection}, visible light and thermal
 infrared are used to exploit their complementary strengths. The fusion of these modalities
 is the critical component for improved performance of the detection model.
 The core problem in multispectral object detection is combining
@@ -2297,6 +2300,7 @@ Accordingly, multi-modality fusion can be split into two levels,
 selecting input features at the macro level, and constructing
 the fusion function at the micro level.~\cite{qingyun2021CFT}
 
+\vspace{-1em}
 \subsection{Macro level feature fusion}
 
 Macro-level fusion addresses the question of where in the network the
@@ -2344,9 +2348,9 @@ maximum selection to produce the final results.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{images/macro_fusion_architecture.png}
+    \includegraphics[width=\textwidth]{images/macro_fusion_architecture.png}
     \caption{
-        An illustration of the macro-level fusion architectures for multispectral object detection.
+        Macro-level fusion architectures for multispectral object detection.
         Adapted from \cite{wan2025yolov11rgbt}.
     }
     \label{fig:macro_fusion_architecture}
@@ -2369,6 +2373,7 @@ This work therefore evaluates all four fusion architectures and compares their
 performance on a vehicle and pedestrian detection dataset for both full-precision
 and quantized models in a real-time edge deployment scenario.
 
+\vspace{-1em}
 \subsection{Micro level feature fusion}
 \label{sec:micro_fusion}
 
@@ -2481,8 +2486,10 @@ complicates tracking.
 There are two major paradigms for online MOT, namely tracking-by-detection
 and end-to-end tracking.
 
+\vspace{-2em}
 \section{Tracking-by-Detection}
 \label{sec:tracking_by_detection}
+\vspace{-0.5em}
 
 The emergence of deep learning-based
 methods led to introduction of tracking-by-detection frameworks.
@@ -2515,17 +2522,17 @@ does not tolerate long occlusions, which is one of its main limitations.
 \cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}
 
 Deep SORT~\cite{wojke2017DeepSORT} targets SORT's tendency to accumulate identity switches during occlusions by augmenting
-motion-based association with appearance information. A interchangeable convolutional re-identification model extracts
-a compact embedding vector from each detected bounding box crop, and each track maintains a rolling buffer
-of such embeddings. Similarity between a detection and a track is measured as the minimum cosine distance
-between the detection's embedding and any embedding stored in the track's buffer, capturing the most
-favourable historical match. The final association cost blends this
+motion-based association with appearance information. An interchangeable convolutional re-identification model extracts
+a compact embedding from each detected crop, and each track maintains a rolling buffer
+of such embeddings. Similarity is measured as the minimum cosine distance
+between the detection's embedding and any embedding in the track's buffer.
+The final association cost blends this
 appearance distance with the computed distance from the Kalman Filter prediction, with a gate that
 requires both motion and appearance conditions to be satisfied before a pairing is considered.
-Deep SORT also introduces cascaded association ordered by how long a track has been lost, so recently
+Deep SORT also introduces cascaded association ordered by track age, so recently
 active tracks are matched first and accumulated Kalman Filter uncertainty cannot cause lost tracks to
-steal detections from visible objects. Confirmed tracks are then prioritised over candidate tracks in
-their probationary period, reducing false-positive associations.
+steal detections from visible objects. Confirmed tracks are prioritised over probationary candidates,
+reducing false-positive associations.
 \cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}
 
 ByteTrack~\cite{zhang2022bytetrack} builds directly on SORT and addresses its sensitivity to the detection score threshold
@@ -2568,8 +2575,10 @@ reference bounding box. Together these mechanisms make OC-SORT a strong alternat
 in scenarios involving long occlusions and erratic motion, where linear constant-velocity assumptions
 break down.
 
+\vspace{-2em}
 \section{End-to-End Tracking}
 \label{sec:end_to_end_tracking}
+\vspace{-0.5em}
 
 In end-to-end tracking methods, object detection and association are trained jointly rather than as separate stages.
 The most well-known methods of this type~\cite{zeng2022motr, zhang2023motrv2, yu2023motrv3, cai2022memot, gao2023memotr} build on the DETR
@@ -2581,8 +2590,10 @@ generally more suitable for real-time applications. Furthermore, their transform
 the Hailo-8 NPU due to hardware limitations, as already discussed in Chapter~\ref{chap:object_detection}.
 \cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}
 
+\vspace{-2em}
 \section{Tracking evaluation metrics}
 \label{sec:tracking_evaluation_metrics}
+\vspace{-0.5em}
 
 Evaluating a multi-object tracker requires comparing predicted tracks against ground truth
 tracks. Errors fall into two broad
@@ -2597,11 +2608,10 @@ outcomes.~\cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}
     \centering
     \includegraphics[width=0.9\textwidth]{images/mot_tracking_errors_advzemovic_2025.png}
     \caption{
-        Six representative tracking outcomes. Case (a) shows a correctly tracked object. Cases (b) and
-        (c) show a false positive track and a false negative track. Cases (d) and (e) show a false
-        negative detection and a false positive detection. Case (f) shows an identity switch. In all
-        cases the predicted and ground truth bounding boxes do not align perfectly, resulting in
-        localisation errors. Modified after \cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}.
+        Six representative tracking outcomes illustrating (a) a correct track, (b) a false positive track,
+        (c) a false negative track, (d) a false negative detection, (e) a false positive detection,
+        and (f) an identity switch. All cases exhibit localisation errors. 
+        Modified after \cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}.
     }
     \label{fig:mot_error_types}
 \end{figure}
@@ -2645,7 +2655,9 @@ HOTA provides a more complete picture of tracker
 performance than MOTA or IDF1 alone. Therefore, it became the primary metric in MOT benchmarks alongside
 AssA, DetA, MOTA, IDF1, and the total number of identity switches~\cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}.
 
+\vspace{-2em}
 \section{Evaluation}
+\vspace{-0.5em}
 
 For this application, we choose the tracking-by-detection paradigm for its modularity, and
 better performance in real-time applications. To select a specific tracking-by-detection method,
@@ -2672,6 +2684,7 @@ reported boxes. The results are given in Table~\ref{tab:tracker_evaluation_metri
 
 \begin{table}[H]
     \centering
+    \scriptsize
     \rowcolors{2}{rowlight}{rowdark}
     \begin{tabular}{|l cccccccc|}
         \toprule
@@ -2700,11 +2713,11 @@ reported boxes. The results are given in Table~\ref{tab:tracker_evaluation_metri
         \bottomrule
     \end{tabular}
     \caption{
-        Tracking accuracy metrics for each evaluated tracker on the 3D-Net dataset using
-        ground truth detections as input. The top section reports metrics when the tracker
-        returns the input detection bounding boxes unchanged. The bottom section reports metrics
-        when the tracker returns its internally predicted bounding boxes.
+        Tracking accuracy per tracker on the 3D-Net dataset with ground truth detections. 
+        The top section uses the detector bounding boxes, the bottom section uses 
+        tracker-predicted bounding boxes.
     }
+    \vspace{-2em}
     \label{tab:tracker_evaluation_metrics}
 \end{table}
 \rowcolors{1}{}{}
@@ -2722,15 +2735,15 @@ similarly fast with a mean of 0.54\,ms and a p95 of 0.78\,ms on detection frames
 ReID reaches a mean of 7.73\,ms and a p95 of 27.06\,ms on detection frames.
 The latency increase compared to SORT and ByteTrack is caused by the camera motion compensation
 module. DeepSort and BoTSort with ReID reach means of 112.15\,ms and 71.97\,ms on detection
-frames respectively. The substantially higher latency in both cases is caused by the neural
-re-identification module, which runs feature extraction for each detected object.
+frames respectively. The higher latency in both cases is caused by the neural
+re-identification module, which runs feature extraction per detected object.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/tracker_latency_distributions.png}
     \caption{
         Per-frame Latency distributions of the evaluated trackers on the 3D-Net dataset.
-        (Left) all frames, (Right) only frames with at least 1 detection.
+        (left) all frames, (right) only frames with at least 1 detection.
     }
     \label{fig:tracker_latency_distributions}
 \end{figure}
@@ -2747,7 +2760,7 @@ and they would add further computational load to the application.
 The ReID modules of DeepSort and BoTSort with ReID show no measurable benefit in tracking accuracy
 over the purely motion-based trackers on this dataset. ReID features are most effective in scenarios
 involving long occlusions, frequent object crossings, or heavily overlapping trajectories, where
-appearance cues are needed to re-establish identity after a track is lost\cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}.
+appearance cues are needed to re-establish identity after a track is lost~\cite{advzemovic2025deepLearningMultiObjectTrackingSurvey}.
 In the target use case of vehicle tracking, objects follow relatively predictable trajectories
 with little spatial overlap and few sustained occlusions, so motion-based association in
 combination with a high-quality object detector is sufficient.
@@ -2768,6 +2781,7 @@ characteristics of this application with small relatively fast moving objects~\c
 \chapter{Detection Implementation}
 \label{chap:implementation}
 
+\vspace{-1em}
 \section{Model Training Pipeline}
 \label{sec:model_training_pipeline}
 
@@ -2813,7 +2827,9 @@ implemented as a ClearML task as this is a resource intensive long running task 
 subsequently to generate a Hailo binary for deployment on
 Hailo-8 hardware, as further outlined in the next section.
 
+\vspace{-2em}
 \section{Hailo Dataflow Compilation}
+\vspace{-0.5em}
 
 Deploying the trained network on the Hailo-8 cannot reuse standard
 runtimes such as ONNX Runtime or TensorRT, because the accelerator is a
@@ -2914,11 +2930,8 @@ parser.~\cite{hailoDataflowCompilerUserGuide}
     \centering
     \includegraphics[width=0.85\textwidth]{images/yolov11_onnx_structure.png}
     \caption{
-        The ONNX graph structure of the exported YOLOv11n model with
-        marked detection head convolution outputs for bounding-box
-        distribution (blue) and class scores (red) used for the model cut
-        at three detection scales each. The graph is visualized in
-        Netron~\cite{netronViewer}.
+        ONNX graph of YOLOv11n with detection head outputs marked at three scales:
+        bounding-box distribution (blue) and class scores (red). Visualised in Netron~\cite{netronViewer}.
     }
     \label{fig:yolov11n_model_structure_cut}
 \end{figure}
@@ -3031,6 +3044,7 @@ the Straight-Through Estimator, which on the backward pass treats the
 rounding as the identity
 function.~\cite{gholami2021surveyQuantization, hailoQuantizationFineTuning}
 
+\vspace{-1em}
 \subsection{Compilation}
 \label{sec:hailo_compilation}
 
@@ -3069,6 +3083,7 @@ None of the three architectures were modified to enable compilation, as
 establishing equivalence to the original implementations would require separate
 validation.
 
+\vspace{-1em}
 \subsection{Model Script}
 
 The default behaviour of each pipeline stage can be overridden
@@ -3110,13 +3125,13 @@ against the accuracy burden placed on the recovery
 passes. At compilation time, a
 performance mode can be enabled that maximises the utilisation of
 the on-chip compute clusters and therefore the inference throughput
-of the compiled binary at the cost of a substantially longer compile
+of the compiled binary at the cost of a longer compile
 time.~\cite{hailoDataflowCompilerUserGuide} All models built in this
 work were compiled with the highest optimization level of 4, no
-weight compression and the highest compilation level of 2, so that
-accuracy is prioritised and the additional compile time is
-accepted.
+weight compression and the highest compilation level of 2 to
+prioritise accuracy over compile time.
 
+\vspace{-1em}
 \subsection{Execution Environment}
 
 The Dataflow Compiler is only released for x86 Linux hosts, which
@@ -3129,7 +3144,9 @@ training job described in the previous subsection and produces the
 The compiled model is loaded on the Raspberry Pi host to run the
 vehicle tracking service, which is further outlined in the next chapter.
 
+\vspace{-2em}
 \section{Vehicle Tracking Service}
+\vspace{-0.5em}
 
 The vehicle tracking service is implemented in Python and uses the natively
 installed HailoRT library to execute the compiled model on the Hailo-8.
@@ -3160,7 +3177,7 @@ as described in Section~\ref{chap:sensor_alignment}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/detection_service_flow_nunito.png}
+    \includegraphics[width=\textwidth]{images/detection_service_flow_nunito_large.png}
     \caption{
         The information flow of the vehicle tracking service with the major classes and their interactions.
     }
@@ -3238,7 +3255,9 @@ every 30 frames to avoid performance degradation from frequent I/O polling.
 \chapter{Evaluation}
 \label{chap:evaluation}
 
+\vspace{-1em}
 \section{Detection Accuracy}
+\vspace{-0.5em}
 
 The primary measurement used for determining the detection accuracy of the trained
 models is the mean average precision (mAP). The mAP is computed by first calculating
@@ -3260,9 +3279,9 @@ and therefore penalises imprecise bounding-box localisation.
 \cite{padilla2020surveyPerformanceMetricsObjectDetection}
 
 The object detectors evaluated in this section are the single-modality RGB and
-thermal models, the different macro fusion approaches of early, mid,
-late, and score fusion, which concatenate the feature maps at
-different stages of the object detector as described in
+thermal models and the different macro fusion approaches of early, mid,
+late, and score fusion, which concatenate the modalities at
+different stages as described in
 Chapter~\ref{chap:object_detection}. In addition, the micro-fusion variants MidP3, midCFT3, and midCMA3 applied at
 the mid-fusion position are evaluated, as described in
 Section~\ref{sec:micro_fusion}.
@@ -3294,7 +3313,7 @@ in Appendix~\ref{chap:detection_accuracy_tables}.
     \centering
     \includegraphics[width=\textwidth]{images/fusion_performance_full_precision.png}
     \caption{
-        Fusion Model variant performances on the validation sets of the M3fd, RTDOD, Visdrone
+        Fusion model variant performances on the validation sets of the M3FD, RTDOD, Visdrone
         Dronevehicle, 3D-Net and the combined datasets in full precision.
     }
     \label{fig:fusion_performance_full_precision}
@@ -3304,7 +3323,7 @@ in Appendix~\ref{chap:detection_accuracy_tables}.
     \centering
     \includegraphics[width=\textwidth]{images/fusion_model_complexity.png}
     \caption{
-        Comparison of the fusion Model variant model parameters and FLOPS.
+        Comparison of the fusion model variant model parameters and FLOPS.
     }
     \label{fig:model_complexity}
 \end{figure}
@@ -3447,25 +3466,26 @@ the total data, and the lower coverage leads to greater performance degradation 
     \centering
     \includegraphics[width=\textwidth]{images/fusion_performance_full_vs_quantized.png}
     \caption{
-        Comparison of the full precision and quantized fusion Model variant performances
-        on the validation sets of the M3fd, RTDOD, Visdrone Dronevehicle, 3D-Net and the
+        Comparison of the full precision and quantized fusion model variant performances
+        on the validation sets of the M3FD, RTDOD, Visdrone Dronevehicle, 3D-Net and the
         combined datasets.
     }
     \label{fig:fusion_performance_full_vs_quantized}
 \end{figure}
 
 The late fusion model is selected for deployment on the Hailo-8 because it achieves the best
-overall performance trade-off across all object sizes, lighting conditions and it achieves the 
+performance trade-off across all object sizes, lighting conditions and it achieves the 
 best quantized performance for the data pool dataset.
 
-
+\vspace{-2em}
 \section{Tracking Accuracy}
+\vspace{-0.5em}
 
 The end-to-end tracking accuracy of the deployed pipeline is evaluated by running the
 tracking service on the 3D-Net dataset train, validation, and test splits with
-the chosen compiled late fusion model. In contrast to the tracker selection evaluation in
-Chapter~\ref{chap:tracking}, the tracker receives Hailo model predictions as input rather
-than ground truth detections. The reported metrics therefore reflect the combined effect of
+the chosen model. In contrast to the tracker selection evaluation in
+Chapter~\ref{chap:tracking}, the tracker receives model predictions as input rather
+than ground truth detections. The reported metrics reflect the combined effect of
 detector and tracker performance.
 
 The evaluation results are given in Table~\ref{tab:tracking_accuracy_splits}. The train split
@@ -3481,6 +3501,7 @@ bounding box output mode is therefore retained for the deployed service.
 
 \begin{table}[H]
     \centering
+    \scriptsize
     \rowcolors{2}{rowlight}{rowdark}
     \begin{tabular}{|l r cccccccc|}
         \toprule
@@ -3505,14 +3526,17 @@ bounding box output mode is therefore retained for the deployed service.
         \bottomrule
     \end{tabular}
     \caption{
-        ByteTrack tracking accuracy on the 3D-Net dataset using Hailo model predictions as
-        input. Top: detection bounding boxes as output. Bottom: tracker-predicted bounding boxes.
+        ByteTrack tracking accuracy on the 3D-Net dataset with Hailo model predictions as
+        input. Detection bounding boxes are used as output (top) and tracker-predicted
+        bounding boxes (bottom).
     }
+    \vspace{-3em}
     \label{tab:tracking_accuracy_splits}
 \end{table}
 \rowcolors{1}{}{}
 
 \section{Embedded Inference Performance}
+\vspace{-0.5em}
 
 The inference performance of the compiled models is evaluated by running the tracking service
 on the Raspberry Pi 5 with the Hailo-8 accelerator and recording the per-frame inference time
@@ -3525,7 +3549,7 @@ with current and voltage sampled at one-second intervals.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.35\textwidth]{images/power_measurement_setup.jpeg}
+    \includegraphics[width=0.32\textwidth]{images/power_measurement_setup.jpeg}
     \caption{
         Power draw measurement setup for the Raspberry Pi 5.
     }
@@ -3693,7 +3717,9 @@ project. The data is collected from a drone perspective with an attached
 camera system containing multiple optical cameras, a thermal camera, and
 a distance sensor.
 
+\vspace{-2em}
 \section{Classification Mapping}
+\vspace{-0.5em}
 
 The detailed vehicle classification for this project uses a simplified mapping
 from Bernard's 12+1 vehicle classification that is based on the BASt 8+1
@@ -3704,6 +3730,7 @@ car, bus, truck, motorcycle, bicycle, or person.
 
 \begin{table}[H]
     \centering
+    \scriptsize
     \caption{Mapping from Bernard's 12+1 vehicle types to 3D-Net dataset classes.}
     \label{tab:labeling_class_mapping}
     \rowcolors{2}{rowlight}{rowdark}
@@ -3724,7 +3751,9 @@ car, bus, truck, motorcycle, bicycle, or person.
 \end{table}
 \rowcolors{1}{}{}
 
+\vspace{-2em}
 \section{Bounding Box Rules}
+\vspace{-0.5em}
 
 Bounding boxes must be axis-aligned with the image, rotated boxes are not
 supported. Only the visible portion of an object should be annotated. The
@@ -3737,7 +3766,9 @@ If a vehicle is towing a trailer or similar attachment, a single bounding
 box encompasses both the towing vehicle and the trailer, even if other
 vehicles are loaded on the trailer.
 
+\vspace{-2em}
 \section{Minimum Requirements for Annotation}
+\vspace{-0.5em}
 
 A vehicle is annotated only when all of the following conditions are met.
 
@@ -3750,7 +3781,9 @@ A vehicle is annotated only when all of the following conditions are met.
           If it is too blurry to classify, do not annotate it.
 \end{itemize}
 
+\vspace{-2em}
 \section{Low-Light Conditions}
+\vspace{-0.5em}
 
 Objects that are difficult to distinguish due to low light should still be labeled.
 The camera system includes a thermal camera that is unaffected by visible light and
@@ -3853,7 +3886,7 @@ the S3 URL attached to the FiftyOne sample to confirm object presence and class.
 \begin{table}[H]
     \centering
     \caption{Detection accuracy on adverse weather and night samples of the RTDOD dataset
-        for models trained on the RTDOD dataset and the combined dataset.}
+        for models trained on the RTDOD and the combined dataset.}
     \label{tab:acc_weather_night}
     \begin{adjustbox}{max width=\textwidth}
         \begin{tabular}{|l l l r r r r r r r r r|}
