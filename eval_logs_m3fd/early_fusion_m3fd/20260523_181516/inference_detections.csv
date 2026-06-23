@@ -1,0 +1,1 @@
+frame_id,timestamp,frame_stem,det_idx,class_name,label,confidence,x1,y1,x2,y2,bbox_w,bbox_h,track_id

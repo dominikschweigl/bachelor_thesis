@@ -1,0 +1,82 @@
+{
+  "mAP_50": 0.894,
+  "per_class": {
+    "car": {
+      "AP_50": 0.9358,
+      "precision": 0.9351,
+      "recall": 0.9007,
+      "accuracy": 0.8477,
+      "n_gt": 21193,
+      "n_pred": 20413,
+      "AP_50_95": 0.6966
+    },
+    "truck": {
+      "AP_50": 0.8139,
+      "precision": 0.8161,
+      "recall": 0.7605,
+      "accuracy": 0.6492,
+      "n_gt": 2380,
+      "n_pred": 2218,
+      "AP_50_95": 0.5978
+    },
+    "bus": {
+      "AP_50": 0.9323,
+      "precision": 0.9399,
+      "recall": 0.8968,
+      "accuracy": 0.8482,
+      "n_gt": 785,
+      "n_pred": 749,
+      "AP_50_95": 0.7475
+    }
+  },
+  "timing": {
+    "frame_provider_ms": {
+      "mean": 0.444,
+      "p95": 2.804,
+      "p99": 8.812
+    },
+    "align_ms": {
+      "mean": 57.108,
+      "p95": 88.651,
+      "p99": 110.649
+    },
+    "pre_ms": {
+      "mean": 36.054,
+      "p95": 62.212,
+      "p99": 78.784
+    },
+    "infer_ms": {
+      "mean": 16.617,
+      "p95": 20.134,
+      "p99": 22.942
+    },
+    "post_ms": {
+      "mean": 0.387,
+      "p95": 0.907,
+      "p99": 1.314
+    },
+    "track_ms": {
+      "mean": 4.501,
+      "p95": 10.124,
+      "p99": 13.932
+    },
+    "total_ms": {
+      "mean": 21.948,
+      "p95": 28.99,
+      "p99": 34.082
+    },
+    "fps": {
+      "mean": 41.71,
+      "p95": 44.6,
+      "p99": 45.4
+    }
+  },
+  "pipeline_workers": 4,
+  "frames_evaluated": 1463,
+  "frames_skipped": 0,
+  "mAP_50_95": 0.6806,
+  "charts": [
+    "/app/logs/20260524_042518/evaluation/temperature_chart.png",
+    "/app/logs/20260524_042518/evaluation/cpu_ram_usage_chart.png"
+  ]
+}

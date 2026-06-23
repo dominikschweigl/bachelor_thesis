@@ -1,0 +1,1 @@
+timestamp,frame_id,frame_stem,drift_ms,frame_provider_ms,align_ms,pre_ms,infer_ms,post_ms,track_ms,fps,n_detections,hailo_temp_c,hailo_pct,cpu_temp_c,cpu_pct,ram_used_mb

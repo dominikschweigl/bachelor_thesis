@@ -1,0 +1,100 @@
+{
+  "mAP_50": 0.6894,
+  "per_class": {
+    "person": {
+      "AP_50": 0.7558,
+      "precision": 0.6771,
+      "recall": 0.7018,
+      "accuracy": 0.5258,
+      "n_gt": 1700,
+      "n_pred": 1762,
+      "AP_50_95": 0.4647
+    },
+    "car": {
+      "AP_50": 0.8177,
+      "precision": 0.6892,
+      "recall": 0.7783,
+      "accuracy": 0.5761,
+      "n_gt": 2584,
+      "n_pred": 2918,
+      "AP_50_95": 0.6207
+    },
+    "bus": {
+      "AP_50": 0.6596,
+      "precision": 0.5738,
+      "recall": 0.5833,
+      "accuracy": 0.407,
+      "n_gt": 60,
+      "n_pred": 61,
+      "AP_50_95": 0.525
+    },
+    "motorcycle": {
+      "AP_50": 0.5166,
+      "precision": 0.5,
+      "recall": 0.4,
+      "accuracy": 0.2857,
+      "n_gt": 55,
+      "n_pred": 44,
+      "AP_50_95": 0.2909
+    },
+    "truck": {
+      "AP_50": 0.6973,
+      "precision": 0.6612,
+      "recall": 0.5714,
+      "accuracy": 0.442,
+      "n_gt": 140,
+      "n_pred": 121,
+      "AP_50_95": 0.5411
+    }
+  },
+  "timing": {
+    "frame_provider_ms": {
+      "mean": 1.456,
+      "p95": 9.542,
+      "p99": 19.677
+    },
+    "align_ms": {
+      "mean": 75.785,
+      "p95": 112.141,
+      "p99": 136.498
+    },
+    "pre_ms": {
+      "mean": 36.707,
+      "p95": 61.533,
+      "p99": 78.597
+    },
+    "infer_ms": {
+      "mean": 21.492,
+      "p95": 25.933,
+      "p99": 27.955
+    },
+    "post_ms": {
+      "mean": 0.247,
+      "p95": 0.673,
+      "p99": 1.089
+    },
+    "track_ms": {
+      "mean": 3.076,
+      "p95": 7.755,
+      "p99": 9.81
+    },
+    "total_ms": {
+      "mean": 26.271,
+      "p95": 34.724,
+      "p99": 43.818
+    },
+    "fps": {
+      "mean": 34.17,
+      "p95": 36.87,
+      "p99": 38.02
+    }
+  },
+  "pipeline_workers": 4,
+  "frames_evaluated": 624,
+  "frames_skipped": 0,
+  "mAP_50_95": 0.4885,
+  "charts": [
+    "/app/logs/20260523_182025/evaluation/temperature_chart.png",
+    "/app/logs/20260523_182025/evaluation/cpu_ram_usage_chart.png"
+  ]
+}

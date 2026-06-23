@@ -1,0 +1,109 @@
+{
+  "mAP_50": 0.9347,
+  "per_class": {
+    "person": {
+      "AP_50": 0.995,
+      "precision": 0.9896,
+      "recall": 1.0,
+      "accuracy": 0.9896,
+      "n_gt": 191,
+      "n_pred": 193,
+      "AP_50_95": 0.792
+    },
+    "car": {
+      "AP_50": 0.9565,
+      "precision": 0.8372,
+      "recall": 0.9633,
+      "accuracy": 0.8113,
+      "n_gt": 790,
+      "n_pred": 909,
+      "AP_50_95": 0.8436
+    },
+    "motorcycle": {
+      "AP_50": 0.995,
+      "precision": 1.0,
+      "recall": 1.0,
+      "accuracy": 1.0,
+      "n_gt": 4,
+      "n_pred": 4,
+      "AP_50_95": 0.8793
+    },
+    "bicycle": {
+      "AP_50": 0.995,
+      "precision": 1.0,
+      "recall": 1.0,
+      "accuracy": 1.0,
+      "n_gt": 31,
+      "n_pred": 31,
+      "AP_50_95": 0.798
+    },
+    "bus": {
+      "AP_50": 0.7939,
+      "precision": 0.5556,
+      "recall": 0.7143,
+      "accuracy": 0.4545,
+      "n_gt": 7,
+      "n_pred": 9,
+      "AP_50_95": 0.7784
+    },
+    "truck": {
+      "AP_50": 0.8727,
+      "precision": 0.953,
+      "recall": 0.7614,
+      "accuracy": 0.7339,
+      "n_gt": 373,
+      "n_pred": 298,
+      "AP_50_95": 0.7402
+    }
+  },
+  "timing": {
+    "frame_provider_ms": {
+      "mean": 2.03,
+      "p95": 11.816,
+      "p99": 20.209
+    },
+    "align_ms": {
+      "mean": 64.52,
+      "p95": 99.803,
+      "p99": 119.772
+    },
+    "pre_ms": {
+      "mean": 37.517,
+      "p95": 70.499,
+      "p99": 80.208
+    },
+    "infer_ms": {
+      "mean": 21.135,
+      "p95": 25.256,
+      "p99": 27.569
+    },
+    "post_ms": {
+      "mean": 0.093,
+      "p95": 0.299,
+      "p99": 0.404
+    },
+    "track_ms": {
+      "mean": 0.67,
+      "p95": 1.752,
+      "p99": 3.774
+    },
+    "total_ms": {
+      "mean": 23.928,
+      "p95": 34.514,
+      "p99": 42.977
+    },
+    "fps": {
+      "mean": 36.86,
+      "p95": 37.87,
+      "p99": 38.34
+    }
+  },
+  "pipeline_workers": 4,
+  "frames_evaluated": 1885,
+  "frames_skipped": 0,
+  "mAP_50_95": 0.8052,
+  "charts": [
+    "/app/logs/20260523_172240/evaluation/temperature_chart.png",
+    "/app/logs/20260523_172240/evaluation/cpu_ram_usage_chart.png"
+  ]
+}
